@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/go-martini/martini"
-	pez "github.com/pivotalservice/pezdispenser"
+	pez "github.com/pivotalservices/pezdispenser"
 )
 
 func main() {
