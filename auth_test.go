@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("Authentication", func() {
 	Describe("InitAuth", func() {
-		var m *ClassicMartini
+		var m *martini.ClassicMartini
 		BeforeEach(func() {
 			m = martini.Classic()
 		})
