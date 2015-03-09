@@ -7,33 +7,36 @@ import (
 )
 
 const (
-	ApiVersion = "v1"
-	indexRoute = "/"
-	leasePath  = "lease"
-	lockPath   = "lock"
-	typePath   = "type"
-	itemPath   = "item"
-	invGuid    = ":inventoryTypeGuid"
-	typeGuid   = ":inventoryItemGuid"
+	ApiVersion1 = "v1"
+	indexRoute  = "/"
+	leasePath   = "lease"
+	lockPath    = "lock"
+	typePath    = "type"
+	itemPath    = "item"
+	InvGuid     = "inventoryTypeGuid"
+	TypeGuid    = "inventoryItemGuid"
 )
 
 var (
-	UrlLeaseBase = fmt.Sprintf("/%s/%s", ApiVersion, leasePath)
-	UrlLockBase  = fmt.Sprintf("/%s/%s", ApiVersion, lockPath)
-	UrlTypeGuid  = fmt.Sprintf("/%s/%s", typePath, typeGuid)
-	UrlItemGuid  = fmt.Sprintf("/%s/%s", itemPath, invGuid)
+	UrlLeaseBaseV1 = fmt.Sprintf("/%s/%s", ApiVersion1, leasePath)
+	UrlLockBaseV1  = fmt.Sprintf("/%s/%s", ApiVersion1, lockPath)
+	UrlTypeGuid    = fmt.Sprintf("/%s/:%s", typePath, TypeGuid)
+	UrlItemGuid    = fmt.Sprintf("/%s/:%s", itemPath, InvGuid)
 )
 
 func InitRoutes(m *martini.ClassicMartini) {
 
-	m.Group(UrlLeaseBase, func(r martini.Router) {
-		r.Post(UrlTypeGuid, RandomController)
-		r.Post(UrlItemGuid, RandomController)
-		r.Delete(UrlItemGuid, RandomController)
+	m.Group(UrlLeaseBaseV1, func(r martini.Router) {
+		itemLeaseController := NewLeaseController(ApiVersion1, Item)
+		typeLeaseController := NewLeaseController(ApiVersion1, Type)
+		r.Post(UrlTypeGuid, typeLeaseController.Post())
+		r.Post(UrlItemGuid, itemLeaseController.Post())
+		r.Delete(UrlItemGuid, itemLeaseController.Delete())
 	})
 
-	m.Group(UrlLockBase, func(r martini.Router) {
-		r.Post(UrlItemGuid, RandomController)
-		r.Get(UrlItemGuid, RandomController)
+	m.Group(UrlLockBaseV1, func(r martini.Router) {
+		lockController := NewLockController(ApiVersion1)
+		r.Post(UrlItemGuid, lockController.Post())
+		r.Get(UrlItemGuid, lockController.Get())
 	})
 }

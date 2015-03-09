@@ -2,6 +2,12 @@ package pezdispenser
 
 import (
 	"github.com/go-martini/martini"
+	"github.com/martini-contrib/auth"
+)
+
+const (
+	user = "admin"
+	pass = "temporary"
 )
 
 type martiniUseable interface {
@@ -9,10 +15,7 @@ type martiniUseable interface {
 }
 
 func InitAuth(m martiniUseable) {
-	// do something here below copied from samples
-	//m.Use(func(res http.ResponseWriter, req *http.Request) {
-	//if req.Header.Get("X-API-KEY") != "secret123" {
-	//res.WriteHeader(http.StatusUnauthorized)
-	//}
-	//})
+	m.Use(auth.BasicFunc(func(username, password string) bool {
+		return auth.SecureCompare(username, user) && auth.SecureCompare(password, pass)
+	}))
 }

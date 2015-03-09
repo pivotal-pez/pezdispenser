@@ -16,6 +16,10 @@
 			"Rev": "6241001738f6e1b1ea7c4a4089195e1b0681609a"
 		},
 		{
+			"ImportPath": "github.com/martini-contrib/auth",
+			"Rev": "fa62c19b7ae87da370242054c8beb11af31d327f"
+		},
+		{
 			"ImportPath": "github.com/onsi/ginkgo",
 			"Comment": "v1.1.0-30-g5ce32b7",
 			"Rev": "5ce32b7910cdddcdd8bac6d761e2de9f27f9377b"
