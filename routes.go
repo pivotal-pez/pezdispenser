@@ -6,6 +6,7 @@ import (
 	"github.com/go-martini/martini"
 )
 
+//Constants to construct routes with
 const (
 	ApiVersion1 = "v1"
 	indexRoute  = "/"
@@ -17,6 +18,7 @@ const (
 	TypeGuid    = "inventoryItemGuid"
 )
 
+//formatted strings based on constants, to be used in URLs
 var (
 	UrlLeaseBaseV1 = fmt.Sprintf("/%s/%s", ApiVersion1, leasePath)
 	UrlLockBaseV1  = fmt.Sprintf("/%s/%s", ApiVersion1, lockPath)
@@ -24,6 +26,7 @@ var (
 	UrlItemGuid    = fmt.Sprintf("/%s/:%s", itemPath, InvGuid)
 )
 
+//InitRoutes - initialize the mappings for controllers against valid routes
 func InitRoutes(m *martini.ClassicMartini) {
 
 	m.Group(UrlLeaseBaseV1, func(r martini.Router) {

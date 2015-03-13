@@ -2,6 +2,7 @@ package pezdispenser
 
 import "github.com/go-martini/martini"
 
+//NewLockController - returns a controller interface build using the version argument
 func NewLockController(version string) (controller Controller) {
 	controller = &LockController{
 		version: version,
@@ -9,11 +10,13 @@ func NewLockController(version string) (controller Controller) {
 	return
 }
 
+//LockController - a controller for locking leases when they hit their expiration date
 type LockController struct {
 	controllerBase
 	version string
 }
 
+//Get - retuns a versioned controller for get requests
 func (s *LockController) Get() (post interface{}) {
 	switch s.version {
 	case ApiVersion1:
@@ -22,6 +25,7 @@ func (s *LockController) Get() (post interface{}) {
 	return
 }
 
+//Post - retuns a versioned controller for post requests
 func (s *LockController) Post() (post interface{}) {
 	switch s.version {
 	case ApiVersion1:

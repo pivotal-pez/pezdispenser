@@ -23,3 +23,6 @@ _testmain.go
 *.test
 *.prof
 coverage.out
+_builds
+_projects
+_steps
