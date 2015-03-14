@@ -16,7 +16,7 @@ type LockController struct {
 	version string
 }
 
-//Get - retuns a versioned controller for get requests
+//Get - returns a versioned controller for get requests
 func (s *LockController) Get() (post interface{}) {
 	switch s.version {
 	case APIVersion1:
@@ -25,7 +25,7 @@ func (s *LockController) Get() (post interface{}) {
 	return
 }
 
-//Post - retuns a versioned controller for post requests
+//Post - returns a versioned controller for post requests
 func (s *LockController) Post() (post interface{}) {
 	switch s.version {
 	case APIVersion1:
