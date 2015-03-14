@@ -19,7 +19,7 @@ type LockController struct {
 //Get - retuns a versioned controller for get requests
 func (s *LockController) Get() (post interface{}) {
 	switch s.version {
-	case ApiVersion1:
+	case APIVersion1:
 		post = s.getV1
 	}
 	return
@@ -28,16 +28,20 @@ func (s *LockController) Get() (post interface{}) {
 //Post - retuns a versioned controller for post requests
 func (s *LockController) Post() (post interface{}) {
 	switch s.version {
-	case ApiVersion1:
+	case APIVersion1:
 		post = s.postV1
 	}
 	return
 }
 
-func (s *LockController) getV1(params martini.Params) string {
-	return "Hello " + params[TypeGuid]
+func (s *LockController) getV1(params martini.Params) (res string) {
+	inventoryGUID := params[ItemGUID]
+	res = inventoryGUID
+	return
 }
 
-func (s *LockController) postV1(params martini.Params) string {
-	return "Hello " + params[TypeGuid]
+func (s *LockController) postV1(params martini.Params) (res string) {
+	inventoryGUID := params[ItemGUID]
+	res = inventoryGUID
+	return
 }

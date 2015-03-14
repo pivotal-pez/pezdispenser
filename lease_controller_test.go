@@ -12,7 +12,7 @@ var _ = Describe("LeaseController", func() {
 		var controller Controller
 
 		BeforeEach(func() {
-			controller = NewLeaseController(ApiVersion1, Type)
+			controller = NewLeaseController(APIVersion1, Type)
 		})
 
 		Context("calling Get()", func() {
@@ -30,14 +30,28 @@ var _ = Describe("LeaseController", func() {
 					Ω(fnc).ShouldNot(BeNil())
 				}).ShouldNot(Panic())
 			})
+
+			Context("calling the function returned from Post()", func() {
+				var fnc func(martini.Params) string
+
+				BeforeEach(func() {
+					fnc = controller.Post().(func(martini.Params) string)
+				})
+
+				It("Should not panic", func() {
+					Ω(func() {
+						fnc(martini.Params{TypeGUID: "something"})
+					}).ShouldNot(Panic())
+				})
+			})
 		})
 
 		Context("calling Delete()", func() {
-			It("Should return a function of the correct format and not panic", func() {
+			It("Should panic", func() {
 				Ω(func() {
-					fnc := controller.Delete().(func(martini.Params) string)
-					Ω(fnc).ShouldNot(BeNil())
-				}).ShouldNot(Panic())
+					x := controller.Delete().(func(martini.Params) string)
+					_ = x
+				}).Should(Panic())
 			})
 		})
 	})
@@ -46,7 +60,7 @@ var _ = Describe("LeaseController", func() {
 		var controller Controller
 
 		BeforeEach(func() {
-			controller = NewLeaseController(ApiVersion1, Item)
+			controller = NewLeaseController(APIVersion1, Item)
 		})
 
 		Context("calling Get()", func() {
@@ -64,6 +78,23 @@ var _ = Describe("LeaseController", func() {
 					Ω(fnc).ShouldNot(BeNil())
 				}).ShouldNot(Panic())
 			})
+
+			Context("calling the function returned from Post()", func() {
+				var fnc func(martini.Params) string
+
+				BeforeEach(func() {
+					fnc = controller.Post().(func(martini.Params) string)
+				})
+
+				Context("with valid arguments", func() {
+
+					It("Should not panic", func() {
+						Ω(func() {
+							fnc(martini.Params{ItemGUID: "something"})
+						}).ShouldNot(Panic())
+					})
+				})
+			})
 		})
 
 		Context("calling Delete()", func() {
@@ -72,6 +103,21 @@ var _ = Describe("LeaseController", func() {
 					fnc := controller.Delete().(func(martini.Params) string)
 					Ω(fnc).ShouldNot(BeNil())
 				}).ShouldNot(Panic())
+			})
+
+			Context("calling the function returned from Delete()", func() {
+				var fnc func(martini.Params) string
+
+				BeforeEach(func() {
+					fnc = controller.Delete().(func(martini.Params) string)
+				})
+				Context("with valid arguments", func() {
+					It("Should not panic", func() {
+						Ω(func() {
+							fnc(martini.Params{ItemGUID: "something"})
+						}).ShouldNot(Panic())
+					})
+				})
 			})
 		})
 	})

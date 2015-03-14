@@ -6,7 +6,6 @@ build:
     - setup-go-workspace
     - wercker/golint
 
-
     # Get the dependencies
     - script:
         name: go get

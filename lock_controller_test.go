@@ -11,7 +11,7 @@ var _ = Describe("LockController", func() {
 	var controller Controller
 
 	BeforeEach(func() {
-		controller = NewLockController(ApiVersion1)
+		controller = NewLockController(APIVersion1)
 	})
 
 	Context("calling Get()", func() {
@@ -21,6 +21,20 @@ var _ = Describe("LockController", func() {
 				Ω(fnc).ShouldNot(BeNil())
 			}).ShouldNot(Panic())
 		})
+
+		Context("calling the function returned from Post()", func() {
+			var fnc func(martini.Params) string
+
+			BeforeEach(func() {
+				fnc = controller.Get().(func(martini.Params) string)
+			})
+
+			It("Should not panic", func() {
+				Ω(func() {
+					fnc(martini.Params{ItemGUID: "something"})
+				}).ShouldNot(Panic())
+			})
+		})
 	})
 
 	Context("calling Post()", func() {
@@ -29,6 +43,20 @@ var _ = Describe("LockController", func() {
 				fnc := controller.Post().(func(martini.Params) string)
 				Ω(fnc).ShouldNot(BeNil())
 			}).ShouldNot(Panic())
+		})
+
+		Context("calling the function returned from Post()", func() {
+			var fnc func(martini.Params) string
+
+			BeforeEach(func() {
+				fnc = controller.Post().(func(martini.Params) string)
+			})
+
+			It("Should not panic", func() {
+				Ω(func() {
+					fnc(martini.Params{ItemGUID: "something"})
+				}).ShouldNot(Panic())
+			})
 		})
 	})
 

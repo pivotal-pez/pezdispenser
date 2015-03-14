@@ -23,30 +23,19 @@ type LeaseTypeController struct {
 	version string
 }
 
-//Delete - this will return the versioned controller for a delete rest call
-func (s *LeaseTypeController) Delete() (post interface{}) {
-	switch s.version {
-	case ApiVersion1:
-		post = s.postV1
-	}
-	return
-}
-
 //Post - this will return the versioned controller for a post rest call
 func (s *LeaseTypeController) Post() (post interface{}) {
 	switch s.version {
-	case ApiVersion1:
+	case APIVersion1:
 		post = s.postV1
 	}
 	return
 }
 
-func (s *LeaseTypeController) postV1(params martini.Params) string {
-	return "Hello " + params[TypeGuid]
-}
-
-func (s *LeaseTypeController) deleteV1(params martini.Params) string {
-	return "Hello " + params[TypeGuid]
+func (s *LeaseTypeController) postV1(params martini.Params) (res string) {
+	typeGUID := params[TypeGUID]
+	res = typeGUID
+	return
 }
 
 //LeaseItemController - this is a controller for a lease for a specific item
@@ -58,8 +47,8 @@ type LeaseItemController struct {
 //Delete - this will return the versioned controller for a delete rest call
 func (s *LeaseItemController) Delete() (post interface{}) {
 	switch s.version {
-	case ApiVersion1:
-		post = s.postV1
+	case APIVersion1:
+		post = s.deleteV1
 	}
 	return
 }
@@ -67,16 +56,20 @@ func (s *LeaseItemController) Delete() (post interface{}) {
 //Post - this will return the versioned controller for a post rest call
 func (s *LeaseItemController) Post() (post interface{}) {
 	switch s.version {
-	case ApiVersion1:
+	case APIVersion1:
 		post = s.postV1
 	}
 	return
 }
 
-func (s *LeaseItemController) postV1(params martini.Params) string {
-	return "Hello " + params[TypeGuid]
+func (s *LeaseItemController) postV1(params martini.Params) (res string) {
+	itemGUID := params[ItemGUID]
+	res = itemGUID
+	return
 }
 
-func (s *LeaseItemController) deleteV1(params martini.Params) string {
-	return "Hello " + params[TypeGuid]
+func (s *LeaseItemController) deleteV1(params martini.Params) (res string) {
+	itemGUID := params[ItemGUID]
+	res = itemGUID
+	return
 }
