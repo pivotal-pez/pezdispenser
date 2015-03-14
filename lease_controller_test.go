@@ -24,6 +24,7 @@ var _ = Describe("LeaseController", func() {
 		})
 
 		Context("calling Post()", func() {
+
 			It("Should return a function of the correct format and not panic", func() {
 				Ω(func() {
 					fnc := controller.Post().(func(martini.Params) string)
@@ -38,15 +39,26 @@ var _ = Describe("LeaseController", func() {
 					fnc = controller.Post().(func(martini.Params) string)
 				})
 
-				It("Should not panic", func() {
-					Ω(func() {
-						fnc(martini.Params{TypeGUID: "something"})
-					}).ShouldNot(Panic())
+				Context("with valid arguments", func() {
+					controlRes := "something"
+					args := martini.Params{TypeGUID: controlRes}
+
+					It("Should not panic", func() {
+						Ω(func() {
+							fnc(args)
+						}).ShouldNot(Panic())
+					})
+
+					It("Should return a string", func() {
+						res := fnc(args)
+						Ω(res).Should(Equal(controlRes))
+					})
 				})
 			})
 		})
 
 		Context("calling Delete()", func() {
+
 			It("Should panic", func() {
 				Ω(func() {
 					x := controller.Delete().(func(martini.Params) string)
@@ -72,6 +84,7 @@ var _ = Describe("LeaseController", func() {
 		})
 
 		Context("calling Post()", func() {
+
 			It("Should return a function of the correct format and not panic", func() {
 				Ω(func() {
 					fnc := controller.Post().(func(martini.Params) string)
@@ -105,6 +118,7 @@ var _ = Describe("LeaseController", func() {
 		})
 
 		Context("calling Delete()", func() {
+
 			It("Should return a function of the correct format and not panic", func() {
 				Ω(func() {
 					fnc := controller.Delete().(func(martini.Params) string)
@@ -118,11 +132,20 @@ var _ = Describe("LeaseController", func() {
 				BeforeEach(func() {
 					fnc = controller.Delete().(func(martini.Params) string)
 				})
+
 				Context("with valid arguments", func() {
+					controlRes := "something"
+					args := martini.Params{ItemGUID: controlRes}
+
 					It("Should not panic", func() {
 						Ω(func() {
-							fnc(martini.Params{ItemGUID: "something"})
+							fnc(args)
 						}).ShouldNot(Panic())
+					})
+
+					It("Should return a string", func() {
+						res := fnc(args)
+						Ω(res).Should(Equal(controlRes))
 					})
 				})
 			})

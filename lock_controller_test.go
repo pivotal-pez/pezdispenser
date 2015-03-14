@@ -29,10 +29,20 @@ var _ = Describe("LockController", func() {
 				fnc = controller.Get().(func(martini.Params) string)
 			})
 
-			It("Should not panic", func() {
-				Ω(func() {
-					fnc(martini.Params{ItemGUID: "something"})
-				}).ShouldNot(Panic())
+			Context("when given valid arguments", func() {
+				controlRes := "something"
+				args := martini.Params{ItemGUID: controlRes}
+
+				It("Should not panic", func() {
+					Ω(func() {
+						fnc(martini.Params{ItemGUID: "something"})
+					}).ShouldNot(Panic())
+				})
+
+				It("should return string", func() {
+					res := fnc(args)
+					Ω(res).Should(Equal(controlRes))
+				})
 			})
 		})
 	})
@@ -52,10 +62,20 @@ var _ = Describe("LockController", func() {
 				fnc = controller.Post().(func(martini.Params) string)
 			})
 
-			It("Should not panic", func() {
-				Ω(func() {
-					fnc(martini.Params{ItemGUID: "something"})
-				}).ShouldNot(Panic())
+			Context("when given valid arguments", func() {
+				controlRes := "something"
+				args := martini.Params{ItemGUID: controlRes}
+
+				It("Should not panic", func() {
+					Ω(func() {
+						fnc(args)
+					}).ShouldNot(Panic())
+				})
+
+				It("should return string", func() {
+					res := fnc(args)
+					Ω(res).Should(Equal(controlRes))
+				})
 			})
 		})
 	})
