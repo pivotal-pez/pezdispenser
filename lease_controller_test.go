@@ -87,11 +87,18 @@ var _ = Describe("LeaseController", func() {
 				})
 
 				Context("with valid arguments", func() {
+					controlRes := "something"
+					args := martini.Params{ItemGUID: controlRes}
 
 					It("Should not panic", func() {
 						Ω(func() {
-							fnc(martini.Params{ItemGUID: "something"})
+							fnc(args)
 						}).ShouldNot(Panic())
+					})
+
+					It("Should return a string", func() {
+						res := fnc(args)
+						Ω(res).Should(Equal(controlRes))
 					})
 				})
 			})
