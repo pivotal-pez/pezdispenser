@@ -39,10 +39,18 @@ var _ = Describe("LockController", func() {
 					}).ShouldNot(Panic())
 				})
 
-				It("should return string", func() {
-					res := fnc(args)
-					Ω(res).Should(Equal(controlRes))
+				Context("string response from controller", func() {
+					var res string
+
+					BeforeEach(func() {
+						res = fnc(args)
+					})
+
+					It("Should return a valid response object", func() {
+						isValidResponseMessage(res, controlRes)
+					})
 				})
+
 			})
 		})
 	})
@@ -72,9 +80,16 @@ var _ = Describe("LockController", func() {
 					}).ShouldNot(Panic())
 				})
 
-				It("should return string", func() {
-					res := fnc(args)
-					Ω(res).Should(Equal(controlRes))
+				Context("string response from controller", func() {
+					var res string
+
+					BeforeEach(func() {
+						res = fnc(args)
+					})
+
+					It("Should return a valid response object", func() {
+						isValidResponseMessage(res, controlRes)
+					})
 				})
 			})
 		})

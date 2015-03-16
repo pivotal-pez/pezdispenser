@@ -1,6 +1,10 @@
 package pezdispenser
 
-import "github.com/go-martini/martini"
+import (
+	"encoding/json"
+
+	"github.com/go-martini/martini"
+)
 
 //NewLeaseController - builds a new object of type controller from arguments
 func NewLeaseController(version string, category int) (controller Controller) {
@@ -13,7 +17,39 @@ func NewLeaseController(version string, category int) (controller Controller) {
 		controller = &LeaseTypeController{
 			version: version,
 		}
+	case List:
+		controller = &LeaseListController{
+			version: version,
+		}
 	}
+	return
+}
+
+//LeaseTypeController - this is a controller for a lease for a specific type
+type LeaseListController struct {
+	controllerBase
+	version string
+}
+
+//Get - this will return the versioned controller for a get rest call
+func (s *LeaseListController) Get() (get interface{}) {
+	get = s.getFnc
+	return
+}
+
+func (s *LeaseListController) getFnc() (res string) {
+	f := NewFinder()
+	dispenserList := f.GetAll()
+	resObj := ResponseMessage{Version: s.version}
+	res = genericControlFormatter(resObj, func() (res []byte, err error) {
+		r := []string{}
+
+		for _, d := range dispenserList {
+			r = append(r, d.GUID())
+		}
+		res, err = json.Marshal(r)
+		return
+	})
 	return
 }
 
@@ -25,16 +61,31 @@ type LeaseTypeController struct {
 
 //Post - this will return the versioned controller for a post rest call
 func (s *LeaseTypeController) Post() (post interface{}) {
-	switch s.version {
-	case APIVersion1:
-		post = s.postV1
-	}
+	post = s.postFnc
 	return
 }
 
-func (s *LeaseTypeController) postV1(params martini.Params) (res string) {
+//Get - this will return the versioned controller for a get rest call
+func (s *LeaseTypeController) Get() (get interface{}) {
+	get = s.getFnc
+	return
+}
+
+func (s *LeaseTypeController) getFnc(params martini.Params) (res string) {
 	typeGUID := params[TypeGUID]
-	res = typeGUID
+	f := NewFinder()
+	dispenser := f.GetByTypeGUID(typeGUID)
+	resObj := ResponseMessage{Version: s.version}
+	res = genericControlFormatter(resObj, dispenser.Status)
+	return
+}
+
+func (s *LeaseTypeController) postFnc(params martini.Params) (res string) {
+	typeGUID := params[TypeGUID]
+	f := NewFinder()
+	dispenser := f.GetByTypeGUID(typeGUID)
+	resObj := ResponseMessage{Version: s.version}
+	res = genericControlFormatter(resObj, dispenser.Lease)
 	return
 }
 
@@ -46,30 +97,45 @@ type LeaseItemController struct {
 
 //Delete - this will return the versioned controller for a delete rest call
 func (s *LeaseItemController) Delete() (post interface{}) {
-	switch s.version {
-	case APIVersion1:
-		post = s.deleteV1
-	}
+	post = s.deleteFnc
 	return
 }
 
 //Post - this will return the versioned controller for a post rest call
 func (s *LeaseItemController) Post() (post interface{}) {
-	switch s.version {
-	case APIVersion1:
-		post = s.postV1
-	}
+	post = s.postFnc
 	return
 }
 
-func (s *LeaseItemController) postV1(params martini.Params) (res string) {
-	itemGUID := params[ItemGUID]
-	res = itemGUID
+//Get - this will return the versioned controller for a get rest call
+func (s *LeaseItemController) Get() (get interface{}) {
+	get = s.getFnc
 	return
 }
 
-func (s *LeaseItemController) deleteV1(params martini.Params) (res string) {
-	itemGUID := params[ItemGUID]
-	res = itemGUID
+func (s *LeaseItemController) getFnc(params martini.Params) (res string) {
+	inventoryGUID := params[ItemGUID]
+	f := NewFinder()
+	dispenser := f.GetByItemGUID(inventoryGUID)
+	resObj := ResponseMessage{Version: s.version}
+	res = genericControlFormatter(resObj, dispenser.Status)
+	return
+}
+
+func (s *LeaseItemController) postFnc(params martini.Params) (res string) {
+	inventoryGUID := params[ItemGUID]
+	f := NewFinder()
+	dispenser := f.GetByItemGUID(inventoryGUID)
+	resObj := ResponseMessage{Version: s.version}
+	res = genericControlFormatter(resObj, dispenser.Lease)
+	return
+}
+
+func (s *LeaseItemController) deleteFnc(params martini.Params) (res string) {
+	inventoryGUID := params[ItemGUID]
+	f := NewFinder()
+	dispenser := f.GetByItemGUID(inventoryGUID)
+	resObj := ResponseMessage{Version: s.version}
+	res = genericControlFormatter(resObj, dispenser.Unlease)
 	return
 }

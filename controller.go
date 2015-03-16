@@ -1,11 +1,17 @@
 package pezdispenser
 
-import "errors"
+import (
+	"encoding/json"
+	"errors"
+)
 
 //Different contexts for rest calls
 const (
 	Type = iota
 	Item
+	List
+	SuccessStatus = "success"
+	FailureStatus = "error"
 )
 
 //Definition of errors for controller
@@ -20,6 +26,12 @@ type Controller interface {
 	Get() interface{}
 	Post() interface{}
 	Delete() interface{}
+}
+
+type ResponseMessage struct {
+	Version string
+	Body    []byte
+	Status  string
 }
 
 type controllerBase struct {
@@ -37,5 +49,27 @@ func (s *controllerBase) Delete() (i interface{}) {
 
 func (s *controllerBase) Get() (i interface{}) {
 	panic(ErrUndefinedGet)
+	return
+}
+
+func genericControlFormatter(resObj ResponseMessage, action func() ([]byte, error)) (res string) {
+	var (
+		err  error
+		resB []byte
+	)
+
+	if stat, err := action(); err == nil {
+		resObj.Status = SuccessStatus
+		resObj.Body = stat
+
+	} else {
+		resObj.Status = FailureStatus
+	}
+
+	if resB, err = json.Marshal(resObj); err != nil {
+		res = err.Error()
+	} else {
+		res = string(resB[:])
+	}
 	return
 }

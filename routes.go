@@ -24,6 +24,7 @@ var (
 	URLLockBaseV1  = fmt.Sprintf("/%s/%s", APIVersion1, lockPath)
 	URLTypeGUID    = fmt.Sprintf("/%s/:%s", typePath, TypeGUID)
 	URLItemGUID    = fmt.Sprintf("/%s/:%s", itemPath, ItemGUID)
+	URLLeases      = "/list"
 )
 
 //InitRoutes - initialize the mappings for controllers against valid routes
@@ -32,9 +33,15 @@ func InitRoutes(m *martini.ClassicMartini) {
 	m.Group(URLLeaseBaseV1, func(r martini.Router) {
 		itemLeaseController := NewLeaseController(APIVersion1, Item)
 		typeLeaseController := NewLeaseController(APIVersion1, Type)
+
 		r.Post(URLTypeGUID, typeLeaseController.Post())
+		r.Get(URLTypeGUID, typeLeaseController.Get())
+
 		r.Post(URLItemGUID, itemLeaseController.Post())
+		r.Get(URLItemGUID, itemLeaseController.Get())
 		r.Delete(URLItemGUID, itemLeaseController.Delete())
+
+		r.Get(URLLeases, itemLeaseController.Get())
 	})
 
 	m.Group(URLLockBaseV1, func(r martini.Router) {
