@@ -25,7 +25,7 @@ func NewLeaseController(version string, category int) (controller Controller) {
 	return
 }
 
-//LeaseTypeController - this is a controller for a lease for a specific type
+//LeaseListController - this is a controller for a lease for a specific type
 type LeaseListController struct {
 	controllerBase
 	version string

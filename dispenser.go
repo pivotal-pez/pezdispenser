@@ -1,11 +1,13 @@
 package pezdispenser
 
+//DispenserFinder - interfcae for a object to find Dispensers
 type DispenserFinder interface {
 	GetAll() []Dispenser
 	GetByTypeGUID(string) Dispenser
 	GetByItemGUID(string) Dispenser
 }
 
+//Dispenser - a interface for leasable inventory
 type Dispenser interface {
 	GUID() string
 	Status() ([]byte, error)
@@ -16,6 +18,7 @@ type Dispenser interface {
 	Renew() ([]byte, error)
 }
 
+//NewFinder - returns a DispenserFinder interface
 func NewFinder() (f DispenserFinder) {
 	f = new(finder)
 	return
@@ -24,57 +27,57 @@ func NewFinder() (f DispenserFinder) {
 type finder struct{}
 
 func (s *finder) GetAll() (d []Dispenser) {
-	d1 := &FakeDispenser{guid: "abcGUID"}
-	d2 := &FakeDispenser{guid: "123GUID"}
+	d1 := &fakeDispenser{guid: "abcGUID"}
+	d2 := &fakeDispenser{guid: "123GUID"}
 	d = []Dispenser{d1, d2}
 	return
 }
 
 func (s *finder) GetByTypeGUID(guid string) (d Dispenser) {
-	d = &FakeDispenser{guid: guid}
+	d = &fakeDispenser{guid: guid}
 	return
 }
 
 func (s *finder) GetByItemGUID(guid string) (d Dispenser) {
-	d = &FakeDispenser{guid: guid}
+	d = &fakeDispenser{guid: guid}
 	return
 }
 
-type FakeDispenser struct {
+type fakeDispenser struct {
 	guid string
 }
 
-func (s *FakeDispenser) GUID() (guid string) {
+func (s *fakeDispenser) GUID() (guid string) {
 	guid = s.guid
 	return
 }
 
-func (s *FakeDispenser) Status() (res []byte, err error) {
+func (s *fakeDispenser) Status() (res []byte, err error) {
 	res = []byte(s.guid)
 	return
 }
 
-func (s *FakeDispenser) Lock() (res []byte, err error) {
+func (s *fakeDispenser) Lock() (res []byte, err error) {
 	res = []byte(s.guid)
 	return
 }
 
-func (s *FakeDispenser) UnLock() (res []byte, err error) {
+func (s *fakeDispenser) UnLock() (res []byte, err error) {
 	res = []byte(s.guid)
 	return
 }
 
-func (s *FakeDispenser) Lease() (res []byte, err error) {
+func (s *fakeDispenser) Lease() (res []byte, err error) {
 	res = []byte(s.guid)
 	return
 }
 
-func (s *FakeDispenser) Unlease() (res []byte, err error) {
+func (s *fakeDispenser) Unlease() (res []byte, err error) {
 	res = []byte(s.guid)
 	return
 }
 
-func (s *FakeDispenser) Renew() (res []byte, err error) {
+func (s *fakeDispenser) Renew() (res []byte, err error) {
 	res = []byte(s.guid)
 	return
 }

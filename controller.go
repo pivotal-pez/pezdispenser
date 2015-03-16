@@ -28,6 +28,7 @@ type Controller interface {
 	Delete() interface{}
 }
 
+//ResponseMessage - this is the structure of a response from any call to a controller
 type ResponseMessage struct {
 	Version string
 	Body    []byte
