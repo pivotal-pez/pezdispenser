@@ -27,7 +27,7 @@ build:
     - script:
         name: go test cover
         code: |
-          ./testCoverage ./... $COVERAGE_WATERMARK
+          (cd $WERCKER_SOURCE_DIR && ./testCoverage ./... $COVERAGE_WATERMARK)
 
     - script:
         name: add repo to artifact
