@@ -1,1 +1,1 @@
-web: pezdispenser-service 
+web: pezdispenser

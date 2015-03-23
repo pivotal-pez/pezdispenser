@@ -29,11 +29,18 @@ var (
 
 //InitRoutes - initialize the mappings for controllers against valid routes
 func InitRoutes(m *martini.ClassicMartini) {
+	itemLeaseController := NewLeaseController(APIVersion1, Item)
+	typeLeaseController := NewLeaseController(APIVersion1, Type)
+	listLeaseController := NewLeaseController(APIVersion1, List)
+	lockController := NewLockController(APIVersion1)
+
+	m.Group("/", func(r martini.Router) {
+		r.Get("info", func() string {
+			return "the dispenser service will give you candy"
+		})
+	})
 
 	m.Group(URLLeaseBaseV1, func(r martini.Router) {
-		itemLeaseController := NewLeaseController(APIVersion1, Item)
-		typeLeaseController := NewLeaseController(APIVersion1, Type)
-
 		r.Post(URLTypeGUID, typeLeaseController.Post())
 		r.Get(URLTypeGUID, typeLeaseController.Get())
 
@@ -41,11 +48,10 @@ func InitRoutes(m *martini.ClassicMartini) {
 		r.Get(URLItemGUID, itemLeaseController.Get())
 		r.Delete(URLItemGUID, itemLeaseController.Delete())
 
-		r.Get(URLLeases, itemLeaseController.Get())
+		r.Get(URLLeases, listLeaseController.Get())
 	})
 
 	m.Group(URLLockBaseV1, func(r martini.Router) {
-		lockController := NewLockController(APIVersion1)
 		r.Post(URLItemGUID, lockController.Post())
 		r.Get(URLItemGUID, lockController.Get())
 	})

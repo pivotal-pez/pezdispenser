@@ -1,0 +1,4 @@
+---
+applications:
+- name: pezdispenser
+  buildpack: https://github.com/kr/heroku-buildpack-go.git

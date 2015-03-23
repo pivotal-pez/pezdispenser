@@ -6,7 +6,7 @@ import (
 	"github.com/go-martini/martini"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotalservices/pezdispenser"
+	. "github.com/pivotalservices/pezdispenser/service"
 )
 
 var _ = Describe("LeaseController", func() {
