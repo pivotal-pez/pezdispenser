@@ -1,4 +1,4 @@
-box: wercker/golang@1.3.2
+box: google/golang
 
 build:
   # The steps that will be executed on build
@@ -27,7 +27,12 @@ build:
     - script:
         name: go test cover
         code: |
-          ./testCoverage ./... $COVERAGE_WATERMARK
+          (cd $WERCKER_SOURCE_DIR && ./testCoverage ./... $COVERAGE_WATERMARK)
+
+    - script:
+        name: build the server binary
+        code: |
+          godep go build main.go
 
     - script:
         name: add repo to artifact
