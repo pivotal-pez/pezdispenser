@@ -44,8 +44,8 @@ deploy:
     - install-packages:
         packages: ssh wget
 
-    #- add-ssh-key:
-        #keyname: PEZ_GITHUB_KEY
+    - add-ssh-key:
+        keyname: PEZ_GITHUB_KEY
     
     #- xchapter7x/cf-push-zdd:
         #user_name: $CF_USER
