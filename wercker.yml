@@ -69,9 +69,9 @@ deploy:
         domain: $CF_DOMAINNAME
 
     - script:
-        name: add repo to artifact
+        name: setting correct origin url
         code: |
-          cat .git/config
+          git remote set-url origin ssh://git@github.com/pivotalservices/pezdispenser.git
 
     - xchapter7x/flowy-release:
         action: "complete-release"
