@@ -49,11 +49,6 @@ build:
         #git_name: jcalabrese
         #git_email: jcalabrese@pivotal.io
 
-    #- script:
-        #name: testing config
-        #code: |
-          #cat /root/.ssh/config
-
 deploy:
   steps: 
     - install-packages:
@@ -72,6 +67,11 @@ deploy:
         use_manifest: true
         host: $CF_HOSTNAME
         domain: $CF_DOMAINNAME
+
+    - script:
+        name: add repo to artifact
+        code: |
+          cat .git/config
 
     - xchapter7x/flowy-release:
         action: "complete-release"
