@@ -1,1 +1,1 @@
-web: main
+program: main

@@ -1,8 +1,5 @@
 ---
 applications:
 - name: pezdispenser
-  ## using cloudfoundry buildpack explicitly and/or from
-  ## the buildpack list both break. swapping out for heroku instead
-  #buildpack: https://github.com/cloudfoundry/go-buildpack.git
-  #buildpack: https://github.com/kr/heroku-buildpack-go.git
   buildpack: http://github.com/ryandotsmith/null-buildpack.git
+  command: ./main
