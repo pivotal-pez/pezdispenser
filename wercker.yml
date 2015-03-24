@@ -41,6 +41,9 @@ build:
 
 deploy:
   steps: 
+    - install-packages:
+        packages: ssh
+
     - add-ssh-key:
         keyname: PEZ_GITHUB_KEY
     
