@@ -80,14 +80,15 @@ deploy:
         name: flow
         code: |
           echo $VERSION_TAG
-          git checkout -b master origin/master && git pull origin master
-          git checkout -b develop origin/develop
-          git fetch --tags
-          git flow init -fd
-          git flow release start $VERSION_TAG develop
-          git flow release finish -m "Auto-Generated-Tag-$VERSION_TAG" $VERSION_TAG
-          git push origin master 
-          git push --tags 
-          git checkout develop 
-          git push origin develop
+          git checkout -b master origin/master || true
+          git pull origin master || true
+          git checkout -b develop origin/develop || true
+          git fetch --tags || true
+          git flow init -fd || true
+          git flow release start $VERSION_TAG develop || true
+          git flow release finish -m "Auto-Generated-Tag-$VERSION_TAG" $VERSION_TAG || true
+          git push origin master || true
+          git push --tags || true
+          git checkout develop || true
+          git push origin develop || true
 
