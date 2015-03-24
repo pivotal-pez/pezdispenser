@@ -47,16 +47,16 @@ deploy:
     - install-packages:
         packages: ssh wget  
     
-    #- xchapter7x/cf-push-zdd:
-        #user_name: $CF_USER
-        #user_pass: $CF_PASS
-        #org: $CF_ORG
-        #space: $CF_SPACE
-        #api_url: $CF_APIURL
-        #app_name: $CF_APPNAME
-        #use_manifest: true
-        #host: $CF_HOSTNAME
-        #domain: $CF_DOMAINNAME
+    - xchapter7x/cf-push-zdd:
+        user_name: $CF_USER
+        user_pass: $CF_PASS
+        org: $CF_ORG
+        space: $CF_SPACE
+        api_url: $CF_APIURL
+        app_name: $CF_APPNAME
+        use_manifest: true
+        host: $CF_HOSTNAME
+        domain: $CF_DOMAINNAME
 
     - script:
         name: setting correct origin url
