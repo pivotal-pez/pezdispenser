@@ -41,11 +41,11 @@ build:
 
 deploy:
   steps: 
-    - install-packages:
-        packages: ssh wget
-
     - add-ssh-key:
         keyname: PEZ_GITHUB_KEY
+    
+    - install-packages:
+        packages: wget  
     
     #- xchapter7x/cf-push-zdd:
         #user_name: $CF_USER
