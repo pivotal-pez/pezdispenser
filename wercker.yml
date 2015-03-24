@@ -58,10 +58,10 @@ deploy:
         #host: $CF_HOSTNAME
         #domain: $CF_DOMAINNAME
 
-    - script:
-        name: setting correct origin url
-        code: |
-          git remote set-url origin ssh://git@github.com/pivotalservices/pezdispenser.git
+    #- script:
+        #name: setting correct origin url
+        #code: |
+          #git remote set-url origin ssh://git@github.com/pivotalservices/pezdispenser.git
 
     #- xchapter7x/flowy-release:
         #action: "complete-release"
@@ -80,12 +80,16 @@ deploy:
         name: flow
         code: |
           echo $VERSION_TAG
+          git branch
+          git status
+          git log | head -10
           git tag -a $VERSION_TAG -m "version $VERSION_TAG"
           git checkout -b localbuild || true
           git checkout -b master origin/master || true
           git pull origin master || true
           git merge localbuild || true
-          git push --follow-tags origin master || true
+          git push origin master || true
+          git push --tags || true
           #git checkout -b develop origin/develop || true
           #git fetch --tags || true
           #git flow init -fd || true
