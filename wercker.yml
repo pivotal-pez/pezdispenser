@@ -39,10 +39,25 @@ build:
         code: |
           cp -R ./ ${WERCKER_OUTPUT_DIR}
 
+    #- install-packages:
+        #packages: ssh wget
+
+    #- xchapter7x/flowy-release:
+        #action: "complete-release"
+        #tag_variable_name: "VERSION_TAG"
+        #active: true
+        #git_name: jcalabrese
+        #git_email: jcalabrese@pivotal.io
+
+    #- script:
+        #name: testing config
+        #code: |
+          #cat /root/.ssh/config
+
 deploy:
   steps: 
     - install-packages:
-        packages: ssh
+        packages: ssh wget
 
     - add-ssh-key:
         keyname: PEZ_GITHUB_KEY
