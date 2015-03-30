@@ -62,6 +62,7 @@ deploy:
         host: $CF_HOSTNAME
         domain: $CF_DOMAINNAME
 
+    #will reactiveate this in favor of the below, when the step is modified
     #- xchapter7x/flowy-release:
         #action: "complete-release"
         #tag_variable_name: "VERSION_TAG"
