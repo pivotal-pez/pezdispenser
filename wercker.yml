@@ -41,9 +41,16 @@ build:
 
 deploy:
   steps: 
-    - add-ssh-key:
-        keyname: PEZ_GITHUB_KEY
-    
+    - install-packages:
+        packages: ssh wget  
+
+    - wercker/add-ssh-key@1.0.2:
+        keyname: PEZ_GITHUB_KEY  
+
+    - add-to-known_hosts:
+        hostname: github.com
+        fingerprint: 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48
+        
     - xchapter7x/cf-push-zdd:
         user_name: $CF_USER
         user_pass: $CF_PASS
@@ -55,6 +62,11 @@ deploy:
         host: $CF_HOSTNAME
         domain: $CF_DOMAINNAME
 
+    #- script:
+        #name: setting correct origin url
+        #code: |
+          #git remote set-url origin ssh://git@github.com/pivotalservices/pezdispenser.git
+
     - xchapter7x/flowy-release:
         action: "complete-release"
         tag_variable_name: "VERSION_TAG"
@@ -62,4 +74,34 @@ deploy:
         git_name: $GITFLOW_NAME
         git_email: $GITFLOW_EMAIL
 
-    
+    #- xchapter7x/flowy-release:
+        #action: "get-next"
+        #tag_variable_name: "VERSION_TAG"
+        #git_name: $GITFLOW_NAME
+        #git_email: $GITFLOW_EMAIL
+
+    #- script:
+        #name: flow
+        #code: |
+          #echo $VERSION_TAG
+          #git branch
+          #git status
+          #git log | head -10
+          #git tag -a $VERSION_TAG -m "version $VERSION_TAG"
+          #git checkout -b localbuild || true
+          #git checkout -b master origin/master || true
+          #git pull origin master || true
+          #git merge localbuild || true
+          #git push origin master || true
+          #git push --tags || true
+
+          #git checkout -b develop origin/develop || true
+          #git fetch --tags || true
+          #git flow init -fd || true
+          #git flow release start $VERSION_TAG develop || true
+          #git flow release finish -m "Auto-Generated-Tag-$VERSION_TAG" $VERSION_TAG || true
+          #git push origin master || true
+          #git push --tags || true
+          #git checkout develop || true
+          #git push origin develop || true
+

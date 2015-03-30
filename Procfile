@@ -1,1 +1,1 @@
-web: pezdispenser
+program: main
