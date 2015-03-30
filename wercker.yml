@@ -87,6 +87,7 @@ deploy:
             git tag -a $VERSION_TAG -m "version $VERSION_TAG"
             git checkout -b localbuild || true
             git checkout -b master origin/master || true
+            git checkout master
             git pull origin master
             git merge localbuild
             git status
