@@ -45,7 +45,7 @@ deploy:
         keyname: PEZ_GITHUB_KEY
     
     - install-packages:
-        packages: ssh wget  
+        packages: wget  
     
     - xchapter7x/cf-push-zdd:
         user_name: $CF_USER
@@ -58,10 +58,10 @@ deploy:
         host: $CF_HOSTNAME
         domain: $CF_DOMAINNAME
 
-    - script:
-        name: setting correct origin url
-        code: |
-          git remote set-url origin ssh://git@github.com/pivotalservices/pezdispenser.git
+    #- script:
+        #name: setting correct origin url
+        #code: |
+          #git remote set-url origin ssh://git@github.com/pivotalservices/pezdispenser.git
 
     - xchapter7x/flowy-release:
         action: "complete-release"
