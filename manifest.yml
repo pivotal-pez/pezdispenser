@@ -2,5 +2,4 @@
 applications:
 - name: pezdispenser
   buildpack: http://github.com/ryandotsmith/null-buildpack.git
-  path: ./main
-  command: ./main
+  command: ./bin/pezdispenser
