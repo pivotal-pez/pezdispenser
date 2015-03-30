@@ -41,7 +41,7 @@ build:
 
 deploy:
   steps: 
-    - add-ssh-key:
+    - wercker/add-ssh-key@1.0.2:
         keyname: PEZ_GITHUB_KEY
     
     - install-packages:
