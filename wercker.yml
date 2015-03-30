@@ -41,12 +41,16 @@ build:
 
 deploy:
   steps: 
-    - wercker/add-ssh-key@1.0.2:
-        keyname: PEZ_GITHUB_KEY
-    
     - install-packages:
         packages: ssh wget  
-    
+
+    - wercker/add-ssh-key@1.0.2:
+        keyname: PEZ_GITHUB_KEY  
+
+    - add-to-known_hosts:
+        hostname: github.com
+        fingerprint: 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48
+        
     - xchapter7x/cf-push-zdd:
         user_name: $CF_USER
         user_pass: $CF_PASS
