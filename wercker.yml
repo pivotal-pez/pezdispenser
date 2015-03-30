@@ -72,20 +72,24 @@ deploy:
     - xchapter7x/flowy-release:
         action: "get-next"
         tag_variable_name: "VERSION_TAG"
+        active: $GITFLOW_ACTIVE
         git_name: $GITFLOW_NAME
         git_email: $GITFLOW_EMAIL
 
     - script:
         name: flow
         code: |
-          echo $VERSION_TAG
-          git branch
-          git status
-          git log | head -10
-          git tag -a $VERSION_TAG -m "version $VERSION_TAG"
-          git checkout -b localbuild || true
-          git checkout -b master origin/master || true
-          git pull origin master
-          git merge localbuild
-          git push origin master
-          git push --tags
+          if [ $GITFLOW_ACTIVE = "true" ]; then
+            echo $VERSION_TAG
+            git branch
+            git status
+            git log | head -10
+            git tag -a $VERSION_TAG -m "version $VERSION_TAG"
+            git checkout -b localbuild || true
+            git checkout -b master origin/master || true
+            git pull origin master
+            git merge localbuild
+            git push origin master
+            git push --tags
+          fi
+
