@@ -34,12 +34,13 @@ build:
         code: |
           godep go build main.go
 
-    - internal/docker-push:
-        username: $DOCKER_USER
-        password: $DOCKER_P
-        tag: ${WERCKER_GIT_COMMIT}.${WERCKER_GIT_BRANCH}
-        repo: $DOCKER_REPO
-        registry: $DOCKER_REGISTRY
+    #we dont actually want to use this just yet
+    #- internal/docker-push:
+        #username: $DOCKER_USER
+        #password: $DOCKER_P
+        #tag: ${WERCKER_GIT_COMMIT}.${WERCKER_GIT_BRANCH}
+        #repo: $DOCKER_REPO
+        #registry: $DOCKER_REGISTRY
 
     - script:
         name: add repo to artifact
