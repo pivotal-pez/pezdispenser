@@ -37,7 +37,7 @@ build:
     - internal/docker-push:
         username: $DOCKER_USER
         password: $DOCKER_P
-        tag: $WERCKER_GIT_COMMIT
+        tag: ${WERCKER_GIT_COMMIT}.${WERCKER_GIT_BRANCH}
         repo: $DOCKER_REPO
         registry: $DOCKER_REGISTRY
 
