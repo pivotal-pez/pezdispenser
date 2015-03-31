@@ -48,7 +48,7 @@ build:
 
 deploy:
   steps: 
-    - wercker/install-packages@0.0.4:
+    - wercker/install-packages@0.0.3:
         packages: ssh wget  
 
     - wercker/add-ssh-key@1.0.2:
