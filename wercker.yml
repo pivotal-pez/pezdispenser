@@ -48,8 +48,10 @@ build:
 
 deploy:
   steps: 
-    - wercker/install-packages@0.0.3:
-        packages: ssh wget  
+    - script:
+        name: install-packages
+        code: |
+          sudo apt-get install -y ssh wget
 
     - wercker/add-ssh-key@1.0.2:
         keyname: PEZ_GITHUB_KEY  
