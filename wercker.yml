@@ -34,10 +34,18 @@ build:
         code: |
           godep go build main.go
 
+    - script:
+        name: docker tag
+        code: |
+          DOCKER_TAG="garbage"
+          if [ $WERCKER_GIT_BRANCH = "develop" ]; then
+            DOCKER_TAG=$WERCKER_GIT_COMMIT
+          fi
+
     - internal/docker-push:
         username: $DOCKER_USER
         password: $DOCKER_P
-        tag: $WERCKER_GIT_COMMIT
+        tag: $DOCKER_TAG
         repo: $DOCKER_REPO
         registry: $DOCKER_REGISTRY
 
