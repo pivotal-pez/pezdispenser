@@ -5,4 +5,3 @@ leasing service for pez resources
 
 [![GoDoc](https://godoc.org/github.com/pivotalservices/pezdispenser?status.png)](http://godoc.org/github.com/pivotalservices/pezdispenser)
 
-
