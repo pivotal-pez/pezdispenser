@@ -3,3 +3,7 @@ applications:
 - name: pezdispenser
   buildpack: http://github.com/ryandotsmith/null-buildpack.git
   command: ./main
+  services:
+    - pezvalidator-service
+  env:
+    UPS_PEZVALIDATOR_NAME: pezvalidator-service

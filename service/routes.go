@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/go-martini/martini"
+	"github.com/pivotalservices/pezauth/keycheck"
 )
 
 //Constants to construct routes with
@@ -29,13 +30,14 @@ var (
 
 //InitRoutes - initialize the mappings for controllers against valid routes
 func InitRoutes(m *martini.ClassicMartini) {
+	keyCheckHandler := keycheck.NewAPIKeyCheckMiddleware("").Handler()
 	itemLeaseController := NewLeaseController(APIVersion1, Item)
 	typeLeaseController := NewLeaseController(APIVersion1, Type)
 	listLeaseController := NewLeaseController(APIVersion1, List)
 	lockController := NewLockController(APIVersion1)
 
 	m.Group("/", func(r martini.Router) {
-		r.Get("info", func() string {
+		r.Get("info", keyCheckHandler, func() string {
 			return "the dispenser service will give you candy"
 		})
 	})
