@@ -29,15 +29,15 @@ var (
 )
 
 //InitRoutes - initialize the mappings for controllers against valid routes
-func InitRoutes(m *martini.ClassicMartini) {
-	keyCheckHandler := keycheck.NewAPIKeyCheckMiddleware("").Handler()
+func InitRoutes(m *martini.ClassicMartini, validationTargetUrl string) {
+	keyCheckHandler := keycheck.NewAPIKeyCheckMiddleware(validationTargetUrl).Handler()
 	itemLeaseController := NewLeaseController(APIVersion1, Item)
 	typeLeaseController := NewLeaseController(APIVersion1, Type)
 	listLeaseController := NewLeaseController(APIVersion1, List)
 	lockController := NewLockController(APIVersion1)
 
 	m.Group("/", func(r martini.Router) {
-		r.Get("info", keyCheckHandler, func() string {
+		r.Get("info", func() string {
 			return "the dispenser service will give you candy"
 		})
 	})
@@ -51,10 +51,10 @@ func InitRoutes(m *martini.ClassicMartini) {
 		r.Delete(URLItemGUID, itemLeaseController.Delete())
 
 		r.Get(URLLeases, listLeaseController.Get())
-	})
+	}, keyCheckHandler)
 
 	m.Group(URLLockBaseV1, func(r martini.Router) {
 		r.Post(URLItemGUID, lockController.Post())
 		r.Get(URLItemGUID, lockController.Get())
-	})
+	}, keyCheckHandler)
 }

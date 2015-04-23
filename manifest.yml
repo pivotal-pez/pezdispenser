@@ -7,3 +7,4 @@ applications:
     - pezvalidator-service
   env:
     UPS_PEZVALIDATOR_NAME: pezvalidator-service
+    UPS_PEZVALIDATOR_TARGET: target-url

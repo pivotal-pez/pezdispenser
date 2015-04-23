@@ -1,0 +1,13 @@
+{
+  "user-provided": [
+    {
+      "name": "pezvalidator-service",
+      "label": "user-provided",
+      "tags": [],
+      "credentials": {
+        "target-url": "https://pezauthdev.cfapps.io/valid-key"
+      },
+      "syslog_drain_url": ""
+    }
+  ]
+}

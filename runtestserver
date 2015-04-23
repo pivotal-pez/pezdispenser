@@ -1,0 +1,1 @@
+UPS_PEZVALIDATOR_NAME="pezvalidator-service" UPS_PEZVALIDATOR_TARGET="target-url" VCAP_APPLICATION=`cat vcap_application.local` VCAP_SERVICES=`cat vcap_services.local` PORT=3000 godep go run main.go

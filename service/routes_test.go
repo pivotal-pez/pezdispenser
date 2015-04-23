@@ -18,7 +18,7 @@ var _ = Describe("Routes", func() {
 
 			It("Should not result in panic", func() {
 				Ω(func() {
-					InitRoutes(m)
+					InitRoutes(m, "testurl.org")
 				}).ShouldNot(Panic())
 			})
 		})
