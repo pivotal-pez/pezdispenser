@@ -7,6 +7,7 @@ import (
 
 	"github.com/martini-contrib/oauth2"
 	"github.com/pivotalservices/pezdispenser/cloudfoundryclient"
+	"github.com/xchapter7x/goutil"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -55,6 +56,11 @@ func (s *orgManager) Show() (result *PivotOrg, err error) {
 	return
 }
 
+func (s *orgManager) RollbackCreate() (err error) {
+	s.log.Println("rolling back changes")
+	return
+}
+
 //SafeCreate - will create an org for the given user
 func (s *orgManager) SafeCreate() (record *PivotOrg, err error) {
 	var (
@@ -62,26 +68,19 @@ func (s *orgManager) SafeCreate() (record *PivotOrg, err error) {
 		orgGUID  string
 		userGUID string
 	)
-	s.cfClient.QueryAPIInfo()
+	c := goutil.NewChain(nil)
+	c.Call(s.cfClient.QueryAPIInfo)
+	c.CallP(c.Returns(&userGUID, &err), s.cfClient.QueryUserGUID, s.username)
+	c.CallP(c.Returns(&orgGUID, &err), s.cfClient.AddOrg, orgName)
+	c.Call(s.cfClient.AddRole, cloudfoundryclient.OrgEndpoint, orgGUID, cloudfoundryclient.RoleTypeManager, userGUID)
+	c.Call(s.cfClient.AddRole, cloudfoundryclient.OrgEndpoint, orgGUID, cloudfoundryclient.RoleTypeUser, userGUID)
+	c.CallP(c.Returns(record, &err), s.upsert, orgGUID)
 
-	if userGUID, err = s.cfClient.QueryUserGUID(s.username); err == nil && userGUID != "" {
-		s.log.Println("found user guid")
-
-		if orgGUID, err = s.cfClient.AddOrg(orgName); err == nil {
-			s.log.Println("we created the org successfully")
-
-			if err = s.cfClient.AddRole(cloudfoundryclient.OrgEndpoint, orgGUID, cloudfoundryclient.RoleTypeManager, userGUID); err == nil {
-
-				if err = s.cfClient.AddRole(cloudfoundryclient.OrgEndpoint, orgGUID, cloudfoundryclient.RoleTypeUser, userGUID); err == nil {
-					record, err = s.upsert(orgGUID)
-				}
-			}
-		}
-	}
-
-	if err != nil {
-		s.log.Println("call to create org api failed")
+	if c.Error != nil {
+		s.log.Println("we experienced a failure, should roll back changes", c.Error)
+		err = c.Error
 		record = new(PivotOrg)
+		s.RollbackCreate()
 	}
 	return
 }

@@ -86,17 +86,21 @@
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/pezauth/keycheck",
-			"Comment": "v0.0.26-66-g5ccdbec",
-			"Rev": "5ccdbecbfa819c362d7238545e90940284d1fafe"
+			"Comment": "v0.0.26-68-g240a180",
+			"Rev": "240a180731801621217ec351a411b77ba4b09748"
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/pezauth/service",
-			"Comment": "v0.0.26-66-g5ccdbec",
-			"Rev": "5ccdbecbfa819c362d7238545e90940284d1fafe"
+			"Comment": "v0.0.26-68-g240a180",
+			"Rev": "240a180731801621217ec351a411b77ba4b09748"
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/cloudcontroller-client",
-			"Rev": "5a4759ba07e864a25ae1ceda37131ee51d3601bb"
+			"Rev": "795e287327dd3faa6a5b65e000779cffe301cb3a"
+		},
+		{
+			"ImportPath": "github.com/xchapter7x/goutil",
+			"Rev": "d11405d449b25127a32fab25ce8b1fc0388da5b3"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",

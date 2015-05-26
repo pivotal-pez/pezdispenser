@@ -92,6 +92,7 @@ func (s *Client) CreateAuthRequest(verb, requestURL, path string, args interface
 
 func (s *Client) createRequestData(requestURL string, path string, postData interface{}) (apiUrl string, dataBuf *bytes.Buffer) {
 	data := url.Values{}
+	dataBuf = new(bytes.Buffer)
 
 	if postData != nil {
 
