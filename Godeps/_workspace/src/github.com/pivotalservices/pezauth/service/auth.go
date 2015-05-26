@@ -18,11 +18,10 @@ import (
 
 //Constants to construct my oauth calls
 const (
-	ClientID       = "1083030294947-6g3bhhrgl3s7ul736jet625ajvp94f5p.apps.googleusercontent.com"
-	ClientSecret   = "kfgM5mT3BqPQ84VeXsYokAK_"
-	sessionName    = "pivotalpezauthservicesession"
-	sessionSecret  = "shhh.donttellanyone"
-	AuthFailStatus = 403
+	ClientID      = "1083030294947-6g3bhhrgl3s7ul736jet625ajvp94f5p.apps.googleusercontent.com"
+	ClientSecret  = "kfgM5mT3BqPQ84VeXsYokAK_"
+	sessionName   = "pivotalpezauthservicesession"
+	sessionSecret = "shhh.donttellanyone"
 )
 
 //Vars for my oauth calls
@@ -32,7 +31,8 @@ var (
 	allowedDomains      = []string{
 		"pivotal.io",
 	}
-	OauthConfig *goauth2.Config
+	OauthConfig     *goauth2.Config
+	userObjectCache = make(map[string]map[string]interface{})
 )
 
 func isBlockedDomain(domain string) bool {
@@ -81,7 +81,7 @@ func DomainChecker(res http.ResponseWriter, tokens oauth2.Tokens) {
 	userInfo := GetUserInfo(tokens)
 
 	if domain, ok := userInfo["domain"]; !ok || tokens.Expired() || isBlockedDomain(domain.(string)) {
-		res.WriteHeader(AuthFailStatus)
+		res.WriteHeader(FailureStatus)
 		res.Write(AuthFailureResponse)
 	}
 }
@@ -93,6 +93,27 @@ var DomainCheck = func() martini.Handler {
 
 //GetUserInfo - query googleapi for the authenticated users information
 var GetUserInfo = func(tokens oauth2.Tokens) (userObject map[string]interface{}) {
+
+	if userObject = getUserInfoCached(tokens); len(userObject) == 0 {
+		userObject = getUserInfo(tokens)
+	}
+	return
+}
+
+func addUserObjectToCache(tokens oauth2.Tokens, userObject map[string]interface{}) (err error) {
+	userObjectCache[tokens.Access()] = userObject
+	return
+}
+
+func getUserInfoCached(tokens oauth2.Tokens) (userObject map[string]interface{}) {
+
+	if val, ok := userObjectCache[tokens.Access()]; ok {
+		userObject = val
+	}
+	return
+}
+
+func getUserInfo(tokens oauth2.Tokens) (userObject map[string]interface{}) {
 	url := "https://www.googleapis.com/plus/v1/people/me"
 	token := &goauth2.Token{
 		AccessToken:  tokens.Access(),
@@ -105,6 +126,7 @@ var GetUserInfo = func(tokens oauth2.Tokens) (userObject map[string]interface{})
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	json.Unmarshal(body, &userObject)
+	addUserObjectToCache(tokens, userObject)
 	return
 }
 

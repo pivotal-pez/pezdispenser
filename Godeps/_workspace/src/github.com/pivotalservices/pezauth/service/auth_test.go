@@ -41,7 +41,7 @@ var _ = Describe("Authentication", func() {
 			It("Should have a valid statuscode and body", func() {
 				mock := new(mockResponseWriter)
 				DomainChecker(mock, new(mockTokens))
-				Ω(mock.StatusCode).ShouldNot(Equal(AuthFailStatus))
+				Ω(mock.StatusCode).ShouldNot(Equal(FailureStatus))
 				Ω(mock.Body).ShouldNot(Equal(AuthFailureResponse))
 			})
 		})
@@ -56,7 +56,7 @@ var _ = Describe("Authentication", func() {
 			It("Should return true", func() {
 				mock := new(mockResponseWriter)
 				DomainChecker(mock, new(mockTokens))
-				Ω(mock.StatusCode).Should(Equal(AuthFailStatus))
+				Ω(mock.StatusCode).Should(Equal(FailureStatus))
 			})
 		})
 	})

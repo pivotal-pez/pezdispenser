@@ -38,7 +38,7 @@ var _ = Describe("NewValidateV1", func() {
 			controlResponse := &Response{ErrorMsg: ErrInvalidKeyFormatMsg}
 			var validGet ValidateGetHandler = NewValidateV1(keyGen).Get().(ValidateGetHandler)
 			validGet(testLogger, render, req)
-			Ω(render.StatusCode).Should(Equal(FailStatusCode))
+			Ω(render.StatusCode).Should(Equal(FailureStatus))
 			Ω(render.ResponseObject).Should(Equal(*controlResponse))
 		})
 	})
@@ -59,7 +59,7 @@ var _ = Describe("NewValidateV1", func() {
 			controlResponse := &Response{ErrorMsg: ErrInvalidKeyFormatMsg}
 			var validGet ValidateGetHandler = NewValidateV1(keyGen).Get().(ValidateGetHandler)
 			validGet(testLogger, render, req)
-			Ω(render.StatusCode).Should(Equal(FailStatusCode))
+			Ω(render.StatusCode).Should(Equal(FailureStatus))
 			Ω(render.ResponseObject).Should(Equal(*controlResponse))
 		})
 	})
@@ -80,7 +80,7 @@ var _ = Describe("NewValidateV1", func() {
 			var validGet ValidateGetHandler = NewValidateV1(keyGen).Get().(ValidateGetHandler)
 			_, controlPayload, _ := keyGen.GetByKey(guid)
 			validGet(testLogger, render, req)
-			Ω(render.StatusCode).Should(Equal(SuccessStatusCode))
+			Ω(render.StatusCode).Should(Equal(SuccessStatus))
 			Ω(render.ResponseObject.(Response).Payload).Should(Equal(controlPayload))
 			Ω(render.ResponseObject.(Response).APIKey).Should(Equal(guid))
 		})

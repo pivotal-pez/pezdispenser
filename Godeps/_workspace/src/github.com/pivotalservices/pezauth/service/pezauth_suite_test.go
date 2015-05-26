@@ -3,6 +3,8 @@ package pezauth_test
 import (
 	"errors"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -12,6 +14,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/pivotalservices/pezauth/service"
+	"github.com/xchapter7x/cloudcontroller-client"
+	"github.com/xchapter7x/goutil"
+	"gopkg.in/mgo.v2"
 
 	"html/template"
 	"testing"
@@ -184,4 +189,103 @@ func (s *mockRedisCreds) Pass() string {
 
 func (s *mockRedisCreds) Uri() string {
 	return s.uri
+}
+
+type mockMongo struct {
+}
+
+func (s *mockMongo) Find(query interface{}) (q *mgo.Query) {
+	return
+}
+
+func (s *mockMongo) Upsert(selector interface{}, update interface{}) (info *mgo.ChangeInfo, err error) {
+	return
+}
+
+type mockPersistence struct {
+	result interface{}
+	err    error
+}
+
+func (s *mockPersistence) FindOne(query interface{}, result interface{}) (err error) {
+	goutil.Unpack([]interface{}{s.result}, result)
+	err = s.err
+	return
+}
+
+func (s *mockPersistence) Upsert(selector interface{}, update interface{}) (err error) {
+	return
+}
+
+type mockHeritageClient struct {
+	*ccclient.Client
+	res *http.Response
+}
+
+func (s *mockHeritageClient) CreateAuthRequest(verb, requestURL, path string, args interface{}) (*http.Request, error) {
+	return &http.Request{}, nil
+}
+
+func (s *mockHeritageClient) CCTarget() string {
+	return ccclient.URLPWSLogin
+}
+
+func (s *mockHeritageClient) HttpClient() ccclient.ClientDoer {
+	return &mockClientDoer{
+		res: s.res,
+	}
+}
+
+func (s *mockHeritageClient) Login() (c *ccclient.Client, err error) {
+	return
+}
+
+type mockClientDoer struct {
+	req *http.Request
+	res *http.Response
+	err error
+}
+
+func (s *mockClientDoer) Do(rq *http.Request) (rs *http.Response, e error) {
+	s.req = rq
+	rs = s.res
+	e = s.err
+	return
+}
+
+type nopCloser struct {
+	io.Reader
+}
+
+func (nopCloser) Close() error { return nil }
+
+func getMockNewOrg(showP, createP, safeCreateP *PivotOrg, showErr, createErr, safeCreateErr error) func(username string, log *log.Logger, tokens oauth2.Tokens, store Persistence, authClient AuthRequestCreator) OrgManager {
+	return func(username string, log *log.Logger, tokens oauth2.Tokens, store Persistence, authClient AuthRequestCreator) OrgManager {
+		s := &mockNewOrg{
+			showP:         showP,
+			createP:       createP,
+			safeCreateP:   safeCreateP,
+			showErr:       showErr,
+			createErr:     createErr,
+			safeCreateErr: safeCreateErr,
+		}
+		return s
+	}
+}
+
+type mockNewOrg struct {
+	showErr       error
+	createErr     error
+	safeCreateErr error
+	showP         *PivotOrg
+	createP       *PivotOrg
+	safeCreateP   *PivotOrg
+}
+
+func (s *mockNewOrg) Show() (result *PivotOrg, err error) {
+	return s.showP, s.showErr
+}
+
+func (s *mockNewOrg) SafeCreate() (record *PivotOrg, err error) {
+	return s.safeCreateP, s.safeCreateErr
 }

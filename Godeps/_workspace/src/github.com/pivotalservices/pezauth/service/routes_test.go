@@ -38,7 +38,7 @@ var _ = Describe("Routes", func() {
 
 			It("Should panic", func() {
 				Ω(func() {
-					InitRoutes(m, new(mockDoer))
+					InitRoutes(m, new(mockDoer), new(mockMongo), new(mockHeritageClient))
 				}).Should(Panic())
 			})
 		})
@@ -57,7 +57,7 @@ var _ = Describe("Routes", func() {
 
 				It("should format the domain in the config object", func() {
 					control := fmt.Sprintf("https://%s/oauth2callback", validDomain)
-					InitRoutes(m, new(mockDoer))
+					InitRoutes(m, new(mockDoer), new(mockMongo), new(mockHeritageClient))
 					Ω(OauthConfig.RedirectURL).Should(Equal(control))
 				})
 			})
@@ -69,7 +69,7 @@ var _ = Describe("Routes", func() {
 
 				It("should format the domain in the config object", func() {
 					control := fmt.Sprintf("https://%s/oauth2callback", validDomain)
-					InitRoutes(m, new(mockDoer))
+					InitRoutes(m, new(mockDoer), new(mockMongo), new(mockHeritageClient))
 					Ω(OauthConfig.RedirectURL).Should(Equal(control))
 				})
 			})

@@ -26,6 +26,10 @@
 			"Rev": "33e0aa1cb7c019ccc3fbe049a8262a6403d30504"
 		},
 		{
+			"ImportPath": "github.com/fatih/structs",
+			"Rev": "c06d8730d42f16f3e8dddc236c7d69c0952a8a2c"
+		},
+		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
 			"Rev": "cca3df8fa0670249a3f746bcc062c69aeba0517c"
 		},
@@ -49,10 +53,6 @@
 		{
 			"ImportPath": "github.com/gorilla/sessions",
 			"Rev": "3e759b5c5532bec4f3934ea4c745e4ae5d69737a"
-		},
-		{
-			"ImportPath": "github.com/martini-contrib/auth",
-			"Rev": "fa62c19b7ae87da370242054c8beb11af31d327f"
 		},
 		{
 			"ImportPath": "github.com/martini-contrib/oauth2",
@@ -86,13 +86,17 @@
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/pezauth/keycheck",
-			"Comment": "v0.0.26-16-g79a8a6e",
-			"Rev": "79a8a6e7e4a2dbd13fb8cf64025194b6f68d7ffc"
+			"Comment": "v0.0.26-65-g5226478",
+			"Rev": "522647800396e91069b5a8b5784d3e864b531fdb"
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/pezauth/service",
-			"Comment": "v0.0.26-16-g79a8a6e",
-			"Rev": "79a8a6e7e4a2dbd13fb8cf64025194b6f68d7ffc"
+			"Comment": "v0.0.26-65-g5226478",
+			"Rev": "522647800396e91069b5a8b5784d3e864b531fdb"
+		},
+		{
+			"ImportPath": "github.com/xchapter7x/cloudcontroller-client",
+			"Rev": "5a4759ba07e864a25ae1ceda37131ee51d3601bb"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
@@ -109,6 +113,11 @@
 		{
 			"ImportPath": "google.golang.org/cloud/internal",
 			"Rev": "f20d6dcccb44ed49de45ae3703312cb46e627db1"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2015.01.24",
+			"Rev": "c6a7dce14133ccac2dcac3793f1d6e2ef048503a"
 		}
 	]
 }

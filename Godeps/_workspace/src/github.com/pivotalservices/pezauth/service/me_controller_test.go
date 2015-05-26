@@ -26,7 +26,7 @@ var _ = Describe("NewMeController", func() {
 			controlResponse := Response{Payload: GetUserInfo(tokens)}
 			var meGet MeGetHandler = NewMeController().Get().(MeGetHandler)
 			meGet(testLogger, render, tokens)
-			Ω(render.StatusCode).Should(Equal(200))
+			Ω(render.StatusCode).Should(Equal(SuccessStatus))
 			Ω(render.ResponseObject).Should(Equal(controlResponse))
 		})
 	})

@@ -12,10 +12,6 @@ const (
 	GUIDLength = 36
 	//HeaderKeyName - header keyname for api-key value
 	HeaderKeyName = "X-API-KEY"
-	//FailStatusCode - statuscode of failed request
-	FailStatusCode = 403
-	//SuccessStatusCode - statuscode of successful request
-	SuccessStatusCode = 200
 	//ErrInvalidKeyFormatMsg - error msg for invalid key
 	ErrInvalidKeyFormatMsg = "Invalid key format"
 )
@@ -40,7 +36,7 @@ type validateV1 struct {
 func (s *validateV1) Get() interface{} {
 	var handler ValidateGetHandler = func(log *log.Logger, r render.Render, req *http.Request) {
 		responseBody := Response{}
-		statusCode := SuccessStatusCode
+		statusCode := SuccessStatus
 
 		if key := req.Header.Get(HeaderKeyName); len(key) == GUIDLength {
 			log.Println("checking key: ...-", key[:4])
@@ -53,13 +49,13 @@ func (s *validateV1) Get() interface{} {
 			} else {
 				log.Println(err)
 				responseBody.ErrorMsg = err.Error()
-				statusCode = FailStatusCode
+				statusCode = FailureStatus
 			}
 
 		} else {
 			log.Println(ErrInvalidKeyFormatMsg)
 			responseBody.ErrorMsg = ErrInvalidKeyFormatMsg
-			statusCode = FailStatusCode
+			statusCode = FailureStatus
 		}
 		r.JSON(statusCode, responseBody)
 	}
