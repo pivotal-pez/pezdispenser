@@ -159,12 +159,13 @@ func (s *CFClient) RemoveOrg(orgGUID string) (err error) {
 		URL:               s.RequestDecorator.CCTarget(),
 		Path:              orgDeletePath,
 		SuccessStatusCode: OrgRemoveSuccessStatus,
+		Data:              "",
 	}
 	rest.OnSuccess = func(res *http.Response) {
 		s.Log.Println("we removed the org successfully")
 	}
 	rest.OnFailure = func(res *http.Response, e error) {
-		s.Log.Println("call to create org api failed")
+		s.Log.Println("call to remove org api failed")
 		err = ErrOrgRemoveAPICallFailure
 	}
 	rest.Run()
