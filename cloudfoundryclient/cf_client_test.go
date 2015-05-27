@@ -8,6 +8,51 @@ import (
 )
 
 var _ = Describe("CFClient", func() {
+	Describe("RemoveOrg", func() {
+		var (
+			cfclient       CloudFoundryClient
+			controlOrgGUID = "1e2bae2c-459e-4ad8-b1cb-ffc09d209b32"
+		)
+
+		Context("RemoveOrg called successfully", func() {
+
+			BeforeEach(func() {
+				mockDoer := &mockClientDoer{
+					res: mockHttpResponse("", mockSuccessRemoveOrgStatusCode),
+					err: nil,
+				}
+				mockRequest := &mockRequestDecorator{
+					doer: mockDoer,
+				}
+				cfclient = NewCloudFoundryClient(mockRequest, new(mockLog))
+			})
+
+			It("should parse the response object without error", func() {
+				err := cfclient.RemoveOrg(controlOrgGUID)
+				Ω(err).Should(BeNil())
+			})
+		})
+
+		Context("RemoveOrg unsuccessful response", func() {
+
+			BeforeEach(func() {
+				mockDoer := &mockClientDoer{
+					res: mockHttpResponse("", (mockSuccessRemoveOrgStatusCode + 1)),
+					err: nil,
+				}
+				mockRequest := &mockRequestDecorator{
+					doer: mockDoer,
+				}
+				cfclient = NewCloudFoundryClient(mockRequest, new(mockLog))
+			})
+
+			It("should return an error", func() {
+				err := cfclient.RemoveOrg(controlOrgGUID)
+				Ω(err).Should(Equal(ErrOrgRemoveAPICallFailure))
+			})
+		})
+	})
+
 	Describe("AddOrg", func() {
 		var (
 			cfclient       CloudFoundryClient
@@ -29,7 +74,7 @@ var _ = Describe("CFClient", func() {
 			})
 
 			It("should parse the response object without error", func() {
-				guid, err := cfclient.AddOrg(controlOrgName)
+				guid, err := cfclient.AddOrg(controlOrgGUID)
 				Ω(err).Should(BeNil())
 				Ω(guid).Should(Equal(controlOrgGUID))
 			})

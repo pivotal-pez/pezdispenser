@@ -34,6 +34,7 @@ type (
 		AddOrg(orgName string) (orgGUID string, err error)
 		AddSpace(spaceName string) (spaceGUID string, err error)
 		AddUser(username string) error
+		RemoveOrg(orgGUID string) (err error)
 	}
 	//CFClient - cloud foundry api client struct
 	CFClient struct {

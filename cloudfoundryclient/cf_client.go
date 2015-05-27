@@ -149,6 +149,30 @@ func (s *CFClient) AddOrg(orgName string) (orgGUID string, err error) {
 	return
 }
 
+//RemoveOrg - remove a org by guid
+func (s *CFClient) RemoveOrg(orgGUID string) (err error) {
+	orgDeletePath := fmt.Sprintf("%s/%s", OrgEndpoint, orgGUID)
+	rest := &RestRunner{
+		Logger:            s.Log,
+		RequestDecorator:  s.RequestDecorator,
+		Verb:              "DELETE",
+		URL:               s.RequestDecorator.CCTarget(),
+		Path:              orgDeletePath,
+		SuccessStatusCode: OrgRemoveSuccessStatus,
+	}
+	rest.OnSuccess = func(res *http.Response) {
+		s.Log.Println("we removed the org successfully")
+	}
+	rest.OnFailure = func(res *http.Response, e error) {
+		s.Log.Println("call to create org api failed")
+		err = ErrOrgRemoveAPICallFailure
+	}
+	rest.Run()
+	return
+
+	return
+}
+
 //AddSpace - add a space to the given org
 func (s *CFClient) AddSpace(spaceName string) (spaceGUID string, err error) {
 	return

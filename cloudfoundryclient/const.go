@@ -25,11 +25,15 @@ const (
 	RoleCreationURLFormat = "%s/%s/%s/%s"
 	//RoleCreateSuccessStatusCode - success status code for role assignment calls
 	RoleCreateSuccessStatusCode = 201
+	//OrgRemoveSuccessStatus - success status code for org removal
+	OrgRemoveSuccessStatus = 204
 )
 
 var (
 	//ErrOrgCreateAPICallFailure - error for failed call to create org endpoint
 	ErrOrgCreateAPICallFailure = errors.New("failed to create org on api call")
+	//ErrOrgRemoveAPICallFailure - error for failed call to remove org endpoint
+	ErrOrgRemoveAPICallFailure = errors.New("failed to remove org on api call")
 	//ErrNoUserFound - error no user found
 	ErrNoUserFound = errors.New("no matching user found in system")
 	//ErrFailedStatusCode - we recieved a status code not matching the success code for the endpoint
