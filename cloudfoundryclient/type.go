@@ -32,7 +32,7 @@ type (
 		QueryUserGUID(username string) (string, error)
 		AddRole(rolePathPrefix string, targetGUID string, roleType string, userGUID string) error
 		AddOrg(orgName string) (orgGUID string, err error)
-		AddSpace(spaceName string) (spaceGUID string, err error)
+		AddSpace(spaceName string, orgGUID string) (spaceGUID string, err error)
 		AddUser(username string) error
 		RemoveOrg(orgGUID string) (err error)
 	}

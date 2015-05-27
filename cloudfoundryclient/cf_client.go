@@ -174,7 +174,31 @@ func (s *CFClient) RemoveOrg(orgGUID string) (err error) {
 }
 
 //AddSpace - add a space to the given org
-func (s *CFClient) AddSpace(spaceName string) (spaceGUID string, err error) {
+func (s *CFClient) AddSpace(spaceName string, orgGUID string) (spaceGUID string, err error) {
+	var (
+		data = fmt.Sprintf(`{"name": "%s","organization_guid":"%s"}`, DefaultSpaceName, orgGUID)
+	)
+	rest := &RestRunner{
+		Logger:            s.Log,
+		RequestDecorator:  s.RequestDecorator,
+		Verb:              "POST",
+		URL:               s.RequestDecorator.CCTarget(),
+		Path:              SpacesEndpont,
+		SuccessStatusCode: SpacesCreateSuccessStatusCode,
+		Data:              data,
+	}
+	rest.OnSuccess = func(res *http.Response) {
+		s.Log.Println("we created the space successfully")
+		apiResponse := new(APIResponse)
+		body, _ := ioutil.ReadAll(res.Body)
+		json.Unmarshal(body, apiResponse)
+		spaceGUID = apiResponse.Metadata.GUID
+	}
+	rest.OnFailure = func(res *http.Response, e error) {
+		s.Log.Println("call to create space api failed")
+		err = ErrSpaceCreateAPICallFailure
+	}
+	rest.Run()
 	return
 }
 

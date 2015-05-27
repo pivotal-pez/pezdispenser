@@ -9,6 +9,10 @@ const (
 	OrgEndpoint = "/v2/organizations"
 	//SpacesEndpont - the endpoint to hit for spaces actions
 	SpacesEndpont = "/v2/spaces"
+	//SpacesCreateSuccessStatusCode = success status code of spaces rest call
+	SpacesCreateSuccessStatusCode = 201
+	//DefaultSpaceName - name of the default space created for each org
+	DefaultSpaceName = "development"
 	//ListUsersEndpoint - get a list of all users in paas
 	ListUsersEndpoint = "/Users"
 	//ListUsersSuccessStatus - success status code for users call
@@ -34,6 +38,8 @@ var (
 	ErrOrgCreateAPICallFailure = errors.New("failed to create org on api call")
 	//ErrOrgRemoveAPICallFailure - error for failed call to remove org endpoint
 	ErrOrgRemoveAPICallFailure = errors.New("failed to remove org on api call")
+	//ErrSpaceCreateAPICallFailure - error for failed call to create org endpoint
+	ErrSpaceCreateAPICallFailure = errors.New("failed to create space on api call")
 	//ErrNoUserFound - error no user found
 	ErrNoUserFound = errors.New("no matching user found in system")
 	//ErrFailedStatusCode - we recieved a status code not matching the success code for the endpoint
