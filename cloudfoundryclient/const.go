@@ -11,8 +11,6 @@ const (
 	SpacesEndpont = "/v2/spaces"
 	//SpacesCreateSuccessStatusCode = success status code of spaces rest call
 	SpacesCreateSuccessStatusCode = 201
-	//DefaultSpaceName - name of the default space created for each org
-	DefaultSpaceName = "development"
 	//ListUsersEndpoint - get a list of all users in paas
 	ListUsersEndpoint = "/Users"
 	//ListUsersSuccessStatus - success status code for users call

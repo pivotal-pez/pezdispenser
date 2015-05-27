@@ -176,7 +176,7 @@ func (s *CFClient) RemoveOrg(orgGUID string) (err error) {
 //AddSpace - add a space to the given org
 func (s *CFClient) AddSpace(spaceName string, orgGUID string) (spaceGUID string, err error) {
 	var (
-		data = fmt.Sprintf(`{"name": "%s","organization_guid":"%s"}`, DefaultSpaceName, orgGUID)
+		data = fmt.Sprintf(`{"name": "%s","organization_guid":"%s"}`, spaceName, orgGUID)
 	)
 	rest := &RestRunner{
 		Logger:            s.Log,
