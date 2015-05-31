@@ -41,7 +41,13 @@ var _ = Describe("CFClient", func() {
 			})
 
 			It("should parse the response object without error", func() {
-				users, err := cfclient.ListUsers(1)
+				users, err := cfclient.ListUsers(1, 1, "attributes=id,userName")
+				Ω(err).Should(BeNil())
+				Ω(users).Should(BeEquivalentTo(controlResources))
+			})
+
+			It("should parse the response object without error without any attributes", func() {
+				users, err := cfclient.ListUsers(1, 1, "")
 				Ω(err).Should(BeNil())
 				Ω(users).Should(BeEquivalentTo(controlResources))
 			})
@@ -61,7 +67,7 @@ var _ = Describe("CFClient", func() {
 			})
 
 			It("should return an error", func() {
-				users, err := cfclient.ListUsers(1)
+				users, err := cfclient.ListUsers(1, 1, "attributes=id,userName")
 				Ω(err).Should(Equal(ErrFailedStatusCode))
 				Ω(users).Should(BeEmpty())
 			})

@@ -63,10 +63,10 @@ func getGUIDFromUsernameInResponse(username string, userResponse UserAPIResponse
 }
 
 //ListUsers - get the guid for the given user
-func (s *CFClient) ListUsers(startIndex int) (userList map[string]interface{}, err error) {
+func (s *CFClient) ListUsers(startIndex, count int, filter string) (userList map[string]interface{}, err error) {
 	var (
 		userResponse = UserAPIResponse{}
-		data         = "attributes=id,userName&startIndex=1&count=1"
+		data         = fmt.Sprintf("startIndex=%d&count=%d&%s", startIndex, count, filter)
 	)
 
 	rest := &RestRunner{
