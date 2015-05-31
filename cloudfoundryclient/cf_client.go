@@ -44,20 +44,6 @@ func (s *CFClient) QueryAPIInfo() (info *CloudFoundryAPIInfo, err error) {
 	return
 }
 
-func getGUIDFromUsernameInResponse(username string, userResponse UserAPIResponse) (guid string, err error) {
-	for _, resource := range userResponse.Resources {
-
-		if resource.UserName == username {
-			guid = resource.ID
-		}
-	}
-
-	if guid == "" {
-		err = ErrNoUserFound
-	}
-	return
-}
-
 //QueryUsers - get the guid for the given user
 func (s *CFClient) QueryUsers(startIndex, count int, attributes, filter string) (userList UserAPIResponse, err error) {
 	var (
@@ -100,33 +86,19 @@ func parseArg(name string, filter string) (parsedFilter string) {
 //QueryUserGUID - get the guid for the given user
 func (s *CFClient) QueryUserGUID(username string) (guid string, err error) {
 	var (
-		userResponse = UserAPIResponse{}
-		userFilter   = url.QueryEscape(fmt.Sprintf("userName eq '%s'", username))
-		data         = fmt.Sprintf("attributes=id,userName&filter=%s", userFilter)
+		users      = UserAPIResponse{}
+		userFilter = url.QueryEscape(fmt.Sprintf("userName eq '%s'", username))
 	)
 
-	rest := &RestRunner{
-		Logger:            s.Log,
-		RequestDecorator:  s.RequestDecorator,
-		Verb:              "GET",
-		URL:               s.Info.TokenEndpoint,
-		Path:              ListUsersEndpoint,
-		SuccessStatusCode: ListUsersSuccessStatus,
-		Data:              data,
+	if users, err = s.QueryUsers(1, 1, "id", userFilter); err == nil && users.TotalResults > 0 {
+		guid = users.Resources[0].ID
+
+	} else {
+
+		if err == nil {
+			err = ErrNoUserFound
+		}
 	}
-	rest.OnSuccess = func(res *http.Response) {
-		s.Log.Println("user response: ", res)
-		b, _ := ioutil.ReadAll(res.Body)
-		json.Unmarshal(b, &userResponse)
-		s.Log.Println("user response: ", userResponse)
-		guid, err = getGUIDFromUsernameInResponse(username, userResponse)
-	}
-	rest.OnFailure = func(res *http.Response, e error) {
-		b, _ := ioutil.ReadAll(res.Body)
-		s.Log.Println("call for user guid failed :(", e, string(b[:]))
-		err = e
-	}
-	rest.Run()
 	return
 }
 

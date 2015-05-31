@@ -296,7 +296,7 @@ var _ = Describe("CFClient", func() {
 
 			BeforeEach(func() {
 				mockDoer := &mockClientDoer{
-					res: mockHttpResponse(mockSuccessUserResponseBody, mockSuccessUserStatusCode),
+					res: mockHttpResponse("{}", mockSuccessUserStatusCode),
 					err: nil,
 				}
 				mockRequest := &mockRequestDecorator{
