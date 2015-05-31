@@ -76,7 +76,6 @@ func (s *CFClient) QueryUsers(startIndex, count int, attributes, filter string) 
 	rest.OnSuccess = func(res *http.Response) {
 		s.Log.Println("user response: ", res)
 		b, _ := ioutil.ReadAll(res.Body)
-		fmt.Println(string(b[:]))
 		json.Unmarshal(b, &userList)
 	}
 	rest.OnFailure = func(res *http.Response, e error) {
