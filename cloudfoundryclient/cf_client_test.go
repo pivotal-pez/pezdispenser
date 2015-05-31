@@ -8,7 +8,7 @@ import (
 )
 
 var _ = Describe("CFClient", func() {
-	Describe("ListUsers", func() {
+	Describe("QueryUsers", func() {
 		var (
 			cfclient         CloudFoundryClient
 			controlResources = map[string]interface{}{
@@ -27,7 +27,7 @@ var _ = Describe("CFClient", func() {
 			}
 		)
 
-		Context("ListUsers called successfully", func() {
+		Context("QueryUsers called successfully", func() {
 
 			BeforeEach(func() {
 				mockDoer := &mockClientDoer{
@@ -41,19 +41,19 @@ var _ = Describe("CFClient", func() {
 			})
 
 			It("should parse the response object without error", func() {
-				users, err := cfclient.ListUsers(1, 1, "attributes=id,userName")
+				users, err := cfclient.QueryUsers(1, 1, "id,userName", "")
 				Ω(err).Should(BeNil())
 				Ω(users).Should(BeEquivalentTo(controlResources))
 			})
 
 			It("should parse the response object without error without any attributes", func() {
-				users, err := cfclient.ListUsers(1, 1, "")
+				users, err := cfclient.QueryUsers(1, 1, "", "")
 				Ω(err).Should(BeNil())
 				Ω(users).Should(BeEquivalentTo(controlResources))
 			})
 		})
 
-		Context("ListUsers unsuccessful response", func() {
+		Context("QueryUsers unsuccessful response", func() {
 
 			BeforeEach(func() {
 				mockDoer := &mockClientDoer{
@@ -67,7 +67,7 @@ var _ = Describe("CFClient", func() {
 			})
 
 			It("should return an error", func() {
-				users, err := cfclient.ListUsers(1, 1, "attributes=id,userName")
+				users, err := cfclient.QueryUsers(1, 1, "id,userName", "")
 				Ω(err).Should(Equal(ErrFailedStatusCode))
 				Ω(users).Should(BeEmpty())
 			})

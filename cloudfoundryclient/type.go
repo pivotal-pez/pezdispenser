@@ -35,7 +35,7 @@ type (
 		AddSpace(spaceName string, orgGUID string) (spaceGUID string, err error)
 		AddUser(username string) error
 		RemoveOrg(orgGUID string) (err error)
-		ListUsers(int, int, string) (userList map[string]interface{}, err error)
+		QueryUsers(int, int, string, string) (userList map[string]interface{}, err error)
 	}
 	//CFClient - cloud foundry api client struct
 	CFClient struct {
