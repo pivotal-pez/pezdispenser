@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 )
 
 //NewCloudFoundryClient - generate a new cloudfoundryclient interface object
@@ -61,13 +62,11 @@ func getGUIDFromUsernameInResponse(username string, userResponse UserAPIResponse
 	return
 }
 
-//QueryUserGUID - get the guid for the given user
-func (s *CFClient) QueryUserGUID(username string) (guid string, err error) {
+//ListUsers - get the guid for the given user
+func (s *CFClient) ListUsers(startIndex int) (userList map[string]interface{}, err error) {
 	var (
 		userResponse = UserAPIResponse{}
-		data         = map[string]string{
-			"attributes": "id,userName",
-		}
+		data         = "attributes=id,userName&startIndex=1&count=1"
 	)
 
 	rest := &RestRunner{
@@ -80,12 +79,43 @@ func (s *CFClient) QueryUserGUID(username string) (guid string, err error) {
 		Data:              data,
 	}
 	rest.OnSuccess = func(res *http.Response) {
-		s.Log.Println("response body", res.Body)
 		s.Log.Println("user response: ", res)
 		b, _ := ioutil.ReadAll(res.Body)
-		s.Log.Println("user response: ", userResponse, b)
+		fmt.Println(string(b[:]))
+		json.Unmarshal(b, &userList)
+		s.Log.Println("user response: ", userResponse)
+	}
+	rest.OnFailure = func(res *http.Response, e error) {
+		b, _ := ioutil.ReadAll(res.Body)
+		s.Log.Println("call for user guid failed :(", e, string(b[:]))
+		err = e
+	}
+	rest.Run()
+	return
+}
+
+//QueryUserGUID - get the guid for the given user
+func (s *CFClient) QueryUserGUID(username string) (guid string, err error) {
+	var (
+		userResponse = UserAPIResponse{}
+		userFilter   = url.QueryEscape(fmt.Sprintf("userName eq '%s'", username))
+		data         = fmt.Sprintf("attributes=id,userName&filter=%s", userFilter)
+	)
+
+	rest := &RestRunner{
+		Logger:            s.Log,
+		RequestDecorator:  s.RequestDecorator,
+		Verb:              "GET",
+		URL:               s.Info.TokenEndpoint,
+		Path:              ListUsersEndpoint,
+		SuccessStatusCode: ListUsersSuccessStatus,
+		Data:              data,
+	}
+	rest.OnSuccess = func(res *http.Response) {
+		s.Log.Println("user response: ", res)
+		b, _ := ioutil.ReadAll(res.Body)
 		json.Unmarshal(b, &userResponse)
-		s.Log.Println("user response: ", userResponse, b)
+		s.Log.Println("user response: ", userResponse)
 		guid, err = getGUIDFromUsernameInResponse(username, userResponse)
 	}
 	rest.OnFailure = func(res *http.Response, e error) {

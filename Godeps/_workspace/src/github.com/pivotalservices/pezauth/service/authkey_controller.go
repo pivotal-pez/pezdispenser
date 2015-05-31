@@ -2,7 +2,6 @@ package pezauth
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 
 	"github.com/go-martini/martini"
@@ -10,32 +9,11 @@ import (
 	"github.com/martini-contrib/render"
 )
 
-//Authentication Handler vars
-var (
-	ErrInvalidCallerEmail = errors.New("Invalid user token for your requested action")
-)
-
-type (
-	//AuthPutHandler - auth control handler for put calls
-	AuthPutHandler func(params martini.Params, log *log.Logger, r render.Render, tokens oauth2.Tokens)
-	//AuthPostHandler - auth control handler for post calls
-	AuthPostHandler func(params martini.Params, log *log.Logger, r render.Render, tokens oauth2.Tokens)
-	//AuthGetHandler - auth control handler for get calls
-	AuthGetHandler func(params martini.Params, log *log.Logger, r render.Render, tokens oauth2.Tokens)
-	//AuthDeleteHandler - auth control handler for delete calls
-	AuthDeleteHandler func(params martini.Params, log *log.Logger, r render.Render, tokens oauth2.Tokens)
-)
-
 //NewAuthKeyV1 - get an instance of a V1 authkey controller
 func NewAuthKeyV1(kg KeyGenerator) Controller {
 	return &authKeyV1{
 		keyGen: kg,
 	}
-}
-
-type authKeyV1 struct {
-	Controller
-	keyGen KeyGenerator
 }
 
 //Put - get a put handler for authkeyv1

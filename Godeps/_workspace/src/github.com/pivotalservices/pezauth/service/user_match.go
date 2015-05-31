@@ -1,23 +1,8 @@
 package pezauth
 
-import "errors"
-
-//UserMatch exported vars
-var (
-	ErrNotValidActionForUser = errors.New("not a valid user to perform this action")
-)
-
 //NewUserMatch - creates a new usermatch struct pointer
 func NewUserMatch() *UserMatch {
 	return new(UserMatch)
-}
-
-//UserMatch - an object used to check if a user is updating the records on a user key they are able to access
-type UserMatch struct {
-	userInfo    map[string]interface{}
-	username    string
-	successFunc func()
-	failFunc    func()
 }
 
 //UserInfo - accepts a userinfo object grabbed from google auth

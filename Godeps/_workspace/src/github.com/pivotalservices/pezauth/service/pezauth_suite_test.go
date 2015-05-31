@@ -198,6 +198,10 @@ func (s *mockMongo) Find(query interface{}) (q *mgo.Query) {
 	return
 }
 
+func (s *mockMongo) Remove(selector interface{}) (err error) {
+	return
+}
+
 func (s *mockMongo) Upsert(selector interface{}, update interface{}) (info *mgo.ChangeInfo, err error) {
 	return
 }
@@ -205,6 +209,10 @@ func (s *mockMongo) Upsert(selector interface{}, update interface{}) (info *mgo.
 type mockPersistence struct {
 	result interface{}
 	err    error
+}
+
+func (s *mockPersistence) Remove(selector interface{}) (err error) {
+	return
 }
 
 func (s *mockPersistence) FindOne(query interface{}, result interface{}) (err error) {

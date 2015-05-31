@@ -28,13 +28,6 @@ var (
 	URLOrgBaseV1  = fmt.Sprintf("/%s/%s", APIVersion1, OrgGroup)
 )
 
-//Response - generic response object
-type Response struct {
-	Payload  interface{}
-	APIKey   string
-	ErrorMsg string
-}
-
 //InitRoutes - initialize the mappings for controllers against valid routes
 func InitRoutes(m *martini.ClassicMartini, redisConn Doer, mongoConn mongoCollection, authClient AuthRequestCreator) {
 	setOauthConfig()

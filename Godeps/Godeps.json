@@ -86,13 +86,13 @@
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/pezauth/keycheck",
-			"Comment": "v0.0.26-68-g240a180",
-			"Rev": "240a180731801621217ec351a411b77ba4b09748"
+			"Comment": "v0.0.26-88-gf765214",
+			"Rev": "f76521405ab34649ab0c6f92c32cfc404cda9743"
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/pezauth/service",
-			"Comment": "v0.0.26-68-g240a180",
-			"Rev": "240a180731801621217ec351a411b77ba4b09748"
+			"Comment": "v0.0.26-88-gf765214",
+			"Rev": "f76521405ab34649ab0c6f92c32cfc404cda9743"
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/cloudcontroller-client",

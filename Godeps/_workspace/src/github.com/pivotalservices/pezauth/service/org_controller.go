@@ -1,55 +1,12 @@
 package pezauth
 
 import (
-	"errors"
 	"log"
 
 	"github.com/fatih/structs"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/oauth2"
 	"github.com/martini-contrib/render"
-)
-
-const (
-	//EmailFieldName - fieldname for email
-	EmailFieldName = "email"
-)
-
-var (
-	//ErrNoMatchInStore - error when there is no matching org in the datastore
-	ErrNoMatchInStore = errors.New("Could not find a matching user org or connection failure")
-	//ErrCanNotCreateOrg - error when we can not create an org
-	ErrCanNotCreateOrg = errors.New("Could not create a new org")
-	//ErrCanNotAddOrgRec - error when we can not add a new org record to the datastore
-	ErrCanNotAddOrgRec = errors.New("Could not add a new org record")
-	//ErrCantCallAcrossUsers - error when a user is trying to update a user record other than their own
-	ErrCantCallAcrossUsers = errors.New("user calling another users endpoint")
-)
-
-type (
-	//OrgGetHandler - func signature of org get handler
-	OrgGetHandler func(params martini.Params, log *log.Logger, r render.Render, tokens oauth2.Tokens)
-	//OrgPutHandler - func signature of org put handler
-	OrgPutHandler func(params martini.Params, log *log.Logger, r render.Render, tokens oauth2.Tokens)
-)
-
-type (
-	//Persistence - interface to a persistence store of some kind
-	Persistence interface {
-		FindOne(query interface{}, result interface{}) (err error)
-		Upsert(selector interface{}, update interface{}) (err error)
-	}
-	//PivotOrg - struct for pivot org record
-	PivotOrg struct {
-		Email   string
-		OrgName string
-		OrgGUID string
-	}
-	orgController struct {
-		Controller
-		store      Persistence
-		authClient AuthRequestCreator
-	}
 )
 
 //NewOrgController - a controller for me requests

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/xchapter7x/cloudcontroller-client"
 )
@@ -14,7 +15,10 @@ type mockRequestDecorator struct {
 }
 
 func (s *mockRequestDecorator) CreateAuthRequest(verb, requestURL, path string, args interface{}) (*http.Request, error) {
-	return nil, nil
+
+	return &http.Request{
+		URL: &url.URL{},
+	}, nil
 }
 
 func (s *mockRequestDecorator) CCTarget() string {

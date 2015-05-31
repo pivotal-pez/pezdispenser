@@ -35,6 +35,7 @@ type (
 		AddSpace(spaceName string, orgGUID string) (spaceGUID string, err error)
 		AddUser(username string) error
 		RemoveOrg(orgGUID string) (err error)
+		ListUsers(int) (userList map[string]interface{}, err error)
 	}
 	//CFClient - cloud foundry api client struct
 	CFClient struct {
@@ -73,7 +74,10 @@ type (
 	}
 	//APIResponseList - a list of resources or apiresponse objects
 	APIResponseList struct {
-		Resources []APIResponse `json:"resources"`
+		StartIndex   int           `json:"startIndex"`
+		ItemsPerPage int           `json:"itemsPerPage"`
+		TotalResults int           `json:"totalResults"`
+		Resources    []APIResponse `json:"resources"`
 	}
 	//UserAPIResponse - the user api response object
 	UserAPIResponse struct {

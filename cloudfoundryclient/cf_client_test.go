@@ -8,6 +8,66 @@ import (
 )
 
 var _ = Describe("CFClient", func() {
+	Describe("ListUsers", func() {
+		var (
+			cfclient         CloudFoundryClient
+			controlResources = map[string]interface{}{
+				"resources": []interface{}{
+					map[string]interface{}{
+						"id":       "123456",
+						"userName": "testuser",
+					},
+				},
+				"startIndex":   float64(1),
+				"itemsPerPage": float64(100),
+				"totalResults": float64(1),
+				"schemas": []interface{}{
+					"urn:scim:schemas:core:1.0",
+				},
+			}
+		)
+
+		Context("ListUsers called successfully", func() {
+
+			BeforeEach(func() {
+				mockDoer := &mockClientDoer{
+					res: mockHttpResponse(mockSuccessUserResponseBody, mockSuccessUserStatusCode),
+					err: nil,
+				}
+				mockRequest := &mockRequestDecorator{
+					doer: mockDoer,
+				}
+				cfclient = NewCloudFoundryClient(mockRequest, new(mockLog))
+			})
+
+			It("should parse the response object without error", func() {
+				users, err := cfclient.ListUsers(1)
+				Ω(err).Should(BeNil())
+				Ω(users).Should(BeEquivalentTo(controlResources))
+			})
+		})
+
+		Context("ListUsers unsuccessful response", func() {
+
+			BeforeEach(func() {
+				mockDoer := &mockClientDoer{
+					res: mockHttpResponse(mockSuccessUserResponseBody, (mockSuccessUserStatusCode + 1)),
+					err: nil,
+				}
+				mockRequest := &mockRequestDecorator{
+					doer: mockDoer,
+				}
+				cfclient = NewCloudFoundryClient(mockRequest, new(mockLog))
+			})
+
+			It("should return an error", func() {
+				users, err := cfclient.ListUsers(1)
+				Ω(err).Should(Equal(ErrFailedStatusCode))
+				Ω(users).Should(BeEmpty())
+			})
+		})
+	})
+
 	Describe("AddSpace", func() {
 		var (
 			cfclient         CloudFoundryClient

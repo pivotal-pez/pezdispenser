@@ -11,23 +11,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type (
-	//OrgManager - interface to the org creation functionality
-	OrgManager interface {
-		Show() (result *PivotOrg, err error)
-		SafeCreate() (record *PivotOrg, err error)
-	}
-	orgManager struct {
-		username string
-		userGUID string
-		log      *log.Logger
-		tokens   oauth2.Tokens
-		store    Persistence
-		cfClient cloudfoundryclient.CloudFoundryClient
-		apiInfo  map[string]interface{}
-	}
-)
-
 //NewOrg - creates a new org manager
 var NewOrg = func(username string, log *log.Logger, tokens oauth2.Tokens, store Persistence, authClient AuthRequestCreator) OrgManager {
 	s := &orgManager{
@@ -56,31 +39,69 @@ func (s *orgManager) Show() (result *PivotOrg, err error) {
 	return
 }
 
-func (s *orgManager) RollbackCreate() (err error) {
-	s.log.Println("rolling back changes")
-	return
-}
-
 //SafeCreate - will create an org for the given user
 func (s *orgManager) SafeCreate() (record *PivotOrg, err error) {
 	var (
-		orgName  = getOrgNameFromEmail(s.username)
-		orgGUID  string
 		userGUID string
 	)
+	record = new(PivotOrg)
+
+	if _, err = s.cfClient.QueryAPIInfo(); err == nil {
+
+		if userGUID, err = s.cfClient.QueryUserGUID(s.username); err != nil {
+			s.log.Println("QueryUserGUID failed w/ error: ", err)
+			err = ErrCouldNotGetUserGUID
+		} else {
+			record, err = s.runOrgCreateCallchain(userGUID)
+		}
+	}
+	return
+}
+
+//RollbackCreate - will rollback anything created by a failed SafeCreate call, so we dont have orphaned/incomplete records
+func (s *orgManager) RollbackCreate(orgGUID string) (err error) {
+	s.log.Println("rolling back changes")
+	if err = s.store.Remove(bson.M{EmailFieldName: s.username}); err == nil {
+
+		if err = s.cfClient.RemoveOrg(orgGUID); err == nil {
+			s.log.Println("org at guid deleted: ", orgGUID)
+
+		} else {
+			s.log.Println("org at guid could not be deleted: ", orgGUID, err)
+		}
+
+	} else {
+		s.log.Println("rollback mongodb error: ", err.Error())
+	}
+	return
+}
+
+func (s *orgManager) runOrgCreateCallchain(userGUID string) (record *PivotOrg, err error) {
+	var (
+		orgName = getOrgNameFromEmail(s.username)
+		orgGUID string
+	)
+	record = new(PivotOrg)
 	c := goutil.NewChain(nil)
-	c.Call(s.cfClient.QueryAPIInfo)
-	c.CallP(c.Returns(&userGUID, &err), s.cfClient.QueryUserGUID, s.username)
 	c.CallP(c.Returns(&orgGUID, &err), s.cfClient.AddOrg, orgName)
 	c.Call(s.cfClient.AddRole, cloudfoundryclient.OrgEndpoint, orgGUID, cloudfoundryclient.RoleTypeManager, userGUID)
 	c.Call(s.cfClient.AddRole, cloudfoundryclient.OrgEndpoint, orgGUID, cloudfoundryclient.RoleTypeUser, userGUID)
-	c.CallP(c.Returns(record, &err), s.upsert, orgGUID)
+	c.Call(s.cfClient.AddSpace, DefaultSpaceName, orgGUID)
+
+	if record, err = s.upsert(orgGUID); err != nil {
+		c.Error = err
+	}
 
 	if c.Error != nil {
 		s.log.Println("we experienced a failure, should roll back changes", c.Error)
 		err = c.Error
-		record = new(PivotOrg)
-		s.RollbackCreate()
+
+		if orgGUID != "" {
+			s.RollbackCreate(orgGUID)
+
+		} else {
+			s.log.Println("nothing to rollback")
+		}
 	}
 	return
 }

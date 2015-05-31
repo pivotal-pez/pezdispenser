@@ -7,30 +7,11 @@ import (
 	"github.com/martini-contrib/render"
 )
 
-const (
-	//GUIDLength - length of valid key
-	GUIDLength = 36
-	//HeaderKeyName - header keyname for api-key value
-	HeaderKeyName = "X-API-KEY"
-	//ErrInvalidKeyFormatMsg - error msg for invalid key
-	ErrInvalidKeyFormatMsg = "Invalid key format"
-)
-
-//ValidateGetHandler - a type of handler for validation get endpoints
-type (
-	ValidateGetHandler func(log *log.Logger, r render.Render, req *http.Request)
-)
-
 //NewValidateV1 - create a validation controller
 func NewValidateV1(kg KeyGenerator) Controller {
 	return &validateV1{
 		keyGenerator: kg,
 	}
-}
-
-type validateV1 struct {
-	Controller
-	keyGenerator KeyGenerator
 }
 
 func (s *validateV1) Get() interface{} {

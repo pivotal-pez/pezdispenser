@@ -1,39 +1,11 @@
 package pezauth
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/garyburd/redigo/redis"
 )
-
-const (
-	//HMFieldActive - name of metadata hash field containing active status
-	HMFieldActive = "active"
-	//HMFieldDetails - name of metadata hash field containing user and key details
-	HMFieldDetails = "details"
-)
-
-var (
-	//ErrUnparsableHash - an error for a hash that is not formed properly
-	ErrUnparsableHash = errors.New("Could not parse the hash or hash was nil")
-	//ErrEmptyKeyResponse - an error for a invalid or empty key
-	ErrEmptyKeyResponse = errors.New("The key could not be found or was not valid")
-)
-
-//KeyGenerator - interface to work with apikeys
-type KeyGenerator interface {
-	Get(user string) (string, error)
-	GetByKey(key string) (hash string, val interface{}, err error)
-	Create(user, details string) error
-	Delete(user string) error
-}
-
-//Doer - interface to make a call to persistence store
-type Doer interface {
-	Do(commandName string, args ...interface{}) (reply interface{}, err error)
-}
 
 //NewKeyGen - create a new implementation of a KeyGenerator interface
 func NewKeyGen(doer Doer, guid GUIDMaker) KeyGenerator {
@@ -41,12 +13,6 @@ func NewKeyGen(doer Doer, guid GUIDMaker) KeyGenerator {
 		store:     doer,
 		guidMaker: guid,
 	}
-}
-
-//KeyGen - and implementation of the KeyGenerator interface
-type KeyGen struct {
-	store     Doer
-	guidMaker GUIDMaker
 }
 
 func parseKeysResponse(r interface{}) (key, username, hash string, err error) {

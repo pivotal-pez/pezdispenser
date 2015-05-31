@@ -17,8 +17,16 @@ func (s *RestRunner) Run() {
 	if req, err = s.RequestDecorator.CreateAuthRequest(s.Verb, s.URL, s.Path, s.Data); err == nil {
 		s.Logger.Println("we created the decorated request")
 
+		if s.Verb == "GET" && s.Data != nil {
+			switch v := s.Data.(type) {
+			case string:
+				req.URL.RawQuery = v
+			}
+		}
+
 		if res, err = s.RequestDecorator.HttpClient().Do(req); res.StatusCode == s.SuccessStatusCode && err == nil {
 			defer res.Body.Close()
+			s.Logger.Println("we are now going to execute the success callback")
 			s.OnSuccess(res)
 
 		} else {

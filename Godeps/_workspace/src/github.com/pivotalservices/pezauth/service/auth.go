@@ -16,24 +16,38 @@ import (
 	goauth2 "golang.org/x/oauth2"
 )
 
-//Constants to construct my oauth calls
-const (
-	ClientID      = "1083030294947-6g3bhhrgl3s7ul736jet625ajvp94f5p.apps.googleusercontent.com"
-	ClientSecret  = "kfgM5mT3BqPQ84VeXsYokAK_"
-	sessionName   = "pivotalpezauthservicesession"
-	sessionSecret = "shhh.donttellanyone"
-)
+//InitSession - initializes authentication middleware for controllers
+func InitSession(m *martini.ClassicMartini, rc redisCreds) {
+	m.Use(render.Renderer())
 
-//Vars for my oauth calls
-var (
-	Scopes              = []string{"https://www.googleapis.com/auth/plus.me", "https://www.googleapis.com/auth/userinfo.email"}
-	AuthFailureResponse = []byte(`{"error": "not logged in as a valid user, or the access token is expired"}`)
-	allowedDomains      = []string{
-		"pivotal.io",
+	if rediStore, err := sessions.NewRediStore(10, "tcp", rc.Uri(), rc.Pass(), []byte(sessionSecret)); err == nil {
+		m.Use(sessions.Sessions(sessionName, rediStore))
 	}
-	OauthConfig     *goauth2.Config
-	userObjectCache = make(map[string]map[string]interface{})
-)
+}
+
+//DomainChecker - check the authenticated users domain to see if it is in the whitelist
+func DomainChecker(res http.ResponseWriter, tokens oauth2.Tokens) {
+	userInfo := GetUserInfo(tokens)
+
+	if domain, ok := userInfo["domain"]; !ok || tokens.Expired() || isBlockedDomain(domain.(string)) {
+		res.WriteHeader(FailureStatus)
+		res.Write(AuthFailureResponse)
+	}
+}
+
+//DomainCheck - a handler to check if we are in a valid domain
+var DomainCheck = func() martini.Handler {
+	return DomainChecker
+}()
+
+//GetUserInfo - query googleapi for the authenticated users information
+var GetUserInfo = func(tokens oauth2.Tokens) (userObject map[string]interface{}) {
+
+	if userObject = getUserInfoCached(tokens); len(userObject) == 0 {
+		userObject = getUserInfo(tokens)
+	}
+	return
+}
 
 func isBlockedDomain(domain string) bool {
 	isBlocked := true
@@ -76,30 +90,6 @@ func getAppURI() string {
 	return cleanVersionFromURI(appEnv.ApplicationURIs[0])
 }
 
-//DomainChecker - check the authenticated users domain to see if it is in the whitelist
-func DomainChecker(res http.ResponseWriter, tokens oauth2.Tokens) {
-	userInfo := GetUserInfo(tokens)
-
-	if domain, ok := userInfo["domain"]; !ok || tokens.Expired() || isBlockedDomain(domain.(string)) {
-		res.WriteHeader(FailureStatus)
-		res.Write(AuthFailureResponse)
-	}
-}
-
-//DomainCheck - a handler to check if we are in a valid domain
-var DomainCheck = func() martini.Handler {
-	return DomainChecker
-}()
-
-//GetUserInfo - query googleapi for the authenticated users information
-var GetUserInfo = func(tokens oauth2.Tokens) (userObject map[string]interface{}) {
-
-	if userObject = getUserInfoCached(tokens); len(userObject) == 0 {
-		userObject = getUserInfo(tokens)
-	}
-	return
-}
-
 func addUserObjectToCache(tokens oauth2.Tokens, userObject map[string]interface{}) (err error) {
 	userObjectCache[tokens.Access()] = userObject
 	return
@@ -136,19 +126,5 @@ func setOauthConfig() {
 		ClientSecret: ClientSecret,
 		Scopes:       Scopes,
 		RedirectURL:  fmt.Sprintf("%s/oauth2callback", getAppURI()),
-	}
-}
-
-type redisCreds interface {
-	Pass() string
-	Uri() string
-}
-
-//InitSession - initializes authentication middleware for controllers
-func InitSession(m *martini.ClassicMartini, rc redisCreds) {
-	m.Use(render.Renderer())
-
-	if rediStore, err := sessions.NewRediStore(10, "tcp", rc.Uri(), rc.Pass(), []byte(sessionSecret)); err == nil {
-		m.Use(sessions.Sessions(sessionName, rediStore))
 	}
 }
