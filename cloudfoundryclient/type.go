@@ -35,7 +35,7 @@ type (
 		AddSpace(spaceName string, orgGUID string) (spaceGUID string, err error)
 		AddUser(username string) error
 		RemoveOrg(orgGUID string) (err error)
-		QueryUsers(int, int, string, string) (userList map[string]interface{}, err error)
+		QueryUsers(int, int, string, string) (userList UserAPIResponse, err error)
 	}
 	//CFClient - cloud foundry api client struct
 	CFClient struct {
@@ -74,13 +74,28 @@ type (
 	}
 	//APIResponseList - a list of resources or apiresponse objects
 	APIResponseList struct {
-		StartIndex   int           `json:"startIndex"`
-		ItemsPerPage int           `json:"itemsPerPage"`
-		TotalResults int           `json:"totalResults"`
-		Resources    []APIResponse `json:"resources"`
+		Resources []APIResponse `json:"resources"`
 	}
 	//UserAPIResponse - the user api response object
 	UserAPIResponse struct {
-		Resources []map[string]interface{}
+		Schemas      []string `json:"schemas"`
+		StartIndex   int      `json:"startIndex"`
+		ItemsPerPage int      `json:"itemsPerPage"`
+		TotalResults int      `json:"totalResults"`
+		Resources    []UserResource
+	}
+	//UserResource - a user resource record
+	UserResource struct {
+		Active    bool                   `json:"active"`
+		Approvals []interface{}          `json:"approvals"`
+		Emails    []map[string]string    `json:"emails"`
+		Groups    []map[string]string    `json:"groups"`
+		ID        string                 `json:"id"`
+		Meta      map[string]interface{} `json:"meta"`
+		Name      map[string]string      `json:"name"`
+		Origin    string                 `json:"origin"`
+		Schemas   []string               `json:"schemas"`
+		UserName  string                 `json:"userName"`
+		Verified  bool                   `json:"verified"`
 	}
 )

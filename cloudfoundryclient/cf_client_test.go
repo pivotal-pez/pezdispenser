@@ -11,18 +11,27 @@ var _ = Describe("CFClient", func() {
 	Describe("QueryUsers", func() {
 		var (
 			cfclient         CloudFoundryClient
-			controlResources = map[string]interface{}{
-				"resources": []interface{}{
-					map[string]interface{}{
-						"id":       "123456",
-						"userName": "testuser",
-					},
-				},
-				"startIndex":   float64(1),
-				"itemsPerPage": float64(100),
-				"totalResults": float64(1),
-				"schemas": []interface{}{
+			controlResources = UserAPIResponse{
+				Schemas: []string{
 					"urn:scim:schemas:core:1.0",
+				},
+				StartIndex:   1,
+				ItemsPerPage: 100,
+				TotalResults: 1,
+				Resources: []UserResource{
+					UserResource{
+						Active:    false,
+						Approvals: nil,
+						Emails:    nil,
+						Groups:    nil,
+						ID:        "123456",
+						Meta:      nil,
+						Name:      nil,
+						Origin:    "",
+						Schemas:   nil,
+						UserName:  "testuser",
+						Verified:  false,
+					},
 				},
 			}
 		)
@@ -69,7 +78,7 @@ var _ = Describe("CFClient", func() {
 			It("should return an error", func() {
 				users, err := cfclient.QueryUsers(1, 1, "id,userName", "")
 				Ω(err).Should(Equal(ErrFailedStatusCode))
-				Ω(users).Should(BeEmpty())
+				Ω(users).Should(Equal(UserAPIResponse{}))
 			})
 		})
 	})
