@@ -62,11 +62,11 @@ func getGUIDFromUsernameInResponse(username string, userResponse UserAPIResponse
 	return
 }
 
-//ListUsers - get the guid for the given user
+//QueryUsers - get the guid for the given user
 func (s *CFClient) QueryUsers(startIndex, count int, attributes, filter string) (userList map[string]interface{}, err error) {
 	var (
 		userResponse = UserAPIResponse{}
-		data         = fmt.Sprintf("startIndex=%d&count=%d&attributes=%s&filter=%s", startIndex, count, attributes, filter)
+		data         = fmt.Sprintf("startIndex=%d&count=%d%s%s", startIndex, count, parseArg("attributes", attributes), parseArg("filter", filter))
 	)
 
 	rest := &RestRunner{
@@ -91,6 +91,16 @@ func (s *CFClient) QueryUsers(startIndex, count int, attributes, filter string) 
 		err = e
 	}
 	rest.Run()
+	return
+}
+
+func parseArg(name string, filter string) (parsedFilter string) {
+
+	if filter == "" {
+		parsedFilter = filter
+	} else {
+		parsedFilter = fmt.Sprintf("&%s=%s", name, filter)
+	}
 	return
 }
 
