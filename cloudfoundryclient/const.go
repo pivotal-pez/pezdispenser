@@ -23,6 +23,8 @@ const (
 	RoleTypeManager = "managers"
 	//RoleTypeUser - this is the users type for role assignments
 	RoleTypeUser = "users"
+	//RoleTypeDeveloper - a role type for developers of a space
+	RoleTypeDeveloper = "developers"
 	//RoleCreationURLFormat - formatter string for role creation url generation
 	RoleCreationURLFormat = "%s/%s/%s/%s"
 	//RoleCreateSuccessStatusCode - success status code for role assignment calls
