@@ -44,6 +44,27 @@ func (s *CFClient) QueryAPIInfo() (info *CloudFoundryAPIInfo, err error) {
 	return
 }
 
+//Query - make a generic query against any rest endpoint
+func (s *CFClient) Query(verb string, domain string, path string, args interface{}) (response *http.Response) {
+	rest := &RestRunner{
+		Logger:            s.Log,
+		RequestDecorator:  s.RequestDecorator,
+		Verb:              verb,
+		URL:               domain,
+		Path:              path,
+		SuccessStatusCode: 0,
+		Data:              args,
+	}
+	rest.OnSuccess = func(res *http.Response) {
+		response = res
+	}
+	rest.OnFailure = func(res *http.Response, e error) {
+		response = res
+	}
+	rest.Run()
+	return
+}
+
 //QueryUsers - get the guid for the given user
 func (s *CFClient) QueryUsers(startIndex, count int, attributes, filter string) (userList UserAPIResponse, err error) {
 	var (

@@ -36,6 +36,7 @@ type (
 		AddUser(username string) error
 		RemoveOrg(orgGUID string) (err error)
 		QueryUsers(int, int, string, string) (userList UserAPIResponse, err error)
+		Query(verb string, domain string, path string, args interface{}) (response *http.Response)
 	}
 	//CFClient - cloud foundry api client struct
 	CFClient struct {
@@ -74,7 +75,11 @@ type (
 	}
 	//APIResponseList - a list of resources or apiresponse objects
 	APIResponseList struct {
-		Resources []APIResponse `json:"resources"`
+		TotalResults int           `json:"total_results"`
+		TotalPages   int           `json:"total_pages"`
+		PrevURL      string        `json:"prev_url"`
+		NextURL      string        `json:"next_url"`
+		Resources    []APIResponse `json:"resources"`
 	}
 	//UserAPIResponse - the user api response object
 	UserAPIResponse struct {

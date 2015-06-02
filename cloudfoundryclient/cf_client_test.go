@@ -8,6 +8,32 @@ import (
 )
 
 var _ = Describe("CFClient", func() {
+	Describe("Query", func() {
+		var (
+			cfclient   CloudFoundryClient
+			controlRes = mockHttpResponse(mockSuccessUserResponseBody, 200)
+		)
+
+		Context("Query called", func() {
+
+			BeforeEach(func() {
+				mockDoer := &mockClientDoer{
+					res: controlRes,
+					err: nil,
+				}
+				mockRequest := &mockRequestDecorator{
+					doer: mockDoer,
+				}
+				cfclient = NewCloudFoundryClient(mockRequest, new(mockLog))
+			})
+
+			It("should just pass back the response object", func() {
+				res := cfclient.Query("GET", "mydomain.com", "/v2/User", "")
+				Ω(res).Should(Equal(controlRes))
+			})
+		})
+	})
+
 	Describe("QueryUsers", func() {
 		var (
 			cfclient         CloudFoundryClient
