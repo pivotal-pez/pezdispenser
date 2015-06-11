@@ -31,6 +31,7 @@ func (s *CFClient) QueryAPIInfo() (info *CloudFoundryAPIInfo, err error) {
 	rest.OnSuccess = func(res *http.Response) {
 		b, _ := ioutil.ReadAll(res.Body)
 		json.Unmarshal(b, &s.Info)
+		s.Info.APIEndpoint = s.RequestDecorator.CCTarget()
 		s.Log.Println(s.Info)
 		s.Log.Println(string(b[:]))
 	}

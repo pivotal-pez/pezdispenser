@@ -11,7 +11,8 @@ import (
 )
 
 type mockRequestDecorator struct {
-	doer ccclient.ClientDoer
+	doer        ccclient.ClientDoer
+	apiEndpoint string
 }
 
 func (s *mockRequestDecorator) CreateAuthRequest(verb, requestURL, path string, args interface{}) (*http.Request, error) {
@@ -22,7 +23,7 @@ func (s *mockRequestDecorator) CreateAuthRequest(verb, requestURL, path string, 
 }
 
 func (s *mockRequestDecorator) CCTarget() string {
-	return ""
+	return s.apiEndpoint
 }
 
 func (s *mockRequestDecorator) HttpClient() ccclient.ClientDoer {

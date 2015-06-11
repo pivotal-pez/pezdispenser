@@ -49,6 +49,7 @@ type (
 	}
 	//CloudFoundryAPIInfo - info response object from cc info endpoint
 	CloudFoundryAPIInfo struct {
+		APIEndpoint              string
 		Name                     string `json:"name"`
 		Build                    string `json:"build"`
 		Support                  string `json:"support"`

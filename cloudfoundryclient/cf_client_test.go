@@ -365,6 +365,7 @@ var _ = Describe("CFClient", func() {
 		var cfclient CloudFoundryClient
 
 		Context("QueryAPIInfo called successfully", func() {
+			var controlAPIDomain = "api.test.org"
 
 			BeforeEach(func() {
 				mockDoer := &mockClientDoer{
@@ -372,7 +373,8 @@ var _ = Describe("CFClient", func() {
 					err: nil,
 				}
 				mockRequest := &mockRequestDecorator{
-					doer: mockDoer,
+					doer:        mockDoer,
+					apiEndpoint: controlAPIDomain,
 				}
 				cfclient = NewCloudFoundryClient(mockRequest, new(mockLog))
 			})
@@ -382,6 +384,7 @@ var _ = Describe("CFClient", func() {
 				Ω(info.LoggingEndpoint).ShouldNot(BeEmpty())
 				Ω(info.AuthorizationEndpoint).ShouldNot(BeEmpty())
 				Ω(info.TokenEndpoint).ShouldNot(BeEmpty())
+				Ω(info.APIEndpoint).Should(Equal(controlAPIDomain))
 				Ω(err).Should(BeNil())
 			})
 		})
