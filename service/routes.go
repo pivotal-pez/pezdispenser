@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/go-martini/martini"
-	"github.com/pivotalservices/pezauth/keycheck"
+	"github.com/pivotal-pez/pezauth/keycheck"
 )
 
 //Constants to construct routes with

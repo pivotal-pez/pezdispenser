@@ -5,7 +5,7 @@ import (
 
 	cfenv "github.com/cloudfoundry-community/go-cfenv"
 	"github.com/go-martini/martini"
-	pez "github.com/pivotalservices/pezdispenser/service"
+	pez "github.com/pivotal-pez/pezdispenser/service"
 )
 
 func main() {

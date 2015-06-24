@@ -5,7 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotalservices/pezdispenser/service"
+	. "github.com/pivotal-pez/pezdispenser/service"
 
 	"testing"
 )

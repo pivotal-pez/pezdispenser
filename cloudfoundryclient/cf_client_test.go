@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/pivotalservices/pezdispenser/cloudfoundryclient"
+	. "github.com/pivotal-pez/pezdispenser/cloudfoundryclient"
 )
 
 var _ = Describe("CFClient", func() {
