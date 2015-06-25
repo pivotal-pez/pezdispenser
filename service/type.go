@@ -5,19 +5,22 @@ import (
 )
 
 type (
-	mongoCollectionGetter interface {
+	//MongoCollectionGetter - Getting collections in mongo
+	MongoCollectionGetter interface {
 		Collection() Persistence
 	}
 
-	mongoCollection interface {
+	//MongoCollection - interface to a collection in mongo
+	MongoCollection interface {
 		Remove(selector interface{}) error
 		Find(query interface{}) *mgo.Query
 		Upsert(selector interface{}, update interface{}) (info *mgo.ChangeInfo, err error)
 	}
 
-	mongoCollectionWrapper struct {
+	//MongoCollectionWrapper - interface to wrap mongo collections with additional persistence functions
+	MongoCollectionWrapper struct {
 		Persistence
-		col mongoCollection
+		col MongoCollection
 	}
 
 	//Persistence - interface to a persistence store of some kind

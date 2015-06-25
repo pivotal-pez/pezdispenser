@@ -1,22 +1,22 @@
 package pezdispenser
 
-//NewMongoCollectionWrapper - wraps a mongo collection in as a Peristence interface implementation
-func NewMongoCollectionWrapper(c mongoCollection) Persistence {
-	return &mongoCollectionWrapper{
+//NewMongoCollectionWrapper - wraps a Mongo collection in as a Peristence interface implementation
+func NewMongoCollectionWrapper(c MongoCollection) Persistence {
+	return &MongoCollectionWrapper{
 		col: c,
 	}
 }
 
-//FindOne - combining the Find and One calls of a mongo collection object
-func (s *mongoCollectionWrapper) FindOne(query interface{}, result interface{}) (err error) {
+//FindOne - combining the Find and One calls of a Mongo collection object
+func (s *MongoCollectionWrapper) FindOne(query interface{}, result interface{}) (err error) {
 	if err = s.col.Find(query).One(result); err != nil {
 		err = ErrNoMatchInStore
 	}
 	return
 }
 
-//Upsert - allow us to call upsert on mongo collection object
-func (s *mongoCollectionWrapper) Upsert(selector interface{}, update interface{}) (err error) {
+//Upsert - allow us to call upsert on Mongo collection object
+func (s *MongoCollectionWrapper) Upsert(selector interface{}, update interface{}) (err error) {
 	if _, err = s.col.Upsert(selector, update); err != nil {
 		err = ErrCanNotAddOrgRec
 	}
@@ -24,6 +24,6 @@ func (s *mongoCollectionWrapper) Upsert(selector interface{}, update interface{}
 }
 
 //Remove - removes the matching selector from collection
-func (s *mongoCollectionWrapper) Remove(selector interface{}) error {
+func (s *MongoCollectionWrapper) Remove(selector interface{}) error {
 	return s.col.Remove(selector)
 }
