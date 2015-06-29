@@ -42,6 +42,15 @@
 		{
 			"ImportPath": "github.com/xchapter7x/cloudcontroller-client",
 			"Rev": "795e287327dd3faa6a5b65e000779cffe301cb3a"
+		},
+		{
+			"ImportPath": "github.com/xchapter7x/goutil",
+			"Rev": "189c9c150f54f5b0fe1de1a659e7ef20fa490cfb"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2015.06.03-3-g3569c88",
+			"Rev": "3569c88678d88179dcbd68d02ab081cbca3cd4d0"
 		}
 	]
 }
