@@ -13,7 +13,7 @@ func main() {
 	validatorServiceName := os.Getenv("UPS_PEZVALIDATOR_NAME")
 	targetKeyName := os.Getenv("UPS_PEZVALIDATOR_TARGET")
 	service, _ := appEnv.Services.WithName(validatorServiceName)
-	validationTargetUrl := service.Credentials[targetKeyName]
+	validationTargetUrl := service.Credentials[targetKeyName].(string)
 	m := martini.Classic()
 	pez.InitRoutes(m, validationTargetUrl)
 	m.Run()
