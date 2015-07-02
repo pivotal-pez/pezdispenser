@@ -170,7 +170,8 @@ func (s *CFClient) AddOrg(orgName string) (orgGUID string, err error) {
 	}
 	rest.OnFailure = func(res *http.Response, e error) {
 		body, _ := ioutil.ReadAll(res.Body)
-		s.Log.Println("call to create org api failed: ", string(body[:]))
+		logMessage := fmt.Sprintf("call to create org api failed: error-(%s) responsebody-(%s)", e.Error(), string(body[:]))
+		s.Log.Println(logMessage)
 		err = ErrOrgCreateAPICallFailure
 	}
 	rest.Run()
