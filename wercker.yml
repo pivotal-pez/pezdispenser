@@ -34,13 +34,6 @@ build:
         code: |
           godep go build main.go
 
-    #- internal/docker-push:
-        #username: $DOCKER_USER
-        #password: $DOCKER_P
-        #tag: ${WERCKER_GIT_COMMIT}.${WERCKER_GIT_BRANCH}
-        #repository: $DOCKER_REPO
-        #registry: $DOCKER_REGISTRY
-
     - script:
         name: add repo to artifact
         code: |
@@ -68,8 +61,7 @@ deploy:
         api_url: $CF_APIURL
         app_name: $CF_APPNAME
         use_manifest: true
-        host: $CF_HOSTNAME
-        domain: $CF_DOMAINNAME
+        manifest: $CF_MANIFEST_FILE_PATH
 
     - xchapter7x/flowy-release:
         action: "tag-only-release"
@@ -78,3 +70,26 @@ deploy:
         git_name: $GITFLOW_NAME
         git_email: $GITFLOW_EMAIL
 
+    - script:
+        name: set release id variable and version.txt file
+        code: |
+          git fetch --tags
+          export WERCKER_GITHUB_CREATE_RELEASE_ID=`git log -n1 --pretty=format:%d HEAD | sed s/\ //g | awk -F',' '{print $2}'`
+          echo $WERCKER_GITHUB_CREATE_RELEASE_ID > version.txt
+          
+    - script:
+        name: package release tarball 
+        code: |
+          tar -cvzf dispenser.tgz manifest.yml $CF_MANIFEST_FILE_PATH cups.txt public main Procfile version.txt README.md
+
+    - github-create-release:
+        token: $GITHUB_TOKEN
+        tag: $WERCKER_GITHUB_CREATE_RELEASE_ID
+        title: Admin Portal $WERCKER_GITHUB_CREATE_RELEASE_ID
+        draft: $RELEASE_DRAFT
+    
+    - github-upload-asset:
+        token: $GITHUB_TOKEN
+        file: dispenser.tgz
+        release_id: $WERCKER_GITHUB_CREATE_RELEASE_ID
+        content-type: application/x-gzip

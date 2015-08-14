@@ -1,0 +1,2 @@
+# creating user provided service for auth service rest api example value. https://hcfdev.cfapps.pez.pivotal.io/valid-key
+cf cups pezvalidator-service -p "target-url"
