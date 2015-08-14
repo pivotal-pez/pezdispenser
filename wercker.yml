@@ -53,6 +53,7 @@ deploy:
         fingerprint: 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48
         
     - xchapter7x/cf-push-zdd:
+        num_instances: $CF_INSTANCES
         user_name: $CF_USER
         user_pass: $CF_PASS
         org: $CF_ORG
