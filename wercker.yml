@@ -1,5 +1,4 @@
 box: google/golang
-
 build:
   # The steps that will be executed on build
   steps:
@@ -74,13 +73,13 @@ deploy:
         name: set release id variable and version.txt file
         code: |
           git fetch --tags
-          export WERCKER_GITHUB_CREATE_RELEASE_ID=`git log -n1 --pretty=format:%d HEAD | sed s/\ //g | awk -F',' '{print $2}'`
+          export WERCKER_GITHUB_CREATE_RELEASE_ID=`git log -n1 --pretty=format:%d HEAD | sed s/\ //g | sed s/tag\://g | awk -F',' '{print $2}'`
           echo $WERCKER_GITHUB_CREATE_RELEASE_ID > version.txt
           
     - script:
         name: package release tarball 
         code: |
-          tar -cvzf dispenser.tgz manifest.yml $CF_MANIFEST_FILE_PATH cups.txt public main Procfile version.txt README.md
+          tar -cvzf dispenser.tgz manifest.yml $CF_MANIFEST_FILE_PATH cups.txt main Procfile version.txt README.md
 
     - github-create-release:
         token: $GITHUB_TOKEN
