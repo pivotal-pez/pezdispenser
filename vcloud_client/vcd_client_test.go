@@ -10,15 +10,6 @@ import (
 	. "github.com/pivotal-pez/pezdispenser/vcloud_client"
 )
 
-type fakeHttpClient struct {
-	Err      error
-	Response *http.Response
-}
-
-func (s *fakeHttpClient) Do(req *http.Request) (*http.Response, error) {
-	return s.Response, s.Err
-}
-
 var _ = Describe("VCloud Client", func() {
 	Describe("VCDClient", func() {
 
