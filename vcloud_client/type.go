@@ -8,6 +8,7 @@ type (
 		Token  string
 		client httpClientDoer
 	}
+
 	httpClientDoer interface {
 		Do(req *http.Request) (resp *http.Response, err error)
 	}

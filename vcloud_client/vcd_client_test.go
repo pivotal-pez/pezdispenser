@@ -12,7 +12,33 @@ import (
 
 var _ = Describe("VCloud Client", func() {
 	Describe("VCDClient", func() {
+		Describe(".AuthDecorate()", func() {
+			var (
+				vcdClient    *VCDClient
+				controlToken = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
+			)
+			Context("given an *http.Request object", func() {
+				BeforeEach(func() {
+					client := new(fakeHttpClient)
+					vcdClient = NewVCDClient(client)
+				})
 
+				It("should add the proper authentication token to the header of the given request", func() {
+					vcdClient.Token = controlToken
+					req := new(http.Request)
+					vcdClient.AuthDecorate(req)
+					token := req.Header.Get(VCloudTokenHeaderName)
+					Ω(token).Should(Equal(controlToken))
+				})
+
+				It("should return error if there is no token available", func() {
+					req := new(http.Request)
+					err := vcdClient.AuthDecorate(req)
+					Ω(err).Should(HaveOccurred())
+					Ω(err).Should(Equal(ErrNoTokenToApply))
+				})
+			})
+		})
 		Describe(".Auth()", func() {
 			var (
 				vcdClient    *VCDClient

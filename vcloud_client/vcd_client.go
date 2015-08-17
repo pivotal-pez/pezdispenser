@@ -21,6 +21,22 @@ func DefaultClient() (client *http.Client) {
 	return
 }
 
+//AuthDecorate - decorate a given request object with a auth token header
+func (s *VCDClient) AuthDecorate(req *http.Request) (err error) {
+
+	if s.Token == "" {
+		err = ErrNoTokenToApply
+
+	} else {
+
+		if req.Header == nil {
+			req.Header = http.Header{}
+		}
+		req.Header.Set(VCloudTokenHeaderName, s.Token)
+	}
+	return
+}
+
 //Auth - authenticates against the vcd api and sets a token
 func (s *VCDClient) Auth(username, password, uri string) (err error) {
 	var (
