@@ -74,12 +74,16 @@ func (s *VCDClient) queryAndParseResponse(req *http.Request) (vappTemplate *VApp
 		body, err = ioutil.ReadAll(res.Body)
 		tmplt := QueryResultRecords{}
 		xml.Unmarshal(body, &tmplt)
-		*vappTemplate = tmplt.VAppTemplateRecord[0]
+		*vappTemplate = firstElement(tmplt.VAppTemplateRecord)
 
 	} else if res.StatusCode != QuerySuccessStatusCode && err == nil {
 		err = ErrFailedQuery
 	}
 	return
+}
+
+func firstElement(va []VAppTemplateRecord) VAppTemplateRecord {
+	return va[0]
 }
 
 //Auth - authenticates against the vcd api and sets a token

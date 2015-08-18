@@ -20,6 +20,7 @@ var _ = Describe("VCloud Client", func() {
 				controlToken    = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
 				controlSlotName = "PCFaaS-Slot-10"
 			)
+
 			Context("when query call response has status other than 200", func() {
 				BeforeEach(func() {
 					client := new(fakeHttpClient)
