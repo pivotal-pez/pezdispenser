@@ -14,6 +14,31 @@ import (
 
 var _ = Describe("VCloud Client", func() {
 	Describe("VCDClient", func() {
+		Describe(".DeployVApp()", func() {
+			var (
+				vcdClient       *VCDClient
+				controlToken    = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
+				controlSlotName = "PCFaaS-Slot-10"
+				controlVcdHref  = "https://sandbox.pez.pivotal.io/api/vdc/59b61466-fad9-49b4-a355-2467d311da78"
+				controlHref     = "https://sandbox.pez.pivotal.io/api/vAppTemplate/vappTemplate-8b761107-eddc-430c-8aba-3cdf900e9812"
+			)
+			Context("when called with valid templatename, templatehref & vcdhref", func() {
+				BeforeEach(func() {
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = DeployVappSuccessStatusCode
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+
+				It("should respond with a 201", func() {
+					res, err := vcdClient.DeployVApp(controlSlotName, controlHref, controlVcdHref)
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(res.StatusCode).Should(Equal(201))
+				})
+			})
+		})
+
 		Describe(".QueryTemplate()", func() {
 			var (
 				vcdClient       *VCDClient

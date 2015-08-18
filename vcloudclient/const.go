@@ -10,9 +10,27 @@ const (
 	AuthSuccessStatusCode = 200
 	//QuerySuccessStatusCode - a query call to vcd api was successful
 	QuerySuccessStatusCode = 200
-	vCDAuthURIPath         = "/api/sessions"
-	vCDQueryURIPath        = "/api/query"
-	templateQueryParams    = "type=vAppTemplate&filter=name=="
+	//DeployVappSuccessStatusCode - successful status code for vapp deploy
+	DeployVappSuccessStatusCode = 201
+	vCDAuthURIPath              = "/api/sessions"
+	vCDQueryURIPath             = "/api/query"
+	vCDVAppDeploymentPath       = "/action/instantiateVAppTemplate"
+	templateQueryParams         = "type=vAppTemplate&filter=name=="
+	vAppDeploymentContentType   = "application/vnd.vmware.vcloud.instantiateVAppTemplateParams+xml; charset=ISO-8859-1"
+	vAppDeploymentPayload       = `
+		<InstantiateVAppTemplateParams 
+		xmlns="http://www.vmware.com/vcloud/v1.5"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/1"
+		name="%s"
+		deploy="true"
+		powerOn="true">
+			<Description>PEZ PCFaaS</Description>
+			<InstantiationParams></InstantiationParams>
+			<Source 
+			href="%s" />
+		</InstantiateVAppTemplateParams>
+		`
 )
 
 var (
