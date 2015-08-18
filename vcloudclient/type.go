@@ -17,6 +17,7 @@ type (
 	QueryResultRecords struct {
 		XMLName            xml.Name             `xml:"QueryResultRecords"`
 		VAppTemplateRecord []VAppTemplateRecord `xml:"VAppTemplateRecord"`
+		Link               []interface{}        `xml:"Link"`
 	}
 	//VAppTemplateRecord - vapp result from query
 	VAppTemplateRecord struct {

@@ -1,7 +1,9 @@
 package vcloudclient_test
 
 import (
+	"bytes"
 	"errors"
+	"io/ioutil"
 	"net/http"
 
 	. "github.com/onsi/ginkgo"
@@ -12,6 +14,51 @@ import (
 
 var _ = Describe("VCloud Client", func() {
 	Describe("VCDClient", func() {
+		Describe(".QueryTemplate()", func() {
+			var (
+				vcdClient       *VCDClient
+				controlToken    = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
+				controlSlotName = "PCFaaS-Slot-10"
+			)
+			Context("when query call response has status other than 200", func() {
+				BeforeEach(func() {
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = (QuerySuccessStatusCode + 201)
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+
+				It("Should return query failed error", func() {
+					_, err := vcdClient.QueryTemplate(controlSlotName)
+					Ω(err).Should(HaveOccurred())
+					Ω(err).Should(Equal(ErrFailedQuery))
+				})
+			})
+
+			Context("when given a valid template name", func() {
+				BeforeEach(func() {
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = QuerySuccessStatusCode
+					client.Response.Header = http.Header{}
+					client.Response.Header.Set(VCloudTokenHeaderName, controlToken)
+					fixtureData, _ := ioutil.ReadFile("fixtures/template_query_response.xml")
+					client.Response.Body = nopCloser{bytes.NewBuffer(fixtureData)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+
+				It("Should return a vapptemplate object for the matching template", func() {
+					template, err := vcdClient.QueryTemplate(controlSlotName)
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(template.Name).Should(Equal(controlSlotName))
+					Ω(template.Vdc).Should(Equal("https://sandbox.pez.pivotal.io/api/vdc/59b61466-fad9-49b4-a355-2467d311da78"))
+					Ω(template.Href).Should(Equal("https://sandbox.pez.pivotal.io/api/vAppTemplate/vappTemplate-8b761107-eddc-430c-8aba-3cdf900e9812"))
+				})
+			})
+		})
+
 		Describe(".AuthDecorate()", func() {
 			var (
 				vcdClient    *VCDClient

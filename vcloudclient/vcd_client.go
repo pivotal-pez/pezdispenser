@@ -2,7 +2,9 @@ package vcloudclient
 
 import (
 	"crypto/tls"
+	"encoding/xml"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -44,13 +46,49 @@ func (s *VCDClient) getAbsoluteURIFromPath(uriPath string) (absoluteURI string) 
 	return
 }
 
+//QueryTemplate - query the vcd api for the template we would like to use
+func (s *VCDClient) QueryTemplate(templateName string) (vappTemplate *VAppTemplateRecord, err error) {
+	var (
+		req *http.Request
+	)
+	URI := s.getAbsoluteURIFromPath(vCDQueryURIPath)
+	queryURI := fmt.Sprintf("%s?%s%s", URI, templateQueryParams, templateName)
+
+	if req, err = http.NewRequest("GET", queryURI, nil); err == nil {
+
+		if err = s.AuthDecorate(req); err == nil {
+			vappTemplate, err = s.queryAndParseResponse(req)
+		}
+	}
+	return
+}
+
+func (s *VCDClient) queryAndParseResponse(req *http.Request) (vappTemplate *VAppTemplateRecord, err error) {
+	var (
+		res  *http.Response
+		body []byte
+	)
+	vappTemplate = new(VAppTemplateRecord)
+
+	if res, err = s.client.Do(req); err == nil && res.StatusCode == QuerySuccessStatusCode {
+		body, err = ioutil.ReadAll(res.Body)
+		tmplt := QueryResultRecords{}
+		xml.Unmarshal(body, &tmplt)
+		*vappTemplate = tmplt.VAppTemplateRecord[0]
+
+	} else if res.StatusCode != QuerySuccessStatusCode && err == nil {
+		err = ErrFailedQuery
+	}
+	return
+}
+
 //Auth - authenticates against the vcd api and sets a token
 func (s *VCDClient) Auth(username, password string) (err error) {
 	var (
 		req   *http.Request
 		resp  *http.Response
 		token string
-		uri   = s.getAbsoluteURIFromPath(VCDAuthURIPath)
+		uri   = s.getAbsoluteURIFromPath(vCDAuthURIPath)
 	)
 	defer func() {
 		s.Token = token
