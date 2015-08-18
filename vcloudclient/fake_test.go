@@ -1,4 +1,4 @@
-package vcloud_client_test
+package vcloudclient_test
 
 import "net/http"
 

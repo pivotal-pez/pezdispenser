@@ -1,4 +1,4 @@
-package vcloud_client_test
+package vcloudclient_test
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/pivotal-pez/pezdispenser/vcloud_client"
+	. "github.com/pivotal-pez/pezdispenser/vcloudclient"
 )
 
 var _ = Describe("VCloud Client", func() {

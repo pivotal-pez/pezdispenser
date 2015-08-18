@@ -1,4 +1,4 @@
-package vcloud_client
+package vcloudclient
 
 import "errors"
 
@@ -14,6 +14,6 @@ const (
 var (
 	//ErrAuthFailure - error message returned for authentication responses not having a success statuscode
 	ErrAuthFailure = errors.New("status code failure on authentication call to api")
-	//ErrNoTokenToApply - error response if decorator can not find a token to decorate with
+
 	ErrNoTokenToApply = errors.New("no token to decorate the given request with")
 )

@@ -1,4 +1,4 @@
-package vcloud_client
+package vcloudclient
 
 import (
 	"crypto/tls"
