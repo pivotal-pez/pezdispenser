@@ -20,7 +20,7 @@ var _ = Describe("VCloud Client", func() {
 			Context("given an *http.Request object", func() {
 				BeforeEach(func() {
 					client := new(fakeHttpClient)
-					vcdClient = NewVCDClient(client)
+					vcdClient = NewVCDClient(client, "")
 				})
 
 				It("should add the proper authentication token to the header of the given request", func() {
@@ -52,11 +52,11 @@ var _ = Describe("VCloud Client", func() {
 					client.Response.StatusCode = AuthSuccessStatusCode
 					client.Response.Header = http.Header{}
 					client.Response.Header.Set(VCloudTokenHeaderName, controlToken)
-					vcdClient = NewVCDClient(client)
+					vcdClient = NewVCDClient(client, "")
 				})
 
 				It("should set us a valid auth token", func() {
-					err := vcdClient.Auth("", "", "")
+					err := vcdClient.Auth("", "")
 					token := vcdClient.Token
 					Ω(err).ShouldNot(HaveOccurred())
 					Ω(token).ShouldNot(BeEmpty())
@@ -71,17 +71,17 @@ var _ = Describe("VCloud Client", func() {
 					client.Response.StatusCode = (AuthSuccessStatusCode + 201)
 					client.Response.Header = http.Header{}
 					client.Response.Header.Set(VCloudTokenHeaderName, controlToken)
-					vcdClient = NewVCDClient(client)
+					vcdClient = NewVCDClient(client, "")
 				})
 
 				It("should return the proper error", func() {
-					err := vcdClient.Auth("", "", "")
+					err := vcdClient.Auth("", "")
 					Ω(err).Should(HaveOccurred())
 					Ω(err).Should(Equal(ErrAuthFailure))
 				})
 
 				It("should not set a token", func() {
-					vcdClient.Auth("", "", "")
+					vcdClient.Auth("", "")
 					token := vcdClient.Token
 					Ω(token).Should(BeEmpty())
 				})
@@ -93,11 +93,11 @@ var _ = Describe("VCloud Client", func() {
 					client.Err = errors.New("random connection error")
 					client.Response = new(http.Response)
 					client.Response.StatusCode = (AuthSuccessStatusCode + 300)
-					vcdClient = NewVCDClient(client)
+					vcdClient = NewVCDClient(client, "")
 				})
 
 				It("should pass through the error from the client connection", func() {
-					err := vcdClient.Auth("", "", "")
+					err := vcdClient.Auth("", "")
 					token := vcdClient.Token
 					Ω(err).Should(HaveOccurred())
 					Ω(err).ShouldNot(Equal(ErrAuthFailure))

@@ -2,13 +2,15 @@ package vcloudclient
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
 )
 
 //NewVCDClient - constructs a new VCDClient object with given client
-func NewVCDClient(client httpClientDoer) *VCDClient {
+func NewVCDClient(client httpClientDoer, baseURI string) *VCDClient {
 	return &VCDClient{
-		client: client,
+		BaseURI: baseURI,
+		client:  client,
 	}
 }
 
@@ -37,12 +39,18 @@ func (s *VCDClient) AuthDecorate(req *http.Request) (err error) {
 	return
 }
 
+func (s *VCDClient) getAbsoluteURIFromPath(uriPath string) (absoluteURI string) {
+	absoluteURI = fmt.Sprintf("%s%s", s.BaseURI, uriPath)
+	return
+}
+
 //Auth - authenticates against the vcd api and sets a token
-func (s *VCDClient) Auth(username, password, uri string) (err error) {
+func (s *VCDClient) Auth(username, password string) (err error) {
 	var (
 		req   *http.Request
 		resp  *http.Response
 		token string
+		uri   = s.getAbsoluteURIFromPath(VCDAuthURIPath)
 	)
 	defer func() {
 		s.Token = token

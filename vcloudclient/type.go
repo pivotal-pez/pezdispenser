@@ -9,8 +9,9 @@ import (
 type (
 	//VCDAuth - vcd authentication object
 	VCDClient struct {
-		Token  string
-		client httpClientDoer
+		BaseURI string
+		Token   string
+		client  httpClientDoer
 	}
 	//QueryResultRecords - root level query result xml object
 	QueryResultRecords struct {
