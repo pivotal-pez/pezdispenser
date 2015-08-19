@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VApp xmlns="http://www.vmware.com/vcloud/v1.5" xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/1"
+        xmlns:environment_1="http://schemas.dmtf.org/ovf/environment/1" href="xs:anyURI" type="xs:string" name="xs:string" id="xs:string"
+        status="xs:int" deployed="xs:boolean" ovfDescriptorUploaded="xs:boolean">
+    <Link href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"
+            rel="xs:string"/>
+    <Description> xs:string </Description>
+    <Tasks>
+      <Task href="https://sampleurl.com" type="xs:string" name="xs:string" id="xs:string"
+                status="xs:string" operation="xs:string" operationName="xs:string" startTime="xs:dateTime"
+                endTime="xs:dateTime" expiryTime="xs:dateTime">
+            <Link href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"
+                    rel="xs:string"/>
+            <Description> xs:string </Description>
+            <Tasks> TasksInProgressType </Tasks>
+            <Owner href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+            <Error message="xs:string" majorErrorCode="xs:int" minorErrorCode="xs:string" vendorSpecificErrorCode="xs:string"
+                    stackTrace="xs:string"/>
+            <User href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+            <Organization href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+            <Progress> xs:int </Progress>
+            <Params> ... </Params>
+        </Task>
+    </Tasks>
+    <Files>
+        <File href="xs:anyURI" type="xs:string" name="xs:string" id="xs:string"
+                size="xs:long" bytesTransferred="xs:long" checksum="xs:normalizedString">
+            <Link href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"
+                    rel="xs:string"/>
+            <Description> xs:string </Description>
+            <Tasks>
+                <Task href="xs:anyURI" type="xs:string" name="xs:string" id="xs:string"
+                        status="xs:string" operation="xs:string" operationName="xs:string" startTime="xs:dateTime"
+                        endTime="xs:dateTime" expiryTime="xs:dateTime">
+                    <Link href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"
+                            rel="xs:string"/>
+                    <Description> xs:string </Description>
+                    <Tasks> TasksInProgressType </Tasks>
+                    <Owner href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+                    <Error message="xs:string" majorErrorCode="xs:int" minorErrorCode="xs:string" vendorSpecificErrorCode="xs:string"
+                            stackTrace="xs:string"/>
+                    <User href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+                    <Organization href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+                    <Progress> xs:int </Progress>
+                    <Params> ... </Params>
+                </Task>
+            </Tasks>
+        </File>
+    </Files>
+    <VAppParent href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+    <ovf:Section> ovf:Section_Type </ovf:Section>
+    <Owner href="xs:anyURI" type="xs:string">
+        <Link href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"
+                rel="xs:string"/>
+        <User href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+    </Owner>
+    <InMaintenanceMode> xs:boolean </InMaintenanceMode>
+    <Children>
+        <VApp> VAppType </VApp>
+        <Vm href="xs:anyURI" type="xs:string" name="xs:string" id="xs:string"
+                status="xs:int" deployed="xs:boolean" needsCustomization="xs:boolean">
+            <Link href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"
+                    rel="xs:string"/>
+            <Description> xs:string </Description>
+            <Tasks>
+                <Task href="xs:anyURI" type="xs:string" name="xs:string" id="xs:string"
+                        status="xs:string" operation="xs:string" operationName="xs:string" startTime="xs:dateTime"
+                        endTime="xs:dateTime" expiryTime="xs:dateTime">
+                    <Link href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"
+                            rel="xs:string"/>
+                    <Description> xs:string </Description>
+                    <Tasks> TasksInProgressType </Tasks>
+                    <Owner href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+                    <Error message="xs:string" majorErrorCode="xs:int" minorErrorCode="xs:string" vendorSpecificErrorCode="xs:string"
+                            stackTrace="xs:string"/>
+                    <User href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+                    <Organization href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+                    <Progress> xs:int </Progress>
+                    <Params> ... </Params>
+                </Task>
+            </Tasks>
+            <Files>
+                <File href="xs:anyURI" type="xs:string" name="xs:string" id="xs:string"
+                        size="xs:long" bytesTransferred="xs:long" checksum="xs:normalizedString">
+                    <Link href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"
+                            rel="xs:string"/>
+                    <Description> xs:string </Description>
+                    <Tasks>
+                        <Task href="xs:anyURI" type="xs:string" name="xs:string" id="xs:string"
+                                status="xs:string" operation="xs:string" operationName="xs:string" startTime="xs:dateTime"
+                                endTime="xs:dateTime" expiryTime="xs:dateTime">
+                            <Link href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"
+                                    rel="xs:string"/>
+                            <Description> xs:string </Description>
+                            <Tasks> TasksInProgressType </Tasks>
+                            <Owner href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+                            <Error message="xs:string" majorErrorCode="xs:int" minorErrorCode="xs:string" vendorSpecificErrorCode="xs:string"
+                                    stackTrace="xs:string"/>
+                            <User href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+                            <Organization href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+                            <Progress> xs:int </Progress>
+                            <Params> ... </Params>
+                        </Task>
+                    </Tasks>
+                </File>
+            </Files>
+            <VAppParent href="xs:anyURI" id="xs:string" type="xs:string" name="xs:string"/>
+            <ovf:Section> ovf:Section_Type </ovf:Section>
+            <VAppScopedLocalId> xs:string </VAppScopedLocalId>
+            <environment_1:Environment> environment_1:Environment_Type </environment_1:Environment>
+        </Vm>
+    </Children>
+</VApp>

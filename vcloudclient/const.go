@@ -40,4 +40,6 @@ var (
 	ErrNoTokenToApply = errors.New("no token to decorate the given request with")
 	//ErrFailedQuery - query to vcd api failed returning non 200 status code
 	ErrFailedQuery = errors.New("invalid response code from query api call")
+	//ErrFailedDeploy - deploy api call returned a non-success statuscode
+	ErrFailedDeploy = errors.New("invalid response code from deploy api call")
 )

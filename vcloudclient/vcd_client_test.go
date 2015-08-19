@@ -23,18 +23,26 @@ var _ = Describe("VCloud Client", func() {
 				controlHref     = "https://sandbox.pez.pivotal.io/api/vAppTemplate/vappTemplate-8b761107-eddc-430c-8aba-3cdf900e9812"
 			)
 			Context("when called with valid templatename, templatehref & vcdhref", func() {
+				controlTaskHref := "https://sampleurl.com"
+
 				BeforeEach(func() {
 					client := new(fakeHttpClient)
 					client.Response = new(http.Response)
 					client.Response.StatusCode = DeployVappSuccessStatusCode
+					fixtureData, _ := ioutil.ReadFile("fixtures/deploy_vapp_response.xml")
+					client.Response.Body = nopCloser{bytes.NewBuffer(fixtureData)}
 					vcdClient = NewVCDClient(client, "")
 					vcdClient.Token = controlToken
 				})
 
-				It("should respond with a 201", func() {
-					res, err := vcdClient.DeployVApp(controlSlotName, controlHref, controlVcdHref)
+				It("should not yield an error", func() {
+					_, err := vcdClient.DeployVApp(controlSlotName, controlHref, controlVcdHref)
 					Ω(err).ShouldNot(HaveOccurred())
-					Ω(res.StatusCode).Should(Equal(201))
+				})
+
+				It("should return a valid vapp object for the deployment call", func() {
+					vapp, _ := vcdClient.DeployVApp(controlSlotName, controlHref, controlVcdHref)
+					Ω(vapp.Tasks.Task.Href).Should(Equal(controlTaskHref))
 				})
 			})
 		})

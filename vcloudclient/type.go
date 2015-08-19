@@ -9,9 +9,46 @@ import (
 type (
 	//VCDAuth - vcd authentication object
 	VCDClient struct {
+		//BaseURI
 		BaseURI string
-		Token   string
-		client  httpClientDoer
+		//Token
+		Token  string
+		client httpClientDoer
+	}
+	//VApp - xml object used in response from deploy app api call
+	VApp struct {
+		//XMLName
+		XMLName xml.Name `xml:"VApp"`
+		//Link
+		Link []interface{} `xml:"Link"`
+		//Description
+		Description string `xml:"Description"`
+		//Tasks
+		Tasks TasksElem `xml:"Tasks"`
+		//Files
+		Files []interface{} `xml:"Files"`
+		//VAppParent
+		VAppParent interface{} `xml:"VAppParent"`
+		//Owner
+		Owner interface{} `xml:"Owner"`
+		//InMaintenanceMode
+		InMaintenanceMode bool `xml:"InMaintenanceMode"`
+		//Children
+		Children []interface{} `xml:"Children"`
+	}
+	//TasksElem
+	TasksElem struct {
+		Task TaskElem `xml:"Task"`
+	}
+	//TaskElem - object representing a XML task response object from the api
+	TaskElem struct {
+		//Href
+		Href string `xml:"href,attr"`
+		//Status
+		Status string `xml:"status,attr"`
+		//StartTime
+		StartTime   time.Time `xml:"startTime,attr"`
+		Description string    `xml:"Description"`
 	}
 	//QueryResultRecords - root level query result xml object
 	QueryResultRecords struct {

@@ -27,8 +27,11 @@ func DefaultClient() (client *http.Client) {
 }
 
 //DeployVApp - deploy a vapptemplate as a vapp to a given slot
-func (s *VCDClient) DeployVApp(templateName, templateHref, vcdHref string) (res *http.Response, err error) {
-	var req *http.Request
+func (s *VCDClient) DeployVApp(templateName, templateHref, vcdHref string) (vapp *VApp, err error) {
+	var (
+		req *http.Request
+		res *http.Response
+	)
 	uri := fmt.Sprintf("%s%s", vcdHref, vCDVAppDeploymentPath)
 	requestBody := fmt.Sprintf(vAppDeploymentPayload, templateName, templateHref)
 
@@ -36,7 +39,26 @@ func (s *VCDClient) DeployVApp(templateName, templateHref, vcdHref string) (res 
 		s.AuthDecorate(req)
 		req.Header.Set("Accept", "application/*+xml;version=5.5")
 		req.Header.Set("Content-Type", vAppDeploymentContentType)
-		res, err = s.client.Do(req)
+
+		if res, err = s.client.Do(req); err == nil {
+			vapp, err = s.parseDeployXMLResponse(res)
+		}
+	}
+	return
+}
+
+func (s *VCDClient) parseDeployXMLResponse(res *http.Response) (vapp *VApp, err error) {
+	var (
+		body []byte
+	)
+	vapp = new(VApp)
+
+	if res.StatusCode == DeployVappSuccessStatusCode {
+		body, err = ioutil.ReadAll(res.Body)
+		xml.Unmarshal(body, vapp)
+
+	} else {
+		err = ErrFailedDeploy
 	}
 	return
 }
