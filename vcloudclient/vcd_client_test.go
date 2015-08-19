@@ -22,6 +22,21 @@ var _ = Describe("VCloud Client", func() {
 				controlVcdHref  = "https://sandbox.pez.pivotal.io/api/vdc/59b61466-fad9-49b4-a355-2467d311da78"
 				controlHref     = "https://sandbox.pez.pivotal.io/api/vAppTemplate/vappTemplate-8b761107-eddc-430c-8aba-3cdf900e9812"
 			)
+			Context("when a call to the rest api fails", func() {
+				BeforeEach(func() {
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = (DeployVappSuccessStatusCode + 201)
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+
+				It("should yield an error showing the failure", func() {
+					_, err := vcdClient.DeployVApp(controlSlotName, controlHref, controlVcdHref)
+					Ω(err).Should(HaveOccurred())
+				})
+			})
+
 			Context("when called with valid templatename, templatehref & vcdhref", func() {
 				controlTaskHref := "https://sampleurl.com"
 
