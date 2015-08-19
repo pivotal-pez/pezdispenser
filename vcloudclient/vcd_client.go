@@ -35,7 +35,55 @@ func (s *VCDClient) PollTaskURL(taskURL string, timeout uint64, frequency uint64
 		defer scheduler.Clear()
 		failureCallback()
 	})
+	scheduler.Every(frequency).Seconds().Do(s.pollingTask, taskURL, successCallback, failureCallback, scheduler)
 	go scheduler.Start()
+	return
+}
+
+func (s *VCDClient) pollingTask(taskURL string, successCallback, failureCallback func(), scheduler *gocron.Scheduler) {
+	var (
+		res  *http.Response
+		req  *http.Request
+		task *TaskElem
+		err  error
+	)
+
+	if req, err = http.NewRequest("GET", taskURL, nil); err == nil {
+		s.AuthDecorate(req)
+		req.Header.Set("Accept", "application/*+xml;version=5.5")
+
+		if res, err = s.client.Do(req); err == nil {
+			task, err = s.parseTaskXMLResponse(res)
+			s.decideToCallback(task.Status, successCallback, failureCallback, scheduler)
+		}
+	}
+}
+
+func (s *VCDClient) decideToCallback(taskStatus string, successCallback, failureCallback func(), scheduler *gocron.Scheduler) {
+
+	if taskStatus == "success" {
+		successCallback()
+		scheduler.Clear()
+
+	} else if taskStatus == "aborted" || taskStatus == "canceled" || taskStatus == "error" {
+		failureCallback()
+		scheduler.Clear()
+	}
+}
+
+func (s *VCDClient) parseTaskXMLResponse(res *http.Response) (task *TaskElem, err error) {
+	var (
+		body []byte
+	)
+	task = new(TaskElem)
+
+	if res.StatusCode == TaskPollSuccessStatusCode {
+		body, err = ioutil.ReadAll(res.Body)
+		xml.Unmarshal(body, task)
+
+	} else {
+		err = ErrTaskPollFailed
+	}
 	return
 }
 

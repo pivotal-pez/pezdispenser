@@ -12,12 +12,14 @@ const (
 	QuerySuccessStatusCode = 200
 	//DeployVappSuccessStatusCode - successful status code for vapp deploy
 	DeployVappSuccessStatusCode = 201
-	vCDAuthURIPath              = "/api/sessions"
-	vCDQueryURIPath             = "/api/query"
-	vCDVAppDeploymentPath       = "/action/instantiateVAppTemplate"
-	templateQueryParams         = "type=vAppTemplate&filter=name=="
-	vAppDeploymentContentType   = "application/vnd.vmware.vcloud.instantiateVAppTemplateParams+xml; charset=ISO-8859-1"
-	vAppDeploymentPayload       = `
+	//TaskPollSuccessStatusCode - successfull statuscode on a call to the task api endpoint
+	TaskPollSuccessStatusCode = 200
+	vCDAuthURIPath            = "/api/sessions"
+	vCDQueryURIPath           = "/api/query"
+	vCDVAppDeploymentPath     = "/action/instantiateVAppTemplate"
+	templateQueryParams       = "type=vAppTemplate&filter=name=="
+	vAppDeploymentContentType = "application/vnd.vmware.vcloud.instantiateVAppTemplateParams+xml; charset=ISO-8859-1"
+	vAppDeploymentPayload     = `
 		<InstantiateVAppTemplateParams 
 		xmlns="http://www.vmware.com/vcloud/v1.5"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -42,4 +44,6 @@ var (
 	ErrFailedQuery = errors.New("invalid response code from query api call")
 	//ErrFailedDeploy - deploy api call returned a non-success statuscode
 	ErrFailedDeploy = errors.New("invalid response code from deploy api call")
+	//ErrTaskPollFailed - cant call task poll rest api endpoint
+	ErrTaskPollFailed = errors.New("failed to poll task status code not successful")
 )

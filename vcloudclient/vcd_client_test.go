@@ -3,6 +3,7 @@ package vcloudclient_test
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -16,58 +17,156 @@ var _ = Describe("VCloud Client", func() {
 	Describe("VCDClient", func() {
 		Describe(".PollTaskURL()", func() {
 			var (
-				vcdClient    *VCDClient
-				controlToken = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
+				vcdClient       *VCDClient
+				controlToken                          = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
+				timeout         uint64                = 1
+				timeoutBuffer                         = float64(timeout) * 2
+				controlOutput                         = 1
+				failureCallback func(chan int) func() = func(c chan int) (f func()) {
+					f = func() {
+						c <- controlOutput
+					}
+					return
+				}
+				successCallback func(chan int) func() = func(c chan int) (f func()) {
+					f = func() {
+						c <- controlOutput
+					}
+					return
+				}
 			)
 
 			XContext("when a call to the endpoint returns a status of `queued`", func() {
-				It("should continue to wait and poll", func() {
 
+				BeforeEach(func() {
+					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "queued")
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = TaskPollSuccessStatusCode
+					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
 				})
+				It("should execute the successCallback", func(done Done) {
+					c := make(chan int)
+					vcdClient.PollTaskURL("", 10, 1, successCallback(c), failureCallback(c))
+					Expect(<-c).To(Equal(controlOutput))
+					close(done)
+				}, 3)
 			})
 			XContext("when a call to the endpoint returns a status of `preRunning`", func() {
-				It("should continue to wait and poll", func() {
+				BeforeEach(func() {
 
+					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "preRunning")
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = TaskPollSuccessStatusCode
+					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
 				})
+				It("should execute the successCallback", func(done Done) {
+					c := make(chan int)
+					vcdClient.PollTaskURL("", 10, 1, successCallback(c), failureCallback(c))
+					Expect(<-c).To(Equal(controlOutput))
+					close(done)
+				}, 3)
+
 			})
 			XContext("when a call to the endpoint returns a status of `running`", func() {
-				It("should continue to wait and poll", func() {
+				BeforeEach(func() {
 
+					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "running")
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = TaskPollSuccessStatusCode
+					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
 				})
-			})
-			XContext("when a call to the endpoint returns a status of `success`", func() {
-				It("should execute the successCallback", func() {
 
-				})
-			})
-			XContext("when a call to the endpoint returns a status of `error`", func() {
-				It("should execute the failureCallback", func() {
+				It("should execute the successCallback", func(done Done) {
+					c := make(chan int)
+					vcdClient.PollTaskURL("", 10, 1, successCallback(c), failureCallback(c))
+					Expect(<-c).To(Equal(controlOutput))
+					close(done)
+				}, 3)
 
-				})
 			})
-			XContext("when a call to the endpoint returns a status of `canceled`", func() {
-				It("should execute the failureCallback", func() {
 
+			Context("when a call to the endpoint returns a status of `success`", func() {
+				BeforeEach(func() {
+					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "success")
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = TaskPollSuccessStatusCode
+					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
 				})
+				It("should execute the successCallback", func(done Done) {
+					c := make(chan int)
+					vcdClient.PollTaskURL("", 10, 1, successCallback(c), func() {})
+					Expect(<-c).To(Equal(controlOutput))
+					close(done)
+				}, 3)
 			})
-			XContext("when a call to the endpoint returns a status of `aborted`", func() {
-				It("should execute the failureCallback", func() {
 
+			Context("when a call to the endpoint returns a status of `error`", func() {
+				BeforeEach(func() {
+					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "error")
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = TaskPollSuccessStatusCode
+					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
 				})
+				It("should execute the failureCallback", func(done Done) {
+					c := make(chan int)
+					vcdClient.PollTaskURL("", 10, 1, func() {}, failureCallback(c))
+					Expect(<-c).To(Equal(controlOutput))
+					close(done)
+				}, 3)
 			})
+
+			Context("when a call to the endpoint returns a status of `canceled`", func() {
+				BeforeEach(func() {
+					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "canceled")
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = TaskPollSuccessStatusCode
+					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+				It("should execute the failureCallback", func(done Done) {
+					c := make(chan int)
+					vcdClient.PollTaskURL("", 10, 1, func() {}, failureCallback(c))
+					Expect(<-c).To(Equal(controlOutput))
+					close(done)
+				}, 3)
+			})
+
+			Context("when a call to the endpoint returns a status of `aborted`", func() {
+				BeforeEach(func() {
+					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "aborted")
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = TaskPollSuccessStatusCode
+					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+				It("should execute the failureCallback", func(done Done) {
+					c := make(chan int)
+					vcdClient.PollTaskURL("", 10, 1, func() {}, failureCallback(c))
+					Expect(<-c).To(Equal(controlOutput))
+					close(done)
+				}, 3)
+			})
+
 			Context("when the timeout is reached", func() {
-				var (
-					timeout         uint64                = 1
-					timeoutBuffer                         = float64(timeout) * 2
-					controlOutput                         = 1
-					failureCallback func(chan int) func() = func(c chan int) (f func()) {
-						f = func() {
-							c <- controlOutput
-						}
-						return
-					}
-				)
-
 				BeforeEach(func() {
 					client := new(fakeHttpClient)
 					client.Response = new(http.Response)
