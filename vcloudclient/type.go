@@ -47,8 +47,16 @@ type (
 		//Status
 		Status string `xml:"status,attr"`
 		//StartTime
-		StartTime   time.Time `xml:"startTime,attr"`
-		Description string    `xml:"Description"`
+		StartTime time.Time `xml:"startTime,attr"`
+		Error     ErrorElem `xml:"Error"`
+	}
+	//ErrorElem - an error xml object
+	ErrorElem struct {
+		Message                 string
+		MajorErrorCode          int
+		MinorErrorCode          string
+		VendorSpecificErrorCode string
+		StackTrace              string
 	}
 	//QueryResultRecords - root level query result xml object
 	QueryResultRecords struct {

@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/jasonlvhit/gocron"
 )
 
 //NewVCDClient - constructs a new VCDClient object with given client
@@ -23,6 +25,17 @@ func DefaultClient() (client *http.Client) {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client = &http.Client{Transport: tr}
+	return
+}
+
+//PollTaskURL - given a task url this will poll it for status, up to a timeout, and take a success or fail action
+func (s *VCDClient) PollTaskURL(taskURL string, timeout uint64, frequency uint64, successCallback func(), failureCallback func()) (scheduler *gocron.Scheduler) {
+	scheduler = gocron.NewScheduler()
+	scheduler.Every(timeout).Seconds().Do(func() {
+		defer scheduler.Clear()
+		failureCallback()
+	})
+	go scheduler.Start()
 	return
 }
 

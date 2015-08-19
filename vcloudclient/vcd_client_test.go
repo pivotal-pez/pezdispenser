@@ -14,6 +14,76 @@ import (
 
 var _ = Describe("VCloud Client", func() {
 	Describe("VCDClient", func() {
+		Describe(".PollTaskURL()", func() {
+			var (
+				vcdClient    *VCDClient
+				controlToken = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
+			)
+
+			XContext("when a call to the endpoint returns a status of `queued`", func() {
+				It("should continue to wait and poll", func() {
+
+				})
+			})
+			XContext("when a call to the endpoint returns a status of `preRunning`", func() {
+				It("should continue to wait and poll", func() {
+
+				})
+			})
+			XContext("when a call to the endpoint returns a status of `running`", func() {
+				It("should continue to wait and poll", func() {
+
+				})
+			})
+			XContext("when a call to the endpoint returns a status of `success`", func() {
+				It("should execute the successCallback", func() {
+
+				})
+			})
+			XContext("when a call to the endpoint returns a status of `error`", func() {
+				It("should execute the failureCallback", func() {
+
+				})
+			})
+			XContext("when a call to the endpoint returns a status of `canceled`", func() {
+				It("should execute the failureCallback", func() {
+
+				})
+			})
+			XContext("when a call to the endpoint returns a status of `aborted`", func() {
+				It("should execute the failureCallback", func() {
+
+				})
+			})
+			Context("when the timeout is reached", func() {
+				var (
+					timeout         uint64                = 1
+					timeoutBuffer                         = float64(timeout) * 2
+					controlOutput                         = 1
+					failureCallback func(chan int) func() = func(c chan int) (f func()) {
+						f = func() {
+							c <- controlOutput
+						}
+						return
+					}
+				)
+
+				BeforeEach(func() {
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+
+				It("should execute the failureCallback", func(done Done) {
+					c := make(chan int)
+					vcdClient.PollTaskURL("", timeout, 0, func() {}, failureCallback(c))
+					Expect(<-c).To(Equal(controlOutput))
+					close(done)
+				}, timeoutBuffer)
+			})
+		})
+
 		Describe(".DeployVApp()", func() {
 			var (
 				vcdClient       *VCDClient
