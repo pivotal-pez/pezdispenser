@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/jasonlvhit/gocron"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -34,9 +36,13 @@ var _ = Describe("VCloud Client", func() {
 					}
 					return
 				}
+				controlNoCallbackExecuted = 2
+				interval                  = uint64(1)
+				controlCheck              = uint64(interval * 2)
+				controlBuffer             = float64(interval * 3)
 			)
 
-			XContext("when a call to the endpoint returns a status of `queued`", func() {
+			Context("when a call to the endpoint returns a status of `queued`", func() {
 
 				BeforeEach(func() {
 					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "queued")
@@ -47,16 +53,22 @@ var _ = Describe("VCloud Client", func() {
 					vcdClient = NewVCDClient(client, "")
 					vcdClient.Token = controlToken
 				})
-				It("should execute the successCallback", func(done Done) {
-					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, successCallback(c), failureCallback(c))
-					Expect(<-c).To(Equal(controlOutput))
-					close(done)
-				}, 3)
-			})
-			XContext("when a call to the endpoint returns a status of `preRunning`", func() {
-				BeforeEach(func() {
 
+				It("should not execute any callback", func(done Done) {
+					c := make(chan int)
+					s := gocron.NewScheduler()
+					s.Every(controlCheck).Seconds().Do(func() {
+						c <- controlNoCallbackExecuted
+					})
+					go s.Start()
+					vcdClient.PollTaskURL("", 10, interval, successCallback(c), failureCallback(c))
+					Expect(<-c).To(Equal(controlNoCallbackExecuted))
+					close(done)
+				}, controlBuffer)
+			})
+
+			Context("when a call to the endpoint returns a status of `preRunning`", func() {
+				BeforeEach(func() {
 					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "preRunning")
 					client := new(fakeHttpClient)
 					client.Response = new(http.Response)
@@ -65,17 +77,22 @@ var _ = Describe("VCloud Client", func() {
 					vcdClient = NewVCDClient(client, "")
 					vcdClient.Token = controlToken
 				})
-				It("should execute the successCallback", func(done Done) {
+
+				It("should not execute any callback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, successCallback(c), failureCallback(c))
-					Expect(<-c).To(Equal(controlOutput))
+					s := gocron.NewScheduler()
+					s.Every(controlCheck).Seconds().Do(func() {
+						c <- controlNoCallbackExecuted
+					})
+					go s.Start()
+					vcdClient.PollTaskURL("", 10, interval, successCallback(c), failureCallback(c))
+					Expect(<-c).To(Equal(controlNoCallbackExecuted))
 					close(done)
-				}, 3)
-
+				}, controlBuffer)
 			})
-			XContext("when a call to the endpoint returns a status of `running`", func() {
-				BeforeEach(func() {
 
+			Context("when a call to the endpoint returns a status of `running`", func() {
+				BeforeEach(func() {
 					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "running")
 					client := new(fakeHttpClient)
 					client.Response = new(http.Response)
@@ -85,13 +102,17 @@ var _ = Describe("VCloud Client", func() {
 					vcdClient.Token = controlToken
 				})
 
-				It("should execute the successCallback", func(done Done) {
+				It("should not execute any callback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, successCallback(c), failureCallback(c))
-					Expect(<-c).To(Equal(controlOutput))
+					s := gocron.NewScheduler()
+					s.Every(controlCheck).Seconds().Do(func() {
+						c <- controlNoCallbackExecuted
+					})
+					go s.Start()
+					vcdClient.PollTaskURL("", 10, interval, successCallback(c), failureCallback(c))
+					Expect(<-c).To(Equal(controlNoCallbackExecuted))
 					close(done)
-				}, 3)
-
+				}, controlBuffer)
 			})
 
 			Context("when a call to the endpoint returns a status of `success`", func() {

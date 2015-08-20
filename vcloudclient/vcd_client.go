@@ -60,12 +60,11 @@ func (s *VCDClient) pollingTask(taskURL string, successCallback, failureCallback
 }
 
 func (s *VCDClient) decideToCallback(taskStatus string, successCallback, failureCallback func(), scheduler *gocron.Scheduler) {
-
-	if taskStatus == "success" {
+	switch taskStatus {
+	case "success":
 		successCallback()
 		scheduler.Clear()
-
-	} else if taskStatus == "aborted" || taskStatus == "canceled" || taskStatus == "error" {
+	case "aborted", "canceled", "error":
 		failureCallback()
 		scheduler.Clear()
 	}
