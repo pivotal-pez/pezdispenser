@@ -30,7 +30,21 @@ func DefaultClient() (client *http.Client) {
 
 //DeleteVApp - this will make a delete api call for the given vapp
 func (s *VCDClient) DeleteVApp(vappId string) (task *TaskElem, err error) {
-	task = new(TaskElem)
+	var (
+		req *http.Request
+		res *http.Response
+	)
+	vappDeletePath := fmt.Sprintf(vCDVAppDeletePathFormat, vappId)
+	uri := fmt.Sprintf("%s%s", s.BaseURI, vappDeletePath)
+
+	if req, err = http.NewRequest("DELETE", uri, nil); err == nil {
+		s.AuthDecorate(req)
+		req.Header.Set("Accept", "application/*+xml;version=5.5")
+
+		if res, err = s.client.Do(req); err == nil {
+			task, err = s.parseTaskXMLResponse(res, DeleteVappSuccessStatusCode)
+		}
+	}
 	return
 }
 
@@ -59,7 +73,7 @@ func (s *VCDClient) pollingTask(taskURL string, successCallback, failureCallback
 		req.Header.Set("Accept", "application/*+xml;version=5.5")
 
 		if res, err = s.client.Do(req); err == nil {
-			task, err = s.parseTaskXMLResponse(res)
+			task, err = s.parseTaskXMLResponse(res, TaskPollSuccessStatusCode)
 			s.decideToCallback(task.Status, successCallback, failureCallback, scheduler)
 		}
 	}
@@ -76,18 +90,18 @@ func (s *VCDClient) decideToCallback(taskStatus string, successCallback, failure
 	}
 }
 
-func (s *VCDClient) parseTaskXMLResponse(res *http.Response) (task *TaskElem, err error) {
+func (s *VCDClient) parseTaskXMLResponse(res *http.Response, expectedStatusCode int) (task *TaskElem, err error) {
 	var (
 		body []byte
 	)
 	task = new(TaskElem)
 
-	if res.StatusCode == TaskPollSuccessStatusCode {
+	if res.StatusCode == expectedStatusCode {
 		body, err = ioutil.ReadAll(res.Body)
 		xml.Unmarshal(body, task)
 
 	} else {
-		err = ErrTaskPollFailed
+		err = ErrTaskResponseParseFailed
 	}
 	return
 }

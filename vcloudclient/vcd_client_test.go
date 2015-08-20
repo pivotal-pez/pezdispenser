@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("VCloud Client", func() {
 	Describe("VCDClient", func() {
-		XDescribe(".DeleteVApp()", func() {
+		Describe(".DeleteVApp()", func() {
 			var (
 				vcdClient    *VCDClient
 				controlToken = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
@@ -42,7 +42,7 @@ var _ = Describe("VCloud Client", func() {
 					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "queued")
 					client := new(fakeHttpClient)
 					client.Response = new(http.Response)
-					client.Response.StatusCode = DeleteVappSuccessStatusCode
+					client.Response.StatusCode = (DeleteVappSuccessStatusCode + 201)
 					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
 					vcdClient = NewVCDClient(client, "")
 					vcdClient.Token = controlToken
@@ -51,7 +51,7 @@ var _ = Describe("VCloud Client", func() {
 				It("should return a failure status error", func() {
 					_, err := vcdClient.DeleteVApp("vappid")
 					Ω(err).Should(HaveOccurred())
-					Ω(err).Should(Equal(ErrDeleteVAppFailed))
+					Ω(err).Should(Equal(ErrTaskResponseParseFailed))
 				})
 			})
 
@@ -61,7 +61,7 @@ var _ = Describe("VCloud Client", func() {
 					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "queued")
 					client := new(fakeHttpClient)
 					client.Response = new(http.Response)
-					client.Response.StatusCode = TaskPollSuccessStatusCode
+					client.Response.StatusCode = DeleteVappSuccessStatusCode
 					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
 					vcdClient = NewVCDClient(client, "")
 					vcdClient.Token = controlToken

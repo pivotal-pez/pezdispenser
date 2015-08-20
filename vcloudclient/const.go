@@ -16,6 +16,7 @@ const (
 	DeleteVappSuccessStatusCode = 201
 	//TaskPollSuccessStatusCode - successfull statuscode on a call to the task api endpoint
 	TaskPollSuccessStatusCode = 200
+	vCDVAppDeletePathFormat   = "/vApp/%s"
 	vCDAuthURIPath            = "/api/sessions"
 	vCDQueryURIPath           = "/api/query"
 	vCDVAppDeploymentPath     = "/action/instantiateVAppTemplate"
@@ -46,8 +47,6 @@ var (
 	ErrFailedQuery = errors.New("invalid response code from query api call")
 	//ErrFailedDeploy - deploy api call returned a non-success statuscode
 	ErrFailedDeploy = errors.New("invalid response code from deploy api call")
-	//ErrTaskPollFailed - cant call task poll rest api endpoint
-	ErrTaskPollFailed = errors.New("failed to poll task status code not successful")
-	//ErrDeleteVAppFailed - failure when calling delete vapp api
-	ErrDeleteVAppFailed = errors.New("call to delete vapp api yielded a un-successful response statuscode")
+	//ErrTaskResponseParseFailed - cant call task poll rest api endpoint
+	ErrTaskResponseParseFailed = errors.New("failed to poll task status code not successful")
 )
