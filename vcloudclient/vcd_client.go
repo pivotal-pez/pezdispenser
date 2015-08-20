@@ -28,6 +28,12 @@ func DefaultClient() (client *http.Client) {
 	return
 }
 
+//DeleteVApp - this will make a delete api call for the given vapp
+func (s *VCDClient) DeleteVApp(vappId string) (task *TaskElem, err error) {
+	task = new(TaskElem)
+	return
+}
+
 //PollTaskURL - given a task url this will poll it for status, up to a timeout, and take a success or fail action
 func (s *VCDClient) PollTaskURL(taskURL string, timeout uint64, frequency uint64, successCallback func(), failureCallback func()) (scheduler *gocron.Scheduler) {
 	scheduler = gocron.NewScheduler()
