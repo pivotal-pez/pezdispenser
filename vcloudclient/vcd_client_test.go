@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/jasonlvhit/gocron"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -134,23 +132,43 @@ var _ = Describe("VCloud Client", func() {
 		})
 		Describe(".PollTaskURL()", func() {
 			var (
-				vcdClient     *VCDClient
-				controlToken                        = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
-				timeout       uint64                = 1
-				timeoutBuffer                       = float64(timeout) * 2
-				controlOutput                       = 1
-				fakeCallback  func(chan int) func() = func(c chan int) func() {
-					return func() {
-						c <- controlOutput
-					}
-				}
-				controlNoCallbackExecuted = 2
-				interval                  = uint64(1)
-				controlCheck              = uint64(interval * 2)
-				controlBuffer             = float64(interval * 3)
+				vcdClient    *VCDClient
+				controlToken = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
 			)
+			Context("when the client call fails", func() {
+				var randomClientError = errors.New("random client error")
+				BeforeEach(func() {
+					client := new(fakeHttpClient)
+					client.Err = randomClientError
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+				It("should return the client error", func() {
+					_, err := vcdClient.PollTaskURL("vappid")
+					Ω(err).Should(HaveOccurred())
+					Ω(err).Should(Equal(randomClientError))
+				})
+			})
 
-			XContext("when a call to the endpoint returns a status of `queued`", func() {
+			Context("when the REST call returns a non successful statuscode", func() {
+				BeforeEach(func() {
+					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "queued")
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = (TaskPollSuccessStatusCode + 201)
+					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+
+				It("should return a failure status error", func() {
+					_, err := vcdClient.PollTaskURL("vappid")
+					Ω(err).Should(HaveOccurred())
+					Ω(err).Should(Equal(ErrTaskResponseParseFailed))
+				})
+			})
+
+			Context("when called with a valid vapp id", func() {
 
 				BeforeEach(func() {
 					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "queued")
@@ -162,153 +180,11 @@ var _ = Describe("VCloud Client", func() {
 					vcdClient.Token = controlToken
 				})
 
-				It("should not execute any callback", func(done Done) {
-					c := make(chan int)
-					s := gocron.NewScheduler()
-					s.Every(controlCheck).Seconds().Do(func() {
-						c <- controlNoCallbackExecuted
-					})
-					go vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c)).Start()
-					go s.Start()
-					Expect(<-c).To(Equal(controlNoCallbackExecuted))
-					close(done)
-				}, controlBuffer)
-			})
-
-			XContext("when a call to the endpoint returns a status of `preRunning`", func() {
-				BeforeEach(func() {
-					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "preRunning")
-					client := new(fakeHttpClient)
-					client.Response = new(http.Response)
-					client.Response.StatusCode = TaskPollSuccessStatusCode
-					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
-					vcdClient = NewVCDClient(client, "")
-					vcdClient.Token = controlToken
+				It("should make the call to the task api endpoint and return a task to monitor its status", func() {
+					task, err := vcdClient.PollTaskURL("vappid")
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(task.Status).ShouldNot(BeEmpty())
 				})
-
-				It("should not execute any callback", func(done Done) {
-					c := make(chan int)
-					s := gocron.NewScheduler()
-					s.Every(controlCheck).Seconds().Do(func() {
-						c <- controlNoCallbackExecuted
-					})
-					go vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c)).Start()
-					go s.Start()
-					Expect(<-c).To(Equal(controlNoCallbackExecuted))
-					close(done)
-				}, controlBuffer)
-			})
-
-			XContext("when a call to the endpoint returns a status of `running`", func() {
-				BeforeEach(func() {
-					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "running")
-					client := new(fakeHttpClient)
-					client.Response = new(http.Response)
-					client.Response.StatusCode = TaskPollSuccessStatusCode
-					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
-					vcdClient = NewVCDClient(client, "")
-					vcdClient.Token = controlToken
-				})
-
-				It("should not execute any callback", func(done Done) {
-					c := make(chan int)
-					s := gocron.NewScheduler()
-					s.Every(controlCheck).Seconds().Do(func() {
-						c <- controlNoCallbackExecuted
-					})
-					go vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c)).Start()
-					go s.Start()
-					Expect(<-c).To(Equal(controlNoCallbackExecuted))
-					close(done)
-				}, controlBuffer)
-			})
-
-			Context("when a call to the endpoint returns a status of `success`", func() {
-				BeforeEach(func() {
-					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "success")
-					client := new(fakeHttpClient)
-					client.Response = new(http.Response)
-					client.Response.StatusCode = TaskPollSuccessStatusCode
-					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
-					vcdClient = NewVCDClient(client, "")
-					vcdClient.Token = controlToken
-				})
-				It("should execute the successCallback", func(done Done) {
-					c := make(chan int)
-					go vcdClient.PollTaskURL("", 10, 1, fakeCallback(c), func() {}).Start()
-					Expect(<-c).To(Equal(controlOutput))
-					close(done)
-				}, 3)
-			})
-
-			Context("when a call to the endpoint returns a status of `error`", func() {
-				BeforeEach(func() {
-					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "error")
-					client := new(fakeHttpClient)
-					client.Response = new(http.Response)
-					client.Response.StatusCode = TaskPollSuccessStatusCode
-					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
-					vcdClient = NewVCDClient(client, "")
-					vcdClient.Token = controlToken
-				})
-				It("should execute the failureCallback", func(done Done) {
-					c := make(chan int)
-					go vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c)).Start()
-					Expect(<-c).To(Equal(controlOutput))
-					close(done)
-				}, 3)
-			})
-
-			Context("when a call to the endpoint returns a status of `canceled`", func() {
-				BeforeEach(func() {
-					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "canceled")
-					client := new(fakeHttpClient)
-					client.Response = new(http.Response)
-					client.Response.StatusCode = TaskPollSuccessStatusCode
-					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
-					vcdClient = NewVCDClient(client, "")
-					vcdClient.Token = controlToken
-				})
-				It("should execute the failureCallback", func(done Done) {
-					c := make(chan int)
-					go vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c)).Start()
-					Expect(<-c).To(Equal(controlOutput))
-					close(done)
-				}, 3)
-			})
-
-			Context("when a call to the endpoint returns a status of `aborted`", func() {
-				BeforeEach(func() {
-					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "aborted")
-					client := new(fakeHttpClient)
-					client.Response = new(http.Response)
-					client.Response.StatusCode = TaskPollSuccessStatusCode
-					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
-					vcdClient = NewVCDClient(client, "")
-					vcdClient.Token = controlToken
-				})
-				It("should execute the failureCallback", func(done Done) {
-					c := make(chan int)
-					go vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c)).Start()
-					Expect(<-c).To(Equal(controlOutput))
-					close(done)
-				}, 3)
-			})
-
-			Context("when the timeout is reached", func() {
-				BeforeEach(func() {
-					client := new(fakeHttpClient)
-					client.Response = new(http.Response)
-					vcdClient = NewVCDClient(client, "")
-					vcdClient.Token = controlToken
-				})
-
-				It("should execute the failureCallback", func(done Done) {
-					c := make(chan int)
-					go vcdClient.PollTaskURL("", timeout, 0, func() {}, fakeCallback(c)).Start()
-					Expect(<-c).To(Equal(controlOutput))
-					close(done)
-				}, timeoutBuffer)
 			})
 		})
 

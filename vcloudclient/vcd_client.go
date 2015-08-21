@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-
-	"github.com/jasonlvhit/gocron"
 )
 
 //NewVCDClient - constructs a new VCDClient object with given client
@@ -69,22 +67,10 @@ func (s *VCDClient) DeleteVApp(vappID string) (task *TaskElem, err error) {
 }
 
 //PollTaskURL - given a task url this will poll it for status, up to a timeout, and take a success or fail action
-func (s *VCDClient) PollTaskURL(taskURL string, timeout uint64, frequency uint64, successCallback func(), failureCallback func()) (scheduler *gocron.Scheduler) {
-	scheduler = gocron.NewScheduler()
-	scheduler.Every(timeout).Seconds().Do(func() {
-		defer scheduler.Clear()
-		failureCallback()
-	})
-	scheduler.Every(frequency).Seconds().Do(s.pollingTask, taskURL, successCallback, failureCallback, scheduler)
-	return
-}
-
-func (s *VCDClient) pollingTask(taskURL string, successCallback, failureCallback func(), scheduler *gocron.Scheduler) {
+func (s *VCDClient) PollTaskURL(taskURL string) (task *TaskElem, err error) {
 	var (
-		res  *http.Response
-		req  *http.Request
-		task *TaskElem
-		err  error
+		req *http.Request
+		res *http.Response
 	)
 
 	if req, err = http.NewRequest("GET", taskURL, nil); err == nil {
@@ -93,20 +79,9 @@ func (s *VCDClient) pollingTask(taskURL string, successCallback, failureCallback
 
 		if res, err = s.client.Do(req); err == nil {
 			task, err = s.parseTaskXMLResponse(res, TaskPollSuccessStatusCode)
-			s.decideToCallback(task.Status, successCallback, failureCallback, scheduler)
 		}
 	}
-}
-
-func (s *VCDClient) decideToCallback(taskStatus string, successCallback, failureCallback func(), scheduler *gocron.Scheduler) {
-	switch taskStatus {
-	case "success":
-		successCallback()
-		scheduler.Clear()
-	case "aborted", "canceled", "error":
-		failureCallback()
-		scheduler.Clear()
-	}
+	return
 }
 
 func (s *VCDClient) parseTaskXMLResponse(res *http.Response, expectedStatusCode int) (task *TaskElem, err error) {
