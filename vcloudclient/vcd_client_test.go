@@ -134,22 +134,15 @@ var _ = Describe("VCloud Client", func() {
 		})
 		Describe(".PollTaskURL()", func() {
 			var (
-				vcdClient       *VCDClient
-				controlToken                          = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
-				timeout         uint64                = 1
-				timeoutBuffer                         = float64(timeout) * 2
-				controlOutput                         = 1
-				failureCallback func(chan int) func() = func(c chan int) (f func()) {
-					f = func() {
+				vcdClient     *VCDClient
+				controlToken                        = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
+				timeout       uint64                = 1
+				timeoutBuffer                       = float64(timeout) * 2
+				controlOutput                       = 1
+				fakeCallback  func(chan int) func() = func(c chan int) func() {
+					return func() {
 						c <- controlOutput
 					}
-					return
-				}
-				successCallback func(chan int) func() = func(c chan int) (f func()) {
-					f = func() {
-						c <- controlOutput
-					}
-					return
 				}
 				controlNoCallbackExecuted = 2
 				interval                  = uint64(1)
@@ -176,7 +169,7 @@ var _ = Describe("VCloud Client", func() {
 						c <- controlNoCallbackExecuted
 					})
 					go s.Start()
-					vcdClient.PollTaskURL("", 10, interval, successCallback(c), failureCallback(c))
+					vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c))
 					Expect(<-c).To(Equal(controlNoCallbackExecuted))
 					close(done)
 				}, controlBuffer)
@@ -200,7 +193,7 @@ var _ = Describe("VCloud Client", func() {
 						c <- controlNoCallbackExecuted
 					})
 					go s.Start()
-					vcdClient.PollTaskURL("", 10, interval, successCallback(c), failureCallback(c))
+					vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c))
 					Expect(<-c).To(Equal(controlNoCallbackExecuted))
 					close(done)
 				}, controlBuffer)
@@ -224,7 +217,7 @@ var _ = Describe("VCloud Client", func() {
 						c <- controlNoCallbackExecuted
 					})
 					go s.Start()
-					vcdClient.PollTaskURL("", 10, interval, successCallback(c), failureCallback(c))
+					vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c))
 					Expect(<-c).To(Equal(controlNoCallbackExecuted))
 					close(done)
 				}, controlBuffer)
@@ -242,7 +235,7 @@ var _ = Describe("VCloud Client", func() {
 				})
 				It("should execute the successCallback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, successCallback(c), func() {})
+					vcdClient.PollTaskURL("", 10, 1, fakeCallback(c), func() {})
 					Expect(<-c).To(Equal(controlOutput))
 					close(done)
 				}, 3)
@@ -260,7 +253,7 @@ var _ = Describe("VCloud Client", func() {
 				})
 				It("should execute the failureCallback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, func() {}, failureCallback(c))
+					vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c))
 					Expect(<-c).To(Equal(controlOutput))
 					close(done)
 				}, 3)
@@ -278,7 +271,7 @@ var _ = Describe("VCloud Client", func() {
 				})
 				It("should execute the failureCallback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, func() {}, failureCallback(c))
+					vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c))
 					Expect(<-c).To(Equal(controlOutput))
 					close(done)
 				}, 3)
@@ -296,7 +289,7 @@ var _ = Describe("VCloud Client", func() {
 				})
 				It("should execute the failureCallback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, func() {}, failureCallback(c))
+					vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c))
 					Expect(<-c).To(Equal(controlOutput))
 					close(done)
 				}, 3)
@@ -312,7 +305,7 @@ var _ = Describe("VCloud Client", func() {
 
 				It("should execute the failureCallback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", timeout, 0, func() {}, failureCallback(c))
+					vcdClient.PollTaskURL("", timeout, 0, func() {}, fakeCallback(c))
 					Expect(<-c).To(Equal(controlOutput))
 					close(done)
 				}, timeoutBuffer)

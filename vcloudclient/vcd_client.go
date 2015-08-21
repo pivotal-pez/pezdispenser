@@ -71,12 +71,14 @@ func (s *VCDClient) DeleteVApp(vappID string) (task *TaskElem, err error) {
 //PollTaskURL - given a task url this will poll it for status, up to a timeout, and take a success or fail action
 func (s *VCDClient) PollTaskURL(taskURL string, timeout uint64, frequency uint64, successCallback func(), failureCallback func()) (scheduler *gocron.Scheduler) {
 	scheduler = gocron.NewScheduler()
-	scheduler.Every(timeout).Seconds().Do(func() {
-		defer scheduler.Clear()
-		failureCallback()
-	})
-	scheduler.Every(frequency).Seconds().Do(s.pollingTask, taskURL, successCallback, failureCallback, scheduler)
-	go scheduler.Start()
+	go func() {
+		scheduler.Every(timeout).Seconds().Do(func() {
+			defer scheduler.Clear()
+			failureCallback()
+		})
+		scheduler.Every(frequency).Seconds().Do(s.pollingTask, taskURL, successCallback, failureCallback, scheduler)
+		scheduler.Start()
+	}()
 	return
 }
 
