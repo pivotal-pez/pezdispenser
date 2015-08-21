@@ -150,7 +150,7 @@ var _ = Describe("VCloud Client", func() {
 				controlBuffer             = float64(interval * 3)
 			)
 
-			Context("when a call to the endpoint returns a status of `queued`", func() {
+			XContext("when a call to the endpoint returns a status of `queued`", func() {
 
 				BeforeEach(func() {
 					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "queued")
@@ -175,7 +175,7 @@ var _ = Describe("VCloud Client", func() {
 				}, controlBuffer)
 			})
 
-			Context("when a call to the endpoint returns a status of `preRunning`", func() {
+			XContext("when a call to the endpoint returns a status of `preRunning`", func() {
 				BeforeEach(func() {
 					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "preRunning")
 					client := new(fakeHttpClient)
@@ -199,7 +199,7 @@ var _ = Describe("VCloud Client", func() {
 				}, controlBuffer)
 			})
 
-			Context("when a call to the endpoint returns a status of `running`", func() {
+			XContext("when a call to the endpoint returns a status of `running`", func() {
 				BeforeEach(func() {
 					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "running")
 					client := new(fakeHttpClient)
