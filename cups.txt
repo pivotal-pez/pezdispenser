@@ -1,3 +1,3 @@
 # creating user provided service for auth service rest api example value. https://hcfdev.cfapps.pez.pivotal.io/valid-key
 cf cups pezvalidator-service -p "target-url"
-cf create-service p-mongo public dispenser-task-service  
+cf create-service p-mongodb development dispenser-task-service  
