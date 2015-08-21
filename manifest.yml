@@ -5,6 +5,7 @@ applications:
   command: ./main
   services:
     - pezvalidator-service
+    - dispenser-task-service
   env:
     UPS_PEZVALIDATOR_NAME: pezvalidator-service
     UPS_PEZVALIDATOR_TARGET: target-url

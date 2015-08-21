@@ -2,39 +2,26 @@ package pezdispenser
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/go-martini/martini"
+	"github.com/martini-contrib/render"
 	"github.com/pivotal-pez/pezauth/keycheck"
 )
 
 //Constants to construct routes with
 const (
 	APIVersion1 = "v1"
-	indexRoute  = "/"
-	leasePath   = "lease"
-	lockPath    = "lock"
-	typePath    = "type"
-	itemPath    = "item"
-	ItemGUID    = "inventoryItemGUID"
-	TypeGUID    = "inventoryTypeGUID"
 )
 
 //formatted strings based on constants, to be used in URLs
 var (
-	URLLeaseBaseV1 = fmt.Sprintf("/%s/%s", APIVersion1, leasePath)
-	URLLockBaseV1  = fmt.Sprintf("/%s/%s", APIVersion1, lockPath)
-	URLTypeGUID    = fmt.Sprintf("/%s/:%s", typePath, TypeGUID)
-	URLItemGUID    = fmt.Sprintf("/%s/:%s", itemPath, ItemGUID)
-	URLLeases      = "/list"
+	URLLeaseBaseV1 = fmt.Sprintf("/%s", APIVersion1)
 )
 
 //InitRoutes - initialize the mappings for controllers against valid routes
 func InitRoutes(m *martini.ClassicMartini, validationTargetUrl string) {
 	keyCheckHandler := keycheck.NewAPIKeyCheckMiddleware(validationTargetUrl).Handler()
-	itemLeaseController := NewLeaseController(APIVersion1, Item)
-	typeLeaseController := NewLeaseController(APIVersion1, Type)
-	listLeaseController := NewLeaseController(APIVersion1, List)
-	lockController := NewLockController(APIVersion1)
 
 	m.Group("/", func(r martini.Router) {
 		r.Get("info", func() string {
@@ -43,18 +30,9 @@ func InitRoutes(m *martini.ClassicMartini, validationTargetUrl string) {
 	})
 
 	m.Group(URLLeaseBaseV1, func(r martini.Router) {
-		r.Post(URLTypeGUID, typeLeaseController.Post())
-		r.Get(URLTypeGUID, typeLeaseController.Get())
-
-		r.Post(URLItemGUID, itemLeaseController.Post())
-		r.Get(URLItemGUID, itemLeaseController.Get())
-		r.Delete(URLItemGUID, itemLeaseController.Delete())
-
-		r.Get(URLLeases, listLeaseController.Get())
-	}, keyCheckHandler)
-
-	m.Group(URLLockBaseV1, func(r martini.Router) {
-		r.Post(URLItemGUID, lockController.Post())
-		r.Get(URLItemGUID, lockController.Get())
+		r.Get("/task/:id", func(params martini.Params, log *log.Logger, r render.Render) {
+			taskID := params["id"]
+			r.JSON(200, map[string]string{"taskID": taskID})
+		})
 	}, keyCheckHandler)
 }

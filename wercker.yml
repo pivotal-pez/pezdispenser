@@ -1,4 +1,8 @@
 box: google/golang
+services:
+    - mongo
+    - redis
+
 build:
   # The steps that will be executed on build
   steps:
