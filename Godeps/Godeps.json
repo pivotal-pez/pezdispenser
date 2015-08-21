@@ -21,8 +21,8 @@
 			"Rev": "8412a652ddae77553a9442708a527d0e616939a3"
 		},
 		{
-			"ImportPath": "github.com/jasonlvhit/gocron",
-			"Rev": "46aa69e77e4ee58d16bc909b56bc4d1dabb93c6b"
+			"ImportPath": "github.com/martini-contrib/render",
+			"Rev": "ec18f8345a1181146728238980606fb1d6f40e8c"
 		},
 		{
 			"ImportPath": "github.com/mitchellh/mapstructure",
@@ -37,6 +37,10 @@
 			"ImportPath": "github.com/onsi/gomega",
 			"Comment": "v1.0-23-g2cd6d99",
 			"Rev": "2cd6d99ccf3ac7ae8398d8296429161bf7061ae2"
+		},
+		{
+			"ImportPath": "github.com/oxtoacart/bpool",
+			"Rev": "4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6"
 		},
 		{
 			"ImportPath": "github.com/pivotal-pez/pezauth/keycheck",
