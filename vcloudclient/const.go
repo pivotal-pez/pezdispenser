@@ -17,6 +17,7 @@ const (
 	//TaskPollSuccessStatusCode - successfull statuscode on a call to the task api endpoint
 	TaskPollSuccessStatusCode = 200
 	vCDVAppDeletePathFormat   = "/vApp/%s"
+	vCDVAppUnDeployPathFormat = "/vApp/%s/action/undeploy"
 	vCDAuthURIPath            = "/api/sessions"
 	vCDQueryURIPath           = "/api/query"
 	vCDVAppDeploymentPath     = "/action/instantiateVAppTemplate"

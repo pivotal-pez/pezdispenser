@@ -28,13 +28,33 @@ func DefaultClient() (client *http.Client) {
 	return
 }
 
-//DeleteVApp - this will make a delete api call for the given vapp
-func (s *VCDClient) DeleteVApp(vappId string) (task *TaskElem, err error) {
+//UnDeployVApp - this will make a undeploy api call for the given vapp
+func (s *VCDClient) UnDeployVApp(vappID string) (task *TaskElem, err error) {
 	var (
 		req *http.Request
 		res *http.Response
 	)
-	vappDeletePath := fmt.Sprintf(vCDVAppDeletePathFormat, vappId)
+	vappUnDeployPath := fmt.Sprintf(vCDVAppUnDeployPathFormat, vappID)
+	uri := fmt.Sprintf("%s%s", s.BaseURI, vappUnDeployPath)
+
+	if req, err = http.NewRequest("POST", uri, nil); err == nil {
+		s.AuthDecorate(req)
+		req.Header.Set("Accept", "application/*+xml;version=5.5")
+
+		if res, err = s.client.Do(req); err == nil {
+			task, err = s.parseTaskXMLResponse(res, DeleteVappSuccessStatusCode)
+		}
+	}
+	return
+}
+
+//DeleteVApp - this will make a delete api call for the given vapp
+func (s *VCDClient) DeleteVApp(vappID string) (task *TaskElem, err error) {
+	var (
+		req *http.Request
+		res *http.Response
+	)
+	vappDeletePath := fmt.Sprintf(vCDVAppDeletePathFormat, vappID)
 	uri := fmt.Sprintf("%s%s", s.BaseURI, vappDeletePath)
 
 	if req, err = http.NewRequest("DELETE", uri, nil); err == nil {

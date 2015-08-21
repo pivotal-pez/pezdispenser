@@ -17,6 +17,64 @@ import (
 
 var _ = Describe("VCloud Client", func() {
 	Describe("VCDClient", func() {
+		Describe(".UnDeployVApp()", func() {
+			var (
+				vcdClient    *VCDClient
+				controlToken = "xxxxxxxxxxxxxxxxxedw8d8sdb9sdb9sdbsd9sdbsdb"
+			)
+			Context("when the client call fails", func() {
+				var randomClientError = errors.New("random client error")
+				BeforeEach(func() {
+					client := new(fakeHttpClient)
+					client.Err = randomClientError
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+				It("should return the client error", func() {
+					_, err := vcdClient.UnDeployVApp("vappid")
+					Ω(err).Should(HaveOccurred())
+					Ω(err).Should(Equal(randomClientError))
+				})
+			})
+
+			Context("when the REST call returns a non successful statuscode", func() {
+				BeforeEach(func() {
+					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "queued")
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = (DeleteVappSuccessStatusCode + 201)
+					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+
+				It("should return a failure status error", func() {
+					_, err := vcdClient.UnDeployVApp("vappid")
+					Ω(err).Should(HaveOccurred())
+					Ω(err).Should(Equal(ErrTaskResponseParseFailed))
+				})
+			})
+
+			Context("when called with a valid vapp id", func() {
+
+				BeforeEach(func() {
+					xmlResponse := fmt.Sprintf(TaskResponseFormatter, "queued")
+					client := new(fakeHttpClient)
+					client.Response = new(http.Response)
+					client.Response.StatusCode = DeleteVappSuccessStatusCode
+					client.Response.Body = nopCloser{bytes.NewBufferString(xmlResponse)}
+					vcdClient = NewVCDClient(client, "")
+					vcdClient.Token = controlToken
+				})
+
+				It("should make the call to the delete vapp api endpoint and return a task to monitor the deletion of the vapp", func() {
+					task, err := vcdClient.UnDeployVApp("vappid")
+					Ω(err).ShouldNot(HaveOccurred())
+					Ω(task.Status).ShouldNot(BeEmpty())
+				})
+			})
+		})
+
 		Describe(".DeleteVApp()", func() {
 			var (
 				vcdClient    *VCDClient
