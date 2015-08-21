@@ -22,6 +22,7 @@ var (
 //InitRoutes - initialize the mappings for controllers against valid routes
 func InitRoutes(m *martini.ClassicMartini, validationTargetUrl string) {
 	keyCheckHandler := keycheck.NewAPIKeyCheckMiddleware(validationTargetUrl).Handler()
+	m.Use(render.Renderer())
 
 	m.Group("/", func(r martini.Router) {
 		r.Get("info", func() string {
