@@ -168,8 +168,8 @@ var _ = Describe("VCloud Client", func() {
 					s.Every(controlCheck).Seconds().Do(func() {
 						c <- controlNoCallbackExecuted
 					})
+					go vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c)).Start()
 					go s.Start()
-					vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c))
 					Expect(<-c).To(Equal(controlNoCallbackExecuted))
 					close(done)
 				}, controlBuffer)
@@ -192,8 +192,8 @@ var _ = Describe("VCloud Client", func() {
 					s.Every(controlCheck).Seconds().Do(func() {
 						c <- controlNoCallbackExecuted
 					})
+					go vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c)).Start()
 					go s.Start()
-					vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c))
 					Expect(<-c).To(Equal(controlNoCallbackExecuted))
 					close(done)
 				}, controlBuffer)
@@ -216,8 +216,8 @@ var _ = Describe("VCloud Client", func() {
 					s.Every(controlCheck).Seconds().Do(func() {
 						c <- controlNoCallbackExecuted
 					})
+					go vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c)).Start()
 					go s.Start()
-					vcdClient.PollTaskURL("", 10, interval, fakeCallback(c), fakeCallback(c))
 					Expect(<-c).To(Equal(controlNoCallbackExecuted))
 					close(done)
 				}, controlBuffer)
@@ -235,7 +235,7 @@ var _ = Describe("VCloud Client", func() {
 				})
 				It("should execute the successCallback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, fakeCallback(c), func() {})
+					go vcdClient.PollTaskURL("", 10, 1, fakeCallback(c), func() {}).Start()
 					Expect(<-c).To(Equal(controlOutput))
 					close(done)
 				}, 3)
@@ -253,7 +253,7 @@ var _ = Describe("VCloud Client", func() {
 				})
 				It("should execute the failureCallback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c))
+					go vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c)).Start()
 					Expect(<-c).To(Equal(controlOutput))
 					close(done)
 				}, 3)
@@ -271,7 +271,7 @@ var _ = Describe("VCloud Client", func() {
 				})
 				It("should execute the failureCallback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c))
+					go vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c)).Start()
 					Expect(<-c).To(Equal(controlOutput))
 					close(done)
 				}, 3)
@@ -289,7 +289,7 @@ var _ = Describe("VCloud Client", func() {
 				})
 				It("should execute the failureCallback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c))
+					go vcdClient.PollTaskURL("", 10, 1, func() {}, fakeCallback(c)).Start()
 					Expect(<-c).To(Equal(controlOutput))
 					close(done)
 				}, 3)
@@ -305,7 +305,7 @@ var _ = Describe("VCloud Client", func() {
 
 				It("should execute the failureCallback", func(done Done) {
 					c := make(chan int)
-					vcdClient.PollTaskURL("", timeout, 0, func() {}, fakeCallback(c))
+					go vcdClient.PollTaskURL("", timeout, 0, func() {}, fakeCallback(c)).Start()
 					Expect(<-c).To(Equal(controlOutput))
 					close(done)
 				}, timeoutBuffer)
