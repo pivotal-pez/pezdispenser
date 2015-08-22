@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-martini/martini"
+	"github.com/martini-contrib/render"
 	. "github.com/pivotal-pez/pezdispenser/service"
 	"github.com/xchapter7x/cloudcontroller-client"
 	"github.com/xchapter7x/goutil"
@@ -38,6 +39,17 @@ const (
 				"users":null
 			}`
 )
+
+type fakeRenderer struct {
+	render.Render
+	SpyStatus int
+	SpyValue  interface{}
+}
+
+func (s *fakeRenderer) JSON(status int, v interface{}) {
+	s.SpyStatus = status
+	s.SpyValue = v
+}
 
 var (
 	fakeKeyCheck martini.Handler = func(log *log.Logger, res http.ResponseWriter, req *http.Request) {}

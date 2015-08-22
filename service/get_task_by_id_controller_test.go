@@ -11,17 +11,6 @@ import (
 	. "github.com/pivotal-pez/pezdispenser/service"
 )
 
-type fakeRenderer struct {
-	render.Render
-	SpyStatus int
-	SpyValue  interface{}
-}
-
-func (s *fakeRenderer) JSON(status int, v interface{}) {
-	s.SpyStatus = status
-	s.SpyValue = v
-}
-
 var _ = Describe("GetTaskByIdController()", func() {
 	Context("when the handler response is called with a valid ID params value", func() {
 		var (
