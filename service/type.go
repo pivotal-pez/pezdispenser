@@ -1,7 +1,10 @@
 package pezdispenser
 
 import (
-	"gopkg.in/mgo.v2"
+	"time"
+
+	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 )
 
 type (
@@ -28,5 +31,13 @@ type (
 		Remove(selector interface{}) error
 		FindOne(query interface{}, result interface{}) (err error)
 		Upsert(selector interface{}, update interface{}) (err error)
+	}
+
+	//Task - a task object
+	Task struct {
+		ID        bson.ObjectId          `bson:"_id"`
+		Timestamp time.Time              `bson:"timestamp"`
+		Status    string                 `bson:"status"`
+		MetaData  map[string]interface{} `bson:"metadata"`
 	}
 )

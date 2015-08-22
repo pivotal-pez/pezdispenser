@@ -15,11 +15,11 @@ func main() {
 	validatorServiceName := os.Getenv("UPS_PEZVALIDATOR_NAME")
 	targetKeyName := os.Getenv("UPS_PEZVALIDATOR_TARGET")
 	service, _ := appEnv.Services.WithName(validatorServiceName)
-	validationTargetUrl := fmt.Sprintf("%s", service.Credentials[targetKeyName])
+	validationTargetURL := fmt.Sprintf("%s", service.Credentials[targetKeyName])
 	m := martini.Classic()
 
 	if appEnv, err := cfenv.Current(); err == nil {
-		keyCheckHandler := keycheck.NewAPIKeyCheckMiddleware(validationTargetUrl).Handler()
+		keyCheckHandler := keycheck.NewAPIKeyCheckMiddleware(validationTargetURL).Handler()
 		pez.InitRoutes(m, keyCheckHandler, appEnv)
 
 	} else {

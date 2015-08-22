@@ -17,8 +17,8 @@
 		},
 		{
 			"ImportPath": "github.com/go-martini/martini",
-			"Comment": "v1.0-115-g8412a65",
-			"Rev": "8412a652ddae77553a9442708a527d0e616939a3"
+			"Comment": "v1.0-134-g184178f",
+			"Rev": "184178ffc6b2f7b86b8b99c2a411de8771708a0a"
 		},
 		{
 			"ImportPath": "github.com/martini-contrib/render",
@@ -26,17 +26,17 @@
 		},
 		{
 			"ImportPath": "github.com/mitchellh/mapstructure",
-			"Rev": "2caf8efc93669b6c43e0441cdc6aed17546c96f3"
+			"Rev": "281073eb9eb092240d33ef253c404f1cca550309"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
-			"Comment": "v1.1.0-24-g7891f86",
-			"Rev": "7891f8646dc62f4e32642ba332bbe7cf0097d8c5"
+			"Comment": "v1.2.0-11-gd94e2f4",
+			"Rev": "d94e2f4000332f62b356ecb2840c98f4218f5358"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
-			"Comment": "v1.0-23-g2cd6d99",
-			"Rev": "2cd6d99ccf3ac7ae8398d8296429161bf7061ae2"
+			"Comment": "v1.0-52-ga2ab864",
+			"Rev": "a2ab8644e0b6a33df2cbe44673bd0f6ebba9abc3"
 		},
 		{
 			"ImportPath": "github.com/oxtoacart/bpool",
@@ -44,8 +44,8 @@
 		},
 		{
 			"ImportPath": "github.com/pivotal-pez/pezauth/keycheck",
-			"Comment": "v0.0.120-6-g1244191",
-			"Rev": "1244191420e299ce2f7b9a2ab0e7a40c9ca8e9ad"
+			"Comment": "v0.0.120-27-g0dd3869",
+			"Rev": "0dd386961b384eeb1a7c96a2f061aab7b7f3f2ab"
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/cloudcontroller-client",
@@ -53,12 +53,12 @@
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/goutil",
-			"Rev": "189c9c150f54f5b0fe1de1a659e7ef20fa490cfb"
+			"Rev": "d11405d449b25127a32fab25ce8b1fc0388da5b3"
 		},
 		{
-			"ImportPath": "gopkg.in/mgo.v2",
-			"Comment": "r2015.06.03-3-g3569c88",
-			"Rev": "3569c88678d88179dcbd68d02ab081cbca3cd4d0"
+			"ImportPath": "labix.org/v2/mgo",
+			"Comment": "287",
+			"Rev": "gustavo@niemeyer.net-20140501184651-975yyw9ipld92pji"
 		}
 	]
 }

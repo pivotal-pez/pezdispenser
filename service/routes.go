@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
+	"github.com/pivotal-pez/pezdispenser/service/_integrations"
 )
 
 const (
@@ -29,7 +30,7 @@ func InitRoutes(m *martini.ClassicMartini, keyCheckHandler martini.Handler, appE
 	})
 
 	m.Group(URLBaseV1, func(r martini.Router) {
-		r.Get("/task/:id", GetTaskByIdController(taskServiceURI))
+		r.Get("/task/:id", GetTaskByIDController(taskServiceURI, integrations.NewCollectionDialer))
 	}, keyCheckHandler)
 }
 

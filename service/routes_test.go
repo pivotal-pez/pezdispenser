@@ -8,6 +8,7 @@ import (
 	"github.com/go-martini/martini"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/pivotal-pez/pezdispenser/fakes"
 	. "github.com/pivotal-pez/pezdispenser/service"
 )
 
@@ -26,14 +27,14 @@ var _ = Describe("Routes", func() {
 				m = martini.Classic()
 				os.Setenv("TASK_SERVICE_NAME", controlTaskServiceName)
 				appEnv, _ = cfenv.New(map[string]string{
-					"VCAP_SERVICES":    fmt.Sprintf(vcapServicesFormatter, controlTaskServiceName, controlURI),
-					"VCAP_APPLICATION": vcapApplicationFormatter,
+					"VCAP_SERVICES":    fmt.Sprintf(VcapServicesFormatter, controlTaskServiceName, controlURI),
+					"VCAP_APPLICATION": VcapApplicationFormatter,
 				})
 			})
 
 			It("Should not result in panic", func() {
 				Ω(func() {
-					InitRoutes(m, fakeKeyCheck, appEnv)
+					InitRoutes(m, FakeKeyCheck, appEnv)
 				}).ShouldNot(Panic())
 			})
 		})
@@ -42,14 +43,14 @@ var _ = Describe("Routes", func() {
 			BeforeEach(func() {
 				m = martini.Classic()
 				appEnv, _ = cfenv.New(map[string]string{
-					"VCAP_SERVICES":    fmt.Sprintf(vcapServicesFormatter, "", ""),
-					"VCAP_APPLICATION": vcapApplicationFormatter,
+					"VCAP_SERVICES":    fmt.Sprintf(VcapServicesFormatter, "", ""),
+					"VCAP_APPLICATION": VcapApplicationFormatter,
 				})
 			})
 
 			It("Should panic and tell us what we are missing", func() {
 				Ω(func() {
-					InitRoutes(m, fakeKeyCheck, appEnv)
+					InitRoutes(m, FakeKeyCheck, appEnv)
 				}).Should(Panic())
 			})
 		})

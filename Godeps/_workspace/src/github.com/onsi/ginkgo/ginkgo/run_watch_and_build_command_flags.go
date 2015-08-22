@@ -11,13 +11,16 @@ type RunWatchAndBuildCommandFlags struct {
 	Recurse     bool
 	Race        bool
 	Cover       bool
+	CoverPkg    string
 	SkipPackage string
 	Tags        string
 
 	//for run and watch commands
 	NumCPU         int
+	NumCompilers   int
 	ParallelStream bool
 	Notify         bool
+	AfterSuiteHook string
 	AutoNodes      bool
 
 	//only for run command
@@ -86,22 +89,24 @@ func (c *RunWatchAndBuildCommandFlags) computeNodes() {
 
 func (c *RunWatchAndBuildCommandFlags) flags(mode int) {
 	onWindows := (runtime.GOOS == "windows")
-	onOSX := (runtime.GOOS == "darwin")
 
 	c.FlagSet.BoolVar(&(c.Recurse), "r", false, "Find and run test suites under the current directory recursively")
 	c.FlagSet.BoolVar(&(c.Race), "race", false, "Run tests with race detection enabled")
 	c.FlagSet.BoolVar(&(c.Cover), "cover", false, "Run tests with coverage analysis, will generate coverage profiles with the package name in the current directory")
+	c.FlagSet.StringVar(&(c.CoverPkg), "coverpkg", "", "Run tests with coverage on the given external modules")
 	c.FlagSet.StringVar(&(c.SkipPackage), "skipPackage", "", "A comma-separated list of package names to be skipped.  If any part of the package's path matches, that package is ignored.")
 	c.FlagSet.StringVar(&(c.Tags), "tags", "", "A list of build tags to consider satisfied during the build")
 
 	if mode == runMode || mode == watchMode {
 		config.Flags(c.FlagSet, "", false)
 		c.FlagSet.IntVar(&(c.NumCPU), "nodes", 1, "The number of parallel test nodes to run")
+		c.FlagSet.IntVar(&(c.NumCompilers), "compilers", 0, "The number of concurrent compilations to run (0 will autodetect)")
 		c.FlagSet.BoolVar(&(c.AutoNodes), "p", false, "Run in parallel with auto-detected number of nodes")
 		c.FlagSet.BoolVar(&(c.ParallelStream), "stream", onWindows, "stream parallel test output in real time: less coherent, but useful for debugging")
-		if onOSX {
+		if !onWindows {
 			c.FlagSet.BoolVar(&(c.Notify), "notify", false, "Send desktop notifications when a test run completes")
 		}
+		c.FlagSet.StringVar(&(c.AfterSuiteHook), "afterSuiteHook", "", "Run a command when a suite test run completes")
 	}
 
 	if mode == runMode {
