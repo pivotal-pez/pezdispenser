@@ -9,14 +9,14 @@ import (
 	"github.com/martini-contrib/render"
 )
 
-//Constants to construct routes with
 const (
+	//APIVersion1 - version 1 const
 	APIVersion1 = "v1"
 )
 
-//formatted strings based on constants, to be used in URLs
 var (
-	URLLeaseBaseV1 = fmt.Sprintf("/%s", APIVersion1)
+	//URLBaseV1 - v1 url path base
+	URLBaseV1 = fmt.Sprintf("/%s", APIVersion1)
 )
 
 //InitRoutes - initialize the mappings for controllers against valid routes
@@ -28,7 +28,7 @@ func InitRoutes(m *martini.ClassicMartini, keyCheckHandler martini.Handler, appE
 		r.Get("info", GetInfoController())
 	})
 
-	m.Group(URLLeaseBaseV1, func(r martini.Router) {
+	m.Group(URLBaseV1, func(r martini.Router) {
 		r.Get("/task/:id", GetTaskByIdController(taskServiceURI))
 	}, keyCheckHandler)
 }
