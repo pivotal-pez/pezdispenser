@@ -9,3 +9,5 @@ applications:
   env:
     UPS_PEZVALIDATOR_NAME: pezvalidator-service
     UPS_PEZVALIDATOR_TARGET: target-url
+    TASK_SERVICE_NAME: dispenser-task-service
+    TASK_SERVICE_URI_NAME: uri
