@@ -44,8 +44,8 @@
 		},
 		{
 			"ImportPath": "github.com/pivotal-pez/pezauth/keycheck",
-			"Comment": "v0.0.120-27-g0dd3869",
-			"Rev": "0dd386961b384eeb1a7c96a2f061aab7b7f3f2ab"
+			"Comment": "v0.0.120-28-g23b26d9",
+			"Rev": "23b26d98e9a6342fd50674d247116281a1fcc196"
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/cloudcontroller-client",
