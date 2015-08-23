@@ -2,7 +2,6 @@ package pezdispenser_test
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/go-martini/martini"
@@ -18,26 +17,6 @@ var _ = Describe("Routes", func() {
 			m      *martini.ClassicMartini
 			appEnv *cfenv.App
 		)
-
-		Context("when InitRoutes is passed valid arguments", func() {
-			controlURI := "my-control-uri"
-			controlTaskServiceName := "dispenser-task-service"
-
-			BeforeEach(func() {
-				m = martini.Classic()
-				os.Setenv("TASK_SERVICE_NAME", controlTaskServiceName)
-				appEnv, _ = cfenv.New(map[string]string{
-					"VCAP_SERVICES":    fmt.Sprintf(VcapServicesFormatter, controlTaskServiceName, controlURI),
-					"VCAP_APPLICATION": VcapApplicationFormatter,
-				})
-			})
-
-			It("Should not result in panic", func() {
-				Ω(func() {
-					InitRoutes(m, FakeKeyCheck, appEnv)
-				}).ShouldNot(Panic())
-			})
-		})
 
 		Context("when InitRoutes is not given the proper appEnv", func() {
 			BeforeEach(func() {

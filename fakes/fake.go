@@ -3,6 +3,7 @@ package fakes
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -48,6 +49,14 @@ const (
 			}`
 )
 
+//FakeResponseBody - a fake response body object
+type FakeResponseBody struct {
+	io.Reader
+}
+
+//Close - close fake body
+func (FakeResponseBody) Close() error { return nil }
+
 //FakeRenderer -
 type FakeRenderer struct {
 	render.Render
@@ -70,7 +79,7 @@ var (
 	MockLogger = log.New(&buf, "logger: ", log.Lshortfile)
 )
 
-//FakeNewCollectionDialer
+//FakeNewCollectionDialer -
 func FakeNewCollectionDialer(c pezdispenser.Task) func(url, dbname, collectionname string) (col integrations.Collection, err error) {
 	return func(url, dbname, collectionname string) (col integrations.Collection, err error) {
 		fmt.Println("this is the one that was called")
@@ -151,8 +160,8 @@ func (s *MockHeritageClient) CCTarget() string {
 	return ccclient.URLPWSLogin
 }
 
-//HttpClient -
-func (s *MockHeritageClient) HttpClient() ccclient.ClientDoer {
+//HTTPClient -
+func (s *MockHeritageClient) HTTPClient() ccclient.ClientDoer {
 	return &MockClientDoer{
 		Res: s.Res,
 	}
@@ -194,6 +203,11 @@ type FakeCollection struct {
 
 //Close -
 func (s *FakeCollection) Close() {
+
+}
+
+//Wake -
+func (s *FakeCollection) Wake() {
 
 }
 

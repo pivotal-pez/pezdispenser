@@ -5,6 +5,7 @@ import "labix.org/v2/mgo"
 type (
 	//Collection - an interface representing a trimmed down collection object
 	Collection interface {
+		Wake()
 		Close()
 		FindOne(id string, result interface{}) (err error)
 		UpsertID(selector interface{}, update interface{}) (info *mgo.ChangeInfo, err error)

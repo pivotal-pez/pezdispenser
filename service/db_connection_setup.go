@@ -1,0 +1,25 @@
+package pezdispenser
+
+import (
+	"fmt"
+
+	"labix.org/v2/mgo"
+
+	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+)
+
+func setupDB(dialer integrations.CollectionDialer, URI string, collectionName string) (collection integrations.Collection) {
+	var (
+		err      error
+		dialInfo *mgo.DialInfo
+	)
+
+	if dialInfo, err = ParseURL(URI); err != nil {
+		panic(fmt.Sprintf("can not parse given URI %s due to error: %s", URI, err.Error()))
+	}
+
+	if collection, err = dialer(URI, dialInfo.Database, collectionName); err != nil {
+		panic(fmt.Sprintf("can not dial connection due to error: %s", err.Error()))
+	}
+	return
+}

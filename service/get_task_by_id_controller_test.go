@@ -2,6 +2,7 @@ package pezdispenser_test
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
@@ -33,7 +34,7 @@ var _ = Describe("GetTaskByIdController()", func() {
 		})
 
 		It("should return the task object w/ a 200 statusCode", func() {
-			Ω(renderer.SpyStatus).Should(Equal(SuccessStatusResponseTaskByID))
+			Ω(renderer.SpyStatus).Should(Equal(http.StatusOK))
 			Ω(*(renderer.SpyValue.(*Task))).Should(Equal(controlResponseValue))
 		})
 	})

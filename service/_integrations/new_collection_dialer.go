@@ -45,3 +45,9 @@ func (s *CollectionRepo) Close() {
 func (s *CollectionRepo) Count() (int, error) {
 	return s.Col.Count()
 }
+
+func (s *CollectionRepo) Wake() {
+	if s.session.Ping() != nil {
+		s.session = s.session.Clone()
+	}
+}

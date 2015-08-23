@@ -1,10 +1,8 @@
 package pezdispenser
 
 import (
-	"fmt"
 	"log"
-
-	"labix.org/v2/mgo"
+	"net/http"
 
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
@@ -13,35 +11,26 @@ import (
 
 //GetTaskByIDController - this is the controller to handle a get task call
 func GetTaskByIDController(taskServiceURI string, collectionDialer integrations.CollectionDialer) martini.Handler {
+	taskCollection := setupDB(collectionDialer, taskServiceURI, TaskCollectionName)
 
-	var (
-		err      error
-		dialInfo *mgo.DialInfo
-	)
-	if dialInfo, err = ParseURL(taskServiceURI); err == nil {
-		log.Println("parsed uri successfully: ", taskServiceURI, dialInfo)
-
-	} else {
-		panic(fmt.Sprintf("can not parse given URI %s due to error: %s", taskServiceURI, err.Error()))
-	}
-
-	return func(params martini.Params, log *log.Logger, r render.Render) {
+	return func(params martini.Params, logger *log.Logger, r render.Render) {
 		var (
 			err        error
-			response   interface{} = &err
-			statusCode             = FailureStatusResponseTaskByID
-			collection integrations.Collection
+			response   interface{}
+			statusCode = http.StatusNotFound
 			task       = new(Task)
 			taskID     = params["id"]
 		)
+		taskCollection.Wake()
+		logger.Println("collection dialed successfully")
 
-		if collection, err = collectionDialer(taskServiceURI, dialInfo.Database, TaskCollectionName); err == nil {
-			defer collection.Close()
-			log.Println("collection dialed successfully")
-			err = collection.FindOne(taskID, task)
-			log.Println("task search complete")
-			statusCode = SuccessStatusResponseTaskByID
+		if err = taskCollection.FindOne(taskID, task); err == nil {
+			logger.Println("task search complete")
+			statusCode = http.StatusOK
 			response = task
+
+		} else {
+			response = map[string]string{"error": err.Error()}
 		}
 		r.JSON(statusCode, response)
 	}
