@@ -36,10 +36,11 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 	logger.Println("collection dialed successfully")
 
 	if _, err = s.taskCollection.UpsertID(newTaskID, task); err == nil {
+		s.SetTask(task)
 		logger.Println("task created")
 
 		if err = s.InitFromHTTPRequest(req); err == nil {
-			s.SetTask(task)
+			logger.Println("restocking...")
 			s.ReStock()
 			statusCode = http.StatusCreated
 			response = s
@@ -59,8 +60,15 @@ func (s *Lease) ReStock() {
 
 //Procurement - method to issue a procurement request for the given lease item.
 func (s *Lease) Procurement() {
-	s.Task.Status = TaskStatusUnavailable
-	s.saveTask()
+	switch s.Sku {
+	case Sku2cSmall:
+		s.Task.Status = TaskStatusProcurement
+		s.saveTask()
+
+	default:
+		s.Task.Status = TaskStatusUnavailable
+		s.saveTask()
+	}
 }
 
 //InitFromHTTPRequest - initialize a lease from the http request object body

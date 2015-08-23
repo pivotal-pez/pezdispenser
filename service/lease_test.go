@@ -97,22 +97,44 @@ var _ = Describe("Lease", func() {
 		})
 	})
 
-	XDescribe(".Procurement()", func() {
-		Context("when calling with a valid lease sku", func() {
-			Context("of 2c.small", func() {
-				It("should check the availablility, and allocate the resource", func() {
-
-				})
+	Describe(".Procurement()", func() {
+		Context("when calling with a valid lease", func() {
+			var (
+				lease   *Lease
+				request *http.Request
+			)
+			BeforeEach(func() {
+				request = new(http.Request)
+				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
+				lease = NewLease(new(fakes.FakeCollection))
+				lease.SetTask(new(Task))
+				lease.InitFromHTTPRequest(request)
+			})
+			It("should update the task status", func() {
+				controlStatus := lease.Task.Status
+				lease.Procurement()
+				Ω(lease.Task.Status).ShouldNot(Equal(controlStatus))
 			})
 		})
 	})
 
-	XDescribe(".ReStock()", func() {
-		Context("when calling with a valid lease sku", func() {
-			Context("of 2c.small", func() {
-				It("should check the state of the resource, begin restock process and update task info", func() {
-
-				})
+	Describe(".ReStock()", func() {
+		Context("when calling with a valid lease", func() {
+			var (
+				lease   *Lease
+				request *http.Request
+			)
+			BeforeEach(func() {
+				request = new(http.Request)
+				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
+				lease = NewLease(new(fakes.FakeCollection))
+				lease.SetTask(new(Task))
+				lease.InitFromHTTPRequest(request)
+			})
+			It("should update the task status", func() {
+				controlStatus := lease.Task.Status
+				lease.ReStock()
+				Ω(lease.Task.Status).ShouldNot(Equal(controlStatus))
 			})
 		})
 	})
