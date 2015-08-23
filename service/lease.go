@@ -53,6 +53,7 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 	return
 }
 
+//ReStock - this will reclaim resources for a given lease
 func (s *Lease) ReStock() {
 	s.Task.Status = TaskStatusUnavailable
 	s.saveTask()
