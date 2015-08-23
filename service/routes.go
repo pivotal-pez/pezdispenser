@@ -22,7 +22,6 @@ var (
 
 //InitRoutes - initialize the mappings for controllers against valid routes
 func InitRoutes(m *martini.ClassicMartini, keyCheckHandler martini.Handler, appEnv *cfenv.App) {
-	fmt.Println("app env: ", appEnv)
 	taskServiceURI := getTaskBinding(appEnv)
 	m.Use(render.Renderer())
 
@@ -38,10 +37,8 @@ func InitRoutes(m *martini.ClassicMartini, keyCheckHandler martini.Handler, appE
 func getTaskBinding(appEnv *cfenv.App) (taskServiceURI string) {
 	taskServiceName := os.Getenv("TASK_SERVICE_NAME")
 	taskCredsURIName := os.Getenv("TASK_SERVICE_URI_NAME")
-	fmt.Println("appenv: ", appEnv)
 
 	if taskService, err := appEnv.Services.WithName(taskServiceName); err == nil {
-		fmt.Println(taskService.Credentials[taskCredsURIName])
 
 		if taskServiceURI = taskService.Credentials[taskCredsURIName].(string); taskServiceURI == "" {
 			panic(fmt.Sprint("we pulled an empty connection string %s from %v - %v", taskServiceURI, taskService, taskService.Credentials))

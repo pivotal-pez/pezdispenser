@@ -2,7 +2,6 @@ package fakes
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -82,7 +81,6 @@ var (
 //FakeNewCollectionDialer -
 func FakeNewCollectionDialer(c pezdispenser.Task) func(url, dbname, collectionname string) (col integrations.Collection, err error) {
 	return func(url, dbname, collectionname string) (col integrations.Collection, err error) {
-		fmt.Println("this is the one that was called")
 		col = &FakeCollection{
 			ControlTask: c,
 		}
