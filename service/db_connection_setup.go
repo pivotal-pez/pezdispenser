@@ -19,7 +19,7 @@ func setupDB(dialer integrations.CollectionDialer, URI string, collectionName st
 	}
 
 	if collection, err = dialer(URI, dialInfo.Database, collectionName); err != nil {
-		panic(fmt.Sprintf("can not dial connection due to error: %s", err.Error()))
+		panic(fmt.Sprintf("can not dial connection due to error: %s URI:%s col:%s db:%s", err.Error(), URI, collectionName, dialInfo.Database))
 	}
 	return
 }
