@@ -1,6 +1,7 @@
 package pezdispenser
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -11,6 +12,7 @@ import (
 
 //GetTaskByIDController - this is the controller to handle a get task call
 func GetTaskByIDController(taskServiceURI string, collectionDialer integrations.CollectionDialer) martini.Handler {
+	fmt.Println("my uri:", taskServiceURI)
 	taskCollection := setupDB(collectionDialer, taskServiceURI, TaskCollectionName)
 
 	return func(params martini.Params, logger *log.Logger, r render.Render) {

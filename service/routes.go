@@ -42,7 +42,7 @@ func getTaskBinding(appEnv *cfenv.App) (taskServiceURI string) {
 		if taskServiceURI = fmt.Sprintf("%s", taskService.Credentials["TASK_SERVICE_URI_NAME"]); taskServiceURI == "" {
 			panic(fmt.Sprint("we pulled an empty connection string %s from %s - %s", taskServiceURI, taskService, taskService.Credentials))
 		}
-		fmt.Println("My Task Service URI:", taskServiceURI)
+		fmt.Println(fmt.Sprint("we pulled an empty connection string %s from %s - %s", taskServiceURI, taskService, taskService.Credentials))
 
 	} else {
 		panic(fmt.Sprint("Experienced an error trying to grab task service binding information:", err.Error()))

@@ -14,7 +14,7 @@ func setupDB(dialer integrations.CollectionDialer, URI string, collectionName st
 		dialInfo *mgo.DialInfo
 	)
 
-	if dialInfo, err = ParseURL(URI); err != nil {
+	if dialInfo, err = ParseURL(URI); err != nil || dialInfo.Database == "" {
 		panic(fmt.Sprintf("can not parse given URI %s due to error: %s", URI, err.Error()))
 	}
 
