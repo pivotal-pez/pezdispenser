@@ -22,6 +22,7 @@ var (
 
 //InitRoutes - initialize the mappings for controllers against valid routes
 func InitRoutes(m *martini.ClassicMartini, keyCheckHandler martini.Handler, appEnv *cfenv.App) {
+	fmt.Println("app env: ", appEnv)
 	taskServiceURI := getTaskBinding(appEnv)
 	m.Use(render.Renderer())
 
