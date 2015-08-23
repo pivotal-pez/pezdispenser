@@ -36,3 +36,5 @@ wercker_local_deploy.yml
 vcap_services_template.json
 pezdispenser
 coverage.out
+vcap_application_template.json
+coverage.out

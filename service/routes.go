@@ -37,12 +37,13 @@ func InitRoutes(m *martini.ClassicMartini, keyCheckHandler martini.Handler, appE
 
 func getTaskBinding(appEnv *cfenv.App) (taskServiceURI string) {
 	taskServiceName := os.Getenv("TASK_SERVICE_NAME")
+	taskCredsURIName := os.Getenv("TASK_SERVICE_URI_NAME")
 	fmt.Println("appenv: ", appEnv)
 
 	if taskService, err := appEnv.Services.WithName(taskServiceName); err == nil {
-		fmt.Println(taskService.Credentials["TASK_SERVICE_URI_NAME"])
+		fmt.Println(taskService.Credentials[taskCredsURIName])
 
-		if taskServiceURI = taskService.Credentials["TASK_SERVICE_URI_NAME"].(string); taskServiceURI == "" {
+		if taskServiceURI = taskService.Credentials[taskCredsURIName].(string); taskServiceURI == "" {
 			panic(fmt.Sprint("we pulled an empty connection string %s from %v - %v", taskServiceURI, taskService, taskService.Credentials))
 		}
 

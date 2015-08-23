@@ -1,15 +1,3 @@
-# Cloudfoundry environment
-
-X_CF_USER=xxxxxxxxxxxxxxxxxx
-X_CF_PASS=xxxxxxxxxxxxxxxxxx
-X_CF_ORG=xxxxxxxxxxxxxxxxxxx
-X_CF_SPACE=xxxxxxxxxxxxxxxxx
-X_CF_APPNAME=xxxxxxxxxxxxxxx
-X_CF_HOSTNAME=xxxxxxxxxxxxxx
-X_CF_DOMAINNAME=xxxxxxxxxxxx
-X_CF_LOGINURL=xxxxxxxxxxxxxx
-# Wercker debug
-
 X_DEBUG_STEP=true
 
 # Local DOCKER IP Address

@@ -12,8 +12,8 @@ import (
 
 func main() {
 	fmt.Println("here")
-	appEnv, _ := cfenv.Current()
-	fmt.Println("appEnv raw:", appEnv)
+	appEnv, err := cfenv.Current()
+	fmt.Println("appEnv raw:", appEnv, err, os.Environ())
 	validatorServiceName := os.Getenv("UPS_PEZVALIDATOR_NAME")
 	targetKeyName := os.Getenv("UPS_PEZVALIDATOR_TARGET")
 	fmt.Println("osGetEnv", validatorServiceName, targetKeyName)
