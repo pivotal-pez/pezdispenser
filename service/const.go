@@ -3,6 +3,8 @@ package pezdispenser
 import "errors"
 
 const (
+	//TaskStatusAvailable - this means the task is in an avaiable state
+	TaskStatusAvailable = "available"
 	//TaskStatusUnavailable - unavailable procurement request
 	TaskStatusUnavailable = "unavailable"
 	//TaskStatusStarted - started this task

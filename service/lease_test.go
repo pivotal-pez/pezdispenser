@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"time"
 
+	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
@@ -17,6 +20,54 @@ var _ = Describe("Lease", func() {
 			It("should yield a lease valid lease", func() {
 				lease := NewLease(new(fakes.FakeCollection))
 				Ω(lease).ShouldNot(BeNil())
+			})
+		})
+	})
+
+	Describe(".InventoryAvailable()", func() {
+		Context("when we can find the record but taskStatus is != available", func() {
+			var (
+				lease *Lease
+			)
+			BeforeEach(func() {
+				lease = NewLease(new(fakes.FakeCollection))
+			})
+			It("should indicate a unavailable status of the inventory item", func() {
+				yesno := lease.InventoryAvailable()
+				Ω(yesno).Should(BeFalse())
+			})
+		})
+
+		Context("when we can find the record and taskStatus is == available", func() {
+			var (
+				lease *Lease
+			)
+			BeforeEach(func() {
+				col := new(fakes.FakeCollection)
+				col.ControlTask = Task{
+					Status: TaskStatusAvailable,
+				}
+				lease = NewLease(col)
+			})
+			It("should indicate a available status of the inventory item", func() {
+				yesno := lease.InventoryAvailable()
+				Ω(yesno).Should(BeTrue())
+			})
+		})
+
+		Context("when we can not find the record", func() {
+			var (
+				lease *Lease
+			)
+			BeforeEach(func() {
+				col := new(fakes.FakeCollection)
+				col.ErrControl = mgo.ErrNotFound
+				lease = NewLease(col)
+				lease.InventoryID = bson.NewObjectId().Hex()
+			})
+			It("should indicate a available status of the inventory item", func() {
+				yesno := lease.InventoryAvailable()
+				Ω(yesno).Should(BeTrue())
 			})
 		})
 	})
@@ -98,7 +149,7 @@ var _ = Describe("Lease", func() {
 	})
 
 	Describe(".Procurement()", func() {
-		Context("when calling with a valid lease", func() {
+		Context("when calling with a valid lease (default)", func() {
 			var (
 				lease   *Lease
 				request *http.Request
@@ -116,6 +167,26 @@ var _ = Describe("Lease", func() {
 				Ω(lease.Task.Status).ShouldNot(Equal(controlStatus))
 			})
 		})
+
+		Context("when calling with a valid lease (2c.small)", func() {
+			var (
+				lease   *Lease
+				request *http.Request
+			)
+			BeforeEach(func() {
+				request = new(http.Request)
+				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","sku":"2c.small", "inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
+				lease = NewLease(new(fakes.FakeCollection))
+				lease.SetTask(new(Task))
+				lease.InitFromHTTPRequest(request)
+			})
+			It("should update the task status", func() {
+				controlStatus := lease.Task.Status
+				lease.Procurement()
+				Ω(lease.Task.Status).ShouldNot(Equal(controlStatus))
+			})
+		})
+
 	})
 
 	Describe(".ReStock()", func() {

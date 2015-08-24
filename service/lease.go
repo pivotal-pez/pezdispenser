@@ -6,9 +6,12 @@ import (
 	"net/http"
 	"time"
 
+	"labix.org/v2/mgo"
+
 	"encoding/json"
 
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/skus"
 	"labix.org/v2/mgo/bson"
 )
 
@@ -63,7 +66,12 @@ func (s *Lease) ReStock() {
 func (s *Lease) Procurement() {
 	switch s.Sku {
 	case Sku2cSmall:
-		s.Task.Status = TaskStatusProcurement
+		s.Task.Status = TaskStatusUnavailable
+
+		if s.InventoryAvailable() {
+			sku := new(skus.Sku2CSmall)
+			s.Task.Status, s.Task.MetaData = sku.Procurement(s.ProcurementMeta)
+		}
 		s.saveTask()
 
 	default:
@@ -94,4 +102,25 @@ func (s *Lease) SetTask(task *Task) {
 
 func (s *Lease) saveTask() {
 	s.taskCollection.UpsertID(s.Task.ID, s.Task)
+}
+
+//InventoryAvailable - lets check if a inventory management task exists for this
+//inventory item. if one does not let's created it, if it does exist lets check
+//its Status to see if we it available or not, return true or false on outcome
+func (s *Lease) InventoryAvailable() (available bool) {
+	task := Task{}
+	available = false
+
+	if err := s.taskCollection.FindOne(s.InventoryID, &task); task.Status == TaskStatusAvailable {
+		available = true
+
+	} else if err == mgo.ErrNotFound {
+		task.ID = bson.ObjectIdHex(s.InventoryID)
+		task.Timestamp = time.Now()
+		task.Status = TaskStatusAvailable
+		task.MetaData = s.ProcurementMeta
+		s.taskCollection.UpsertID(task.ID, task)
+		available = true
+	}
+	return
 }
