@@ -1,0 +1,39 @@
+box: google/golang
+services:
+    - mongo
+dev:
+  # The steps that will be executed on build
+  steps:
+    - setup-go-workspace:
+      package-dir: github.com/pivotal-pez/pezdispenser
+
+    - script:
+        name: env
+        code: env
+
+    # Get the dependencies
+    - script:
+        name: go get
+        code: |
+          cd $WERCKER_SOURCE_DIR
+          go version
+          go get -u github.com/tools/godep
+          go get -u github.com/datianshi/envtemplate
+          export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
+    - script:
+        name: set vcap services/application
+        code: |
+          cat local_wercker_configs/vcap_services_template.json | sed 's,|host|,'"$MONGO_PORT_27017_TCP_ADDR"',' | sed 's,|port|,'"$MONGO_PORT_27017_TCP_PORT"',' > vcap_services_template_fmt.json
+          export VCAP_SERVICES=`envtemplate -file=vcap_services_template_fmt.json`
+          export VCAP_APPLICATION=`envtemplate -file=local_wercker_configs/vcap_application_template.json`
+          export UPS_PEZVALIDATOR_NAME=pezvalidator-service
+          export UPS_PEZVALIDATOR_TARGET=target-url
+          export TASK_SERVICE_NAME=dispenser-task-service
+          export TASK_SERVICE_URI_NAME=uri
+    - script:
+        name: build the server binary
+        code: |
+          godep go build main.go
+    - internal/watch:
+        code: >
+          PORT=80 ./main

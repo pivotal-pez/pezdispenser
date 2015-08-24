@@ -1,0 +1,2 @@
+rm -fvR local_wercker_configs
+cp -fvR samples local_wercker_configs

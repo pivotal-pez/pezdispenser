@@ -1,0 +1,33 @@
+{
+      "p-mongodb": [
+        {
+          "name": "dispenser-task-service",
+          "label": "p-mongodb",
+          "tags": [
+            "pivotal",
+            "mongodb"
+          ],
+          "plan": "development",
+          "credentials": {
+            "uri": "mongodb://|host|:|port|/70ef645b-7e3a-461c-a0d6-94d5b0e5107f",
+            "scheme": "mongodb",
+            "username": "xxxxxxxxxxxxxxxxxxx",
+            "password": "xxxxxxxxxxxxxxxxxxxxx",
+            "host": "xxxxxxxxxx",
+            "port": 27017,
+            "database": "xxxxxxxxxxxxxxxx"
+          }
+        }
+      ],
+      "user-provided": [
+        {
+          "name": "pezvalidator-service",
+          "label": "user-provided",
+          "tags": [],
+          "credentials": {
+            "target-url": "https://hcfdev.cfapps.pez.pivotal.io/valid-key"
+          },
+          "syslog_drain_url": ""
+        }
+      ]
+    }
