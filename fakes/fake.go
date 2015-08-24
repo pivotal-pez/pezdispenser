@@ -197,6 +197,7 @@ type FakeTask struct {
 type FakeCollection struct {
 	mgo.Collection
 	ControlTask pezdispenser.Task
+	ErrControl  error
 }
 
 //Close -
@@ -216,6 +217,7 @@ func (s *FakeCollection) UpsertID(id interface{}, result interface{}) (changInfo
 
 //FindOne -
 func (s *FakeCollection) FindOne(id string, result interface{}) (err error) {
+	err = s.ErrControl
 	*(result.(*pezdispenser.Task)) = s.ControlTask
 	return
 }
