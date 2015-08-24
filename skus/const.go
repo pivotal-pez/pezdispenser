@@ -7,4 +7,6 @@ const (
 	StatusFailed = "failed"
 	//StatusProcessing - a status for in process items
 	StatusProcessing = "processing"
+	//StatusOutsourced - this is to indicate the the task tracking has been outsourced
+	StatusOutsourced = "outsourced"
 )

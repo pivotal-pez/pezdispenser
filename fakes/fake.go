@@ -9,6 +9,7 @@ import (
 
 	"github.com/pivotal-pez/pezdispenser/service"
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 
@@ -47,6 +48,30 @@ const (
 				"users":null
 			}`
 )
+
+//FakeVCDClient - this is a fake vcdclient object
+type FakeVCDClient struct {
+	FakeVAppTemplateRecord *vcloudclient.VAppTemplateRecord
+	FakeVApp               *vcloudclient.VApp
+	ErrDeployFake          error
+	ErrQueryFake           error
+	ErrAuthFake            error
+}
+
+//DeployVApp - fake out calling deploy vapp
+func (s *FakeVCDClient) DeployVApp(templateName, templateHref, vcdHref string) (vapp *vcloudclient.VApp, err error) {
+	return s.FakeVApp, s.ErrDeployFake
+}
+
+//Auth - fake out making an auth call
+func (s *FakeVCDClient) Auth(username, password string) (err error) {
+	return s.ErrAuthFake
+}
+
+//QueryTemplate - fake querying for a template
+func (s *FakeVCDClient) QueryTemplate(templateName string) (vappTemplate *vcloudclient.VAppTemplateRecord, err error) {
+	return s.FakeVAppTemplateRecord, s.ErrDeployFake
+}
 
 //FakeResponseBody - a fake response body object
 type FakeResponseBody struct {

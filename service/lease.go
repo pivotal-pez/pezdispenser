@@ -1,6 +1,7 @@
 package pezdispenser
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
 	"github.com/pivotal-pez/pezdispenser/skus"
+	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 	"labix.org/v2/mgo/bson"
 )
 
@@ -58,8 +60,24 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 
 //ReStock - this will reclaim resources for a given lease
 func (s *Lease) ReStock() {
-	s.Task.Status = TaskStatusUnavailable
-	s.saveTask()
+	switch s.Sku {
+	case Sku2cSmall:
+		s.Task.Status = TaskStatusUnavailable
+
+		if s.InventoryAvailable() {
+			httpClient := vcloudclient.DefaultClient()
+			baseURI := fmt.Sprintf("%s", s.ProcurementMeta["BASE_URI"])
+			sku := &skus.Sku2CSmall{
+				Client: vcloudclient.NewVCDClient(httpClient, baseURI),
+			}
+			s.Task.Status, s.Task.MetaData = sku.ReStock(s.ProcurementMeta)
+		}
+		s.saveTask()
+
+	default:
+		s.Task.Status = TaskStatusUnavailable
+		s.saveTask()
+	}
 }
 
 //Procurement - method to issue a procurement request for the given lease item.
