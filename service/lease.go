@@ -20,6 +20,7 @@ import (
 func NewLease(taskCollection integrations.Collection) *Lease {
 	return &Lease{
 		taskCollection: taskCollection,
+		taskManager:    NewTaskManager(taskCollection),
 	}
 }
 
@@ -30,10 +31,12 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 		newTaskID = bson.NewObjectId().Hex()
 		timestamp = time.Now()
 		task      = &Task{
-			ID:        bson.ObjectIdHex(newTaskID),
-			Status:    TaskStatusStarted,
-			Timestamp: timestamp,
-			MetaData:  make(map[string]interface{}),
+			ID:         bson.ObjectIdHex(newTaskID),
+			Status:     TaskStatusStarted,
+			Timestamp:  timestamp,
+			MetaData:   make(map[string]interface{}),
+			Profile:    TaskLeaseProcurement,
+			CallerName: CallerPostLease,
 		}
 	)
 	statusCode = http.StatusNotFound
@@ -66,17 +69,17 @@ func (s *Lease) ReStock() {
 
 		if s.InventoryAvailable() {
 			httpClient := vcloudclient.DefaultClient()
-			baseURI := fmt.Sprintf("%s", s.ProcurementMeta["BASE_URI"])
+			baseURI := fmt.Sprintf("%s", s.ProcurementMeta["base_uri"])
 			sku := &skus.Sku2CSmall{
 				Client: vcloudclient.NewVCDClient(httpClient, baseURI),
 			}
-			s.Task.Status, s.Task.MetaData = sku.ReStock(s.ProcurementMeta)
+			s.Task.Status, s.ConsumerMeta = sku.ReStock(s.ProcurementMeta)
 		}
-		s.saveTask()
+		s.taskManager.SaveTask(s.Task)
 
 	default:
 		s.Task.Status = TaskStatusUnavailable
-		s.saveTask()
+		s.taskManager.SaveTask(s.Task)
 	}
 }
 
@@ -88,13 +91,13 @@ func (s *Lease) Procurement() {
 
 		if s.InventoryAvailable() {
 			sku := new(skus.Sku2CSmall)
-			s.Task.Status, s.Task.MetaData = sku.Procurement(s.ProcurementMeta)
+			s.Task.Status, s.ConsumerMeta = sku.Procurement(s.ProcurementMeta)
 		}
-		s.saveTask()
+		s.taskManager.SaveTask(s.Task)
 
 	default:
 		s.Task.Status = TaskStatusUnavailable
-		s.saveTask()
+		s.taskManager.SaveTask(s.Task)
 	}
 }
 
@@ -115,21 +118,17 @@ func (s *Lease) InitFromHTTPRequest(req *http.Request) (err error) {
 //SetTask - add a task to the lease object
 func (s *Lease) SetTask(task *Task) {
 	s.Task = task
-	s.saveTask()
-}
-
-func (s *Lease) saveTask() {
-	s.taskCollection.UpsertID(s.Task.ID, s.Task)
+	s.taskManager.SaveTask(s.Task)
 }
 
 //InventoryAvailable - lets check if a inventory management task exists for this
 //inventory item. if one does not let's created it, if it does exist lets check
 //its Status to see if we it available or not, return true or false on outcome
 func (s *Lease) InventoryAvailable() (available bool) {
-	task := Task{}
+	task := new(Task)
 	available = false
 
-	if err := s.taskCollection.FindOne(s.InventoryID, &task); task.Status == TaskStatusAvailable {
+	if err := s.taskCollection.FindOne(s.InventoryID, task); task.Status == TaskStatusAvailable {
 		available = true
 
 	} else if err == mgo.ErrNotFound {
@@ -137,7 +136,7 @@ func (s *Lease) InventoryAvailable() (available bool) {
 		task.Timestamp = time.Now()
 		task.Status = TaskStatusAvailable
 		task.MetaData = s.ProcurementMeta
-		s.taskCollection.UpsertID(task.ID, task)
+		s.taskManager.SaveTask(task)
 		available = true
 	}
 	return

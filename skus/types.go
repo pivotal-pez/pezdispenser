@@ -14,6 +14,7 @@ type (
 	}
 
 	vcdClient interface {
+		UnDeployVApp(vappID string) (task *vcloudclient.TaskElem, err error)
 		DeployVApp(templateName, templateHref, vcdHref string) (vapp *vcloudclient.VApp, err error)
 		Auth(username, password string) (err error)
 		QueryTemplate(templateName string) (vappTemplate *vcloudclient.VAppTemplateRecord, err error)

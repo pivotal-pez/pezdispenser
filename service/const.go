@@ -17,7 +17,17 @@ const (
 	SuccessStatusResponseTaskByID = 200
 	//FailureStatusResponseTaskByID - failure statuscode for gettaskbyidcontroller
 	FailureStatusResponseTaskByID = 404
-	Sku2cSmall                    = "2c.small"
+	//Sku2CSmall - lease sku type indicator. to be replaced with a cleaner injected pattern
+	Sku2cSmall = "2c.small"
+
+	TaskLeaseProcurement ProfileType = "lease_procurement"
+	TaskLeaseReStock     ProfileType = "lease_restock"
+	TaskUnDeploy         ProfileType = "undeploy"
+	TaskDeploy           ProfileType = "deploy"
+	TaskInventoryLedger  ProfileType = "inventory_ledger"
+	TaskGeneric          ProfileType = "generic"
+
+	CallerPostLease = "post_lease"
 )
 
 var (

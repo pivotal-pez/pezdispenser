@@ -36,15 +36,27 @@ type (
 
 	//Task - a task object
 	Task struct {
-		ID        bson.ObjectId          `bson:"_id"`
-		Timestamp time.Time              `bson:"timestamp"`
-		Status    string                 `bson:"status"`
-		MetaData  map[string]interface{} `bson:"metadata"`
+		ID         bson.ObjectId          `bson:"_id"`
+		Timestamp  time.Time              `bson:"timestamp"`
+		Status     string                 `bson:"status"`
+		Profile    ProfileType            `bson:"profile"`
+		CallerName string                 `bson:"caller_name"`
+		MetaData   map[string]interface{} `bson:"metadata"`
+		Lock       bool                   `bson:"lock"`
 	}
+
+	//TaskManager - manages task interactions crud stuff
+	TaskManager struct {
+		taskCollection integrations.Collection
+	}
+
+	//ProfileType - indicator of the purpose of the task to be performed
+	ProfileType string
 
 	//Lease - this represents a lease object
 	Lease struct {
 		taskCollection  integrations.Collection
+		taskManager     *TaskManager
 		ID              string                 `json:"_id"`
 		InventoryID     string                 `json:"inventory_id"`
 		UserName        string                 `json:"username"`
@@ -52,7 +64,7 @@ type (
 		LeaseDuration   float64                `json:"lease_duration"`
 		LeaseEndDate    time.Time              `json:"lease_end_date"`
 		LeaseStartDate  time.Time              `json:"lease_start_date"`
-		Credentials     map[string]interface{} `json:"credentials"`
+		ConsumerMeta    map[string]interface{} `json:"consumer_meta"`
 		ProcurementMeta map[string]interface{} `json:"procurement_meta"`
 		Task            *Task                  `json:"task"`
 	}

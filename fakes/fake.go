@@ -63,6 +63,11 @@ func (s *FakeVCDClient) DeployVApp(templateName, templateHref, vcdHref string) (
 	return s.FakeVApp, s.ErrDeployFake
 }
 
+//UnDeployVApp - executes a fake undeploy on a fake client
+func (s *FakeVCDClient) UnDeployVApp(vappID string) (task *vcloudclient.TaskElem, err error) {
+	return
+}
+
 //Auth - fake out making an auth call
 func (s *FakeVCDClient) Auth(username, password string) (err error) {
 	return s.ErrAuthFake
