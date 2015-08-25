@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"labix.org/v2/mgo"
-	"labix.org/v2/mgo/bson"
 )
 
 type (
@@ -34,29 +34,10 @@ type (
 		Upsert(selector interface{}, update interface{}) (err error)
 	}
 
-	//Task - a task object
-	Task struct {
-		ID         bson.ObjectId          `bson:"_id"`
-		Timestamp  time.Time              `bson:"timestamp"`
-		Status     string                 `bson:"status"`
-		Profile    ProfileType            `bson:"profile"`
-		CallerName string                 `bson:"caller_name"`
-		MetaData   map[string]interface{} `bson:"metadata"`
-		Lock       bool                   `bson:"lock"`
-	}
-
-	//TaskManager - manages task interactions crud stuff
-	TaskManager struct {
-		taskCollection integrations.Collection
-	}
-
-	//ProfileType - indicator of the purpose of the task to be performed
-	ProfileType string
-
 	//Lease - this represents a lease object
 	Lease struct {
 		taskCollection  integrations.Collection
-		taskManager     *TaskManager
+		taskManager     *taskmanager.TaskManager
 		ID              string                 `json:"_id"`
 		InventoryID     string                 `json:"inventory_id"`
 		UserName        string                 `json:"username"`
@@ -66,6 +47,6 @@ type (
 		LeaseStartDate  time.Time              `json:"lease_start_date"`
 		ConsumerMeta    map[string]interface{} `json:"consumer_meta"`
 		ProcurementMeta map[string]interface{} `json:"procurement_meta"`
-		Task            *Task                  `json:"task"`
+		Task            *taskmanager.Task      `json:"task"`
 	}
 )

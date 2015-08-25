@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
 	. "github.com/pivotal-pez/pezdispenser/service"
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
 var _ = Describe("Lease", func() {
@@ -44,7 +45,7 @@ var _ = Describe("Lease", func() {
 			)
 			BeforeEach(func() {
 				col := new(fakes.FakeCollection)
-				col.ControlTask = Task{
+				col.ControlTask = taskmanager.Task{
 					Status: TaskStatusAvailable,
 				}
 				lease = NewLease(col)
@@ -158,7 +159,7 @@ var _ = Describe("Lease", func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
 				lease = NewLease(new(fakes.FakeCollection))
-				lease.SetTask(new(Task))
+				lease.SetTask(new(taskmanager.Task))
 				lease.InitFromHTTPRequest(request)
 			})
 			It("should update the task status", func() {
@@ -177,7 +178,7 @@ var _ = Describe("Lease", func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","sku":"2c.small", "inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
 				lease = NewLease(new(fakes.FakeCollection))
-				lease.SetTask(new(Task))
+				lease.SetTask(new(taskmanager.Task))
 				lease.InitFromHTTPRequest(request)
 			})
 			It("should update the task status", func() {
@@ -199,7 +200,7 @@ var _ = Describe("Lease", func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
 				lease = NewLease(new(fakes.FakeCollection))
-				lease.SetTask(new(Task))
+				lease.SetTask(new(taskmanager.Task))
 				lease.InitFromHTTPRequest(request)
 			})
 			It("should update the task status", func() {
@@ -214,7 +215,7 @@ var _ = Describe("Lease", func() {
 		Context("calling with a valid task on an initialized lease", func() {
 			var (
 				lease       = NewLease(new(fakes.FakeCollection))
-				controlTask = new(Task)
+				controlTask = new(taskmanager.Task)
 			)
 			BeforeEach(func() {
 				lease.SetTask(controlTask)

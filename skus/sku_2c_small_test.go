@@ -32,12 +32,13 @@ var _ = Describe("Sku2CSmall", func() {
 				fakeClient.FakeVApp.Tasks.Task = vcloudclient.TaskElem{}
 				fakeClient.FakeVApp.Tasks.Task.Href = "faketaskhref"
 				sku = &Sku2CSmall{
-					Client: fakeClient,
+					Client:      fakeClient,
+					TaskManager: new(fakes.FakeTaskManager),
 				}
 			})
-			It("should return a status indicating that we outsourced the task to the vcd api", func() {
+			It("should return a status indicating the current status", func() {
 				status, _ := sku.ReStock(make(map[string]interface{}))
-				Ω(status).Should(Equal(StatusOutsourced))
+				Ω(status).Should(Equal(StatusProcessing))
 			})
 		})
 	})

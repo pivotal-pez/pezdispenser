@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
 	. "github.com/pivotal-pez/pezdispenser/service"
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
 var _ = Describe("PostLeaseController()", func() {
@@ -19,7 +20,7 @@ var _ = Describe("PostLeaseController()", func() {
 			fakeURI              = "mongodb://c39642c7-xxxx-xxxx-xxxx-db67a3bbc98f:xxxx4b827xxxx4393dcxxxx3533xxxx@1.1.1.1:27017/70ef645b-xxxx-xxxx-xxxx-94d5b0e5107f"
 			handler              func(log *log.Logger, r render.Render, req *http.Request)
 			renderer             *fakes.FakeRenderer
-			controlResponseValue = Task{
+			controlResponseValue = taskmanager.Task{
 				Status: "rockin and rollin",
 				MetaData: map[string]interface{}{
 					"some": "stuff",

@@ -1,4 +1,4 @@
-package pezdispenser
+package taskmanager
 
 import (
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
@@ -36,5 +36,12 @@ func (s *TaskManager) UnLockTask(id string) (t *Task, err error) {
 
 //FindTask - this will find and return a task with a given ID
 func (s *TaskManager) FindTask(id string) (t *Task, err error) {
+	return
+}
+
+//NewTask - get us a new empty task
+func (s *TaskManager) NewTask() (t *Task) {
+	t = new(Task)
+	t.ID = bson.NewObjectId()
 	return
 }

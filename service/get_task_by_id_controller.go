@@ -7,6 +7,7 @@ import (
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
 //GetTaskByIDController - this is the controller to handle a get task call
@@ -18,7 +19,7 @@ func GetTaskByIDController(taskServiceURI string, collectionDialer integrations.
 			err        error
 			response   interface{}
 			statusCode = http.StatusNotFound
-			task       = new(Task)
+			task       = new(taskmanager.Task)
 			taskID     = params["id"]
 		)
 		taskCollection.Wake()

@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
 	. "github.com/pivotal-pez/pezdispenser/service"
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
 var _ = Describe("GetTaskByIdController()", func() {
@@ -19,7 +20,7 @@ var _ = Describe("GetTaskByIdController()", func() {
 			handler              func(params martini.Params, log *log.Logger, r render.Render)
 			controlID            = "myvalidid"
 			renderer             *fakes.FakeRenderer
-			controlResponseValue = Task{
+			controlResponseValue = taskmanager.Task{
 				Status: "rockin and rollin",
 				MetaData: map[string]interface{}{
 					"some": "stuff",
@@ -35,7 +36,7 @@ var _ = Describe("GetTaskByIdController()", func() {
 
 		It("should return the task object w/ a 200 statusCode", func() {
 			Ω(renderer.SpyStatus).Should(Equal(http.StatusOK))
-			Ω(*(renderer.SpyValue.(*Task))).Should(Equal(controlResponseValue))
+			Ω(*(renderer.SpyValue.(*taskmanager.Task))).Should(Equal(controlResponseValue))
 		})
 	})
 })

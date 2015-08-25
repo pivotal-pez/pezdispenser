@@ -9,6 +9,7 @@ import (
 
 	"github.com/pivotal-pez/pezdispenser/service"
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -109,7 +110,7 @@ var (
 )
 
 //FakeNewCollectionDialer -
-func FakeNewCollectionDialer(c pezdispenser.Task) func(url, dbname, collectionname string) (col integrations.Collection, err error) {
+func FakeNewCollectionDialer(c taskmanager.Task) func(url, dbname, collectionname string) (col integrations.Collection, err error) {
 	return func(url, dbname, collectionname string) (col integrations.Collection, err error) {
 		col = &FakeCollection{
 			ControlTask: c,
@@ -215,6 +216,35 @@ func (s *MockClientDoer) Do(rq *http.Request) (rs *http.Response, e error) {
 	return
 }
 
+//FakeTaskManager - this is a fake representation of the task manager
+type FakeTaskManager struct {
+}
+
+//SaveTask --
+func (s *FakeTaskManager) SaveTask(t *taskmanager.Task) (*taskmanager.Task, error) {
+	return t, nil
+}
+
+//FindLockFirstCallerName --
+func (s *FakeTaskManager) FindLockFirstCallerName(callerName string) (t *taskmanager.Task, err error) {
+	return
+}
+
+//UnLockTask --
+func (s *FakeTaskManager) UnLockTask(id string) (t *taskmanager.Task, err error) {
+	return
+}
+
+//FindTask --
+func (s *FakeTaskManager) FindTask(id string) (t *taskmanager.Task, err error) {
+	return
+}
+
+//NewTask --
+func (s *FakeTaskManager) NewTask() (t *taskmanager.Task) {
+	return
+}
+
 //FakeTask -
 type FakeTask struct {
 	ID        bson.ObjectId          `bson:"_id"`
@@ -226,7 +256,7 @@ type FakeTask struct {
 //FakeCollection -
 type FakeCollection struct {
 	mgo.Collection
-	ControlTask pezdispenser.Task
+	ControlTask taskmanager.Task
 	ErrControl  error
 }
 
@@ -248,6 +278,6 @@ func (s *FakeCollection) UpsertID(id interface{}, result interface{}) (changInfo
 //FindOne -
 func (s *FakeCollection) FindOne(id string, result interface{}) (err error) {
 	err = s.ErrControl
-	*(result.(*pezdispenser.Task)) = s.ControlTask
+	*(result.(*taskmanager.Task)) = s.ControlTask
 	return
 }

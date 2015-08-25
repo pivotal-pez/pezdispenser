@@ -13,6 +13,7 @@ import (
 
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
 	"github.com/pivotal-pez/pezdispenser/skus"
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 	"labix.org/v2/mgo/bson"
 )
@@ -20,7 +21,7 @@ import (
 func NewLease(taskCollection integrations.Collection) *Lease {
 	return &Lease{
 		taskCollection: taskCollection,
-		taskManager:    NewTaskManager(taskCollection),
+		taskManager:    taskmanager.NewTaskManager(taskCollection),
 	}
 }
 
@@ -30,12 +31,12 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 		err       error
 		newTaskID = bson.NewObjectId().Hex()
 		timestamp = time.Now()
-		task      = &Task{
+		task      = &taskmanager.Task{
 			ID:         bson.ObjectIdHex(newTaskID),
 			Status:     TaskStatusStarted,
 			Timestamp:  timestamp,
 			MetaData:   make(map[string]interface{}),
-			Profile:    TaskLeaseProcurement,
+			Profile:    taskmanager.TaskLeaseProcurement,
 			CallerName: CallerPostLease,
 		}
 	)
@@ -64,7 +65,7 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 //ReStock - this will reclaim resources for a given lease
 func (s *Lease) ReStock() {
 	switch s.Sku {
-	case Sku2cSmall:
+	case Sku2CSmall:
 		s.Task.Status = TaskStatusUnavailable
 
 		if s.InventoryAvailable() {
@@ -86,11 +87,12 @@ func (s *Lease) ReStock() {
 //Procurement - method to issue a procurement request for the given lease item.
 func (s *Lease) Procurement() {
 	switch s.Sku {
-	case Sku2cSmall:
+	case Sku2CSmall:
 		s.Task.Status = TaskStatusUnavailable
 
 		if s.InventoryAvailable() {
-			sku := new(skus.Sku2CSmall)
+			sku := skus.New2CSmallSku(vcloudclient.NewVCDClient(new(http.Client), ""), s.taskManager)
+			sku.TaskManager = s.taskManager
 			s.Task.Status, s.ConsumerMeta = sku.Procurement(s.ProcurementMeta)
 		}
 		s.taskManager.SaveTask(s.Task)
@@ -116,7 +118,7 @@ func (s *Lease) InitFromHTTPRequest(req *http.Request) (err error) {
 }
 
 //SetTask - add a task to the lease object
-func (s *Lease) SetTask(task *Task) {
+func (s *Lease) SetTask(task *taskmanager.Task) {
 	s.Task = task
 	s.taskManager.SaveTask(s.Task)
 }
@@ -125,7 +127,7 @@ func (s *Lease) SetTask(task *Task) {
 //inventory item. if one does not let's created it, if it does exist lets check
 //its Status to see if we it available or not, return true or false on outcome
 func (s *Lease) InventoryAvailable() (available bool) {
-	task := new(Task)
+	task := new(taskmanager.Task)
 	available = false
 
 	if err := s.taskCollection.FindOne(s.InventoryID, task); task.Status == TaskStatusAvailable {
