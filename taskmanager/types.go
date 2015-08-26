@@ -16,7 +16,6 @@ type (
 		Profile    ProfileType            `bson:"profile"`
 		CallerName string                 `bson:"caller_name"`
 		MetaData   map[string]interface{} `bson:"metadata"`
-		Lock       bool                   `bson:"lock"`
 	}
 
 	//TaskManager - manages task interactions crud stuff

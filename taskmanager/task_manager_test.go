@@ -1,6 +1,8 @@
 package taskmanager_test
 
 import (
+	"time"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
@@ -58,9 +60,10 @@ var _ = Describe("TaskManager", func() {
 			tm = NewTaskManager(new(fakes.FakeCollection))
 		})
 		Context("when called", func() {
-			It("Should do nothing right now", func() {
-				tm.NewTask()
-				Ω(true).Should(BeTrue())
+			It("Should return a newly initialized task", func() {
+				t := tm.NewTask("random.skutype", TaskLongPollQueue, "processing")
+				Ω(t.ID.Hex()).ShouldNot(BeEmpty())
+				Ω(t.Timestamp).ShouldNot(Equal(time.Time{}))
 			})
 		})
 	})

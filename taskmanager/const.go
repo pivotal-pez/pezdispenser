@@ -5,12 +5,11 @@ const (
 	TaskLeaseProcurement ProfileType = "lease_procurement"
 	//TaskLeaseReStock --
 	TaskLeaseReStock ProfileType = "lease_restock"
-	//TaskUnDeploy --
-	TaskUnDeploy ProfileType = "undeploy"
-	//TaskDeploy --
-	TaskDeploy ProfileType = "deploy"
 	//TaskInventoryLedger --
 	TaskInventoryLedger ProfileType = "inventory_ledger"
-	//TaskGeneric --
-	TaskGeneric ProfileType = "generic"
+	//TaskLongPollQueue --
+	TaskLongPollQueue ProfileType = "longpoll_queue"
+
+	//TaskActionMetaName --
+	TaskActionMetaName = "task_action"
 )

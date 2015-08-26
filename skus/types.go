@@ -15,6 +15,7 @@ type (
 	Sku2CSmall struct {
 		Client      vcdClient
 		TaskManager taskManager
+		name        string
 	}
 
 	vcdClient interface {
@@ -29,6 +30,6 @@ type (
 		FindLockFirstCallerName(callerName string) (t *taskmanager.Task, err error)
 		UnLockTask(id string) (t *taskmanager.Task, err error)
 		FindTask(id string) (t *taskmanager.Task, err error)
-		NewTask() (t *taskmanager.Task)
+		NewTask(n string, p taskmanager.ProfileType, s string) (t *taskmanager.Task)
 	}
 )

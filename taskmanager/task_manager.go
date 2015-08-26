@@ -1,6 +1,8 @@
 package taskmanager
 
 import (
+	"time"
+
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
 	"labix.org/v2/mgo/bson"
 )
@@ -40,8 +42,13 @@ func (s *TaskManager) FindTask(id string) (t *Task, err error) {
 }
 
 //NewTask - get us a new empty task
-func (s *TaskManager) NewTask() (t *Task) {
+func (s *TaskManager) NewTask(callerName string, profile ProfileType, status string) (t *Task) {
 	t = new(Task)
+	t.CallerName = callerName
+	t.Profile = profile
+	t.Status = status
 	t.ID = bson.NewObjectId()
+	t.Timestamp = time.Now()
+	t.MetaData = make(map[string]interface{})
 	return
 }

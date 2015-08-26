@@ -9,4 +9,8 @@ const (
 	StatusProcessing = "processing"
 	//StatusOutsourced - this is to indicate the the task tracking has been outsourced
 	StatusOutsourced = "outsourced"
+	//VCDTaskElementHrefMetaName - the name of the meta data field containing the href for the vcd task
+	VCDTaskElementHrefMetaName = "vcd_task_element_href"
+	//TaskActionUnDeploy --
+	TaskActionUnDeploy = "undeploy_vapp"
 )

@@ -1,11 +1,16 @@
 package skus
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
+)
 
 func New2CSmallSku(client vcdClient, tm taskManager) *Sku2CSmall {
 	return &Sku2CSmall{
 		Client:      client,
 		TaskManager: tm,
+		name:        "2c.small",
 	}
 }
 
@@ -24,9 +29,12 @@ func (s *Sku2CSmall) ReStock(meta map[string]interface{}) (status string, taskMe
 	vAppID := fmt.Sprintf("%s", meta["vapp_id"])
 	s.Client.Auth(user, pass)
 
-	if _, err := s.Client.UnDeployVApp(vAppID); err == nil {
+	if vcdResponseTaskElement, err := s.Client.UnDeployVApp(vAppID); err == nil {
 		status = StatusProcessing
-		task := s.TaskManager.NewTask()
+		task := s.TaskManager.NewTask(s.name, taskmanager.TaskLongPollQueue, status)
+		task.MetaData = meta
+		task.MetaData[VCDTaskElementHrefMetaName] = vcdResponseTaskElement.Href
+		task.MetaData[taskmanager.TaskActionMetaName] = TaskActionUnDeploy
 		s.TaskManager.SaveTask(task)
 
 	} else {

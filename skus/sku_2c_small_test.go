@@ -37,7 +37,10 @@ var _ = Describe("Sku2CSmall", func() {
 				}
 			})
 			It("should return a status indicating the current status", func() {
-				status, _ := sku.ReStock(make(map[string]interface{}))
+				controlMeta := map[string]interface{}{
+					"": "",
+				}
+				status, _ := sku.ReStock(controlMeta)
 				Ω(status).Should(Equal(StatusProcessing))
 			})
 		})

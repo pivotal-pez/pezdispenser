@@ -54,6 +54,7 @@ const (
 type FakeVCDClient struct {
 	FakeVAppTemplateRecord *vcloudclient.VAppTemplateRecord
 	FakeVApp               *vcloudclient.VApp
+	ErrUnDeployFake        error
 	ErrDeployFake          error
 	ErrQueryFake           error
 	ErrAuthFake            error
@@ -61,12 +62,12 @@ type FakeVCDClient struct {
 
 //DeployVApp - fake out calling deploy vapp
 func (s *FakeVCDClient) DeployVApp(templateName, templateHref, vcdHref string) (vapp *vcloudclient.VApp, err error) {
-	return s.FakeVApp, s.ErrDeployFake
+	return s.FakeVApp, s.ErrUnDeployFake
 }
 
 //UnDeployVApp - executes a fake undeploy on a fake client
 func (s *FakeVCDClient) UnDeployVApp(vappID string) (task *vcloudclient.TaskElem, err error) {
-	return
+	return &s.FakeVApp.Tasks.Task, s.ErrDeployFake
 }
 
 //Auth - fake out making an auth call
@@ -241,7 +242,15 @@ func (s *FakeTaskManager) FindTask(id string) (t *taskmanager.Task, err error) {
 }
 
 //NewTask --
-func (s *FakeTaskManager) NewTask() (t *taskmanager.Task) {
+func (s *FakeTaskManager) NewTask(callerName string, profile taskmanager.ProfileType, status string) (t *taskmanager.Task) {
+	t = new(taskmanager.Task)
+	t.CallerName = callerName
+	t.Profile = profile
+	t.Status = status
+	t.ID = bson.NewObjectId()
+	t.Timestamp = time.Now()
+	t.MetaData = make(map[string]interface{})
+
 	return
 }
 
