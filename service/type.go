@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/skus"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"labix.org/v2/mgo"
 )
@@ -38,6 +39,7 @@ type (
 	Lease struct {
 		taskCollection  integrations.Collection
 		taskManager     *taskmanager.TaskManager
+		availableSkus   map[string]skus.Sku
 		ID              string                 `json:"_id"`
 		InventoryID     string                 `json:"inventory_id"`
 		UserName        string                 `json:"username"`

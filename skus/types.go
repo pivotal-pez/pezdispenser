@@ -8,14 +8,17 @@ import (
 type (
 	//Sku - interface for a sku object
 	Sku interface {
-		Procurement(meta map[string]interface{}) (status string, taskMeta map[string]interface{})
-		ReStock(meta map[string]interface{}) (status string, taskMeta map[string]interface{})
+		Procurement() (status string, taskMeta map[string]interface{})
+		ReStock() (status string, taskMeta map[string]interface{})
+		PollForTasks()
+		New(tm TaskManager, procurementMeta map[string]interface{}) Sku
 	}
 	//Sku2CSmall - a object representing a 2csmall sku
 	Sku2CSmall struct {
-		Client      vcdClient
-		TaskManager taskManager
-		name        string
+		Client          vcdClient
+		TaskManager     TaskManager
+		name            string
+		ProcurementMeta map[string]interface{}
 	}
 
 	vcdClient interface {
@@ -25,7 +28,8 @@ type (
 		QueryTemplate(templateName string) (vappTemplate *vcloudclient.VAppTemplateRecord, err error)
 	}
 
-	taskManager interface {
+	//TaskManager - an interface representing a taskmanager object
+	TaskManager interface {
 		SaveTask(t *taskmanager.Task) (*taskmanager.Task, error)
 		FindLockFirstCallerName(callerName string) (t *taskmanager.Task, err error)
 		UnLockTask(id string) (t *taskmanager.Task, err error)

@@ -9,6 +9,7 @@ import (
 
 	"github.com/pivotal-pez/pezdispenser/service"
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/skus"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 	"labix.org/v2/mgo"
@@ -49,6 +50,29 @@ const (
 				"users":null
 			}`
 )
+
+//FakeSku -- a fake sku object
+type FakeSku struct{}
+
+//Procurement --
+func (s *FakeSku) Procurement() (status string, taskMeta map[string]interface{}) {
+	return
+}
+
+//ReStock --
+func (s *FakeSku) ReStock() (status string, taskMeta map[string]interface{}) {
+	return
+}
+
+//PollForTasks --
+func (s *FakeSku) PollForTasks() {
+
+}
+
+//New --
+func (s *FakeSku) New(tm skus.TaskManager, procurementMeta map[string]interface{}) skus.Sku {
+	return new(FakeSku)
+}
 
 //FakeVCDClient - this is a fake vcdclient object
 type FakeVCDClient struct {

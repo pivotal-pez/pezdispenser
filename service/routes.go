@@ -23,6 +23,7 @@ var (
 //InitRoutes - initialize the mappings for controllers against valid routes
 func InitRoutes(m *martini.ClassicMartini, keyCheckHandler martini.Handler, appEnv *cfenv.App) {
 	taskServiceURI := getTaskBinding(appEnv)
+
 	m.Use(render.Renderer())
 
 	m.Group("/", func(r martini.Router) {
@@ -31,6 +32,8 @@ func InitRoutes(m *martini.ClassicMartini, keyCheckHandler martini.Handler, appE
 
 	m.Group(URLBaseV1, func(r martini.Router) {
 		r.Get("/task/:id", GetTaskByIDController(taskServiceURI, integrations.NewCollectionDialer))
+		r.Post("/lease", PostLeaseController(taskServiceURI, integrations.NewCollectionDialer))
+		r.Delete("/lease", DeleteLeaseController(taskServiceURI, integrations.NewCollectionDialer))
 	}, keyCheckHandler)
 }
 

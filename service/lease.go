@@ -1,7 +1,6 @@
 package pezdispenser
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,15 +13,53 @@ import (
 	"github.com/pivotal-pez/pezdispenser/service/_integrations"
 	"github.com/pivotal-pez/pezdispenser/skus"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
-	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 	"labix.org/v2/mgo/bson"
 )
 
-func NewLease(taskCollection integrations.Collection) *Lease {
+//NewLease - create and return a new lease object
+func NewLease(taskCollection integrations.Collection, availableSkus map[string]skus.Sku) *Lease {
 	return &Lease{
 		taskCollection: taskCollection,
 		taskManager:    taskmanager.NewTaskManager(taskCollection),
+		availableSkus:  availableSkus,
 	}
+}
+
+//Delete - handle a delete lease call
+func (s *Lease) Delete(logger *log.Logger, req *http.Request) (statusCode int, response interface{}) {
+	var (
+		err       error
+		newTaskID = bson.NewObjectId().Hex()
+		timestamp = time.Now()
+		task      = &taskmanager.Task{
+			ID:         bson.ObjectIdHex(newTaskID),
+			Status:     TaskStatusStarted,
+			Timestamp:  timestamp,
+			MetaData:   make(map[string]interface{}),
+			Profile:    taskmanager.TaskLeaseReStock,
+			CallerName: CallerPostLease,
+		}
+	)
+	statusCode = http.StatusNotFound
+	s.taskCollection.Wake()
+	logger.Println("collection dialed successfully")
+
+	if _, err = s.taskCollection.UpsertID(newTaskID, task); err == nil {
+		s.SetTask(task)
+		logger.Println("task created")
+
+		if err = s.InitFromHTTPRequest(req); err == nil {
+			logger.Println("restocking inventory...")
+			s.ReStock()
+			statusCode = http.StatusCreated
+			response = s
+		}
+	}
+
+	if err != nil {
+		response = map[string]string{"error": err.Error()}
+	}
+	return
 }
 
 //Post - handle a post lease call
@@ -49,8 +86,8 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 		logger.Println("task created")
 
 		if err = s.InitFromHTTPRequest(req); err == nil {
-			logger.Println("restocking...")
-			s.ReStock()
+			logger.Println("obtaining lease...")
+			s.Procurement()
 			statusCode = http.StatusCreated
 			response = s
 		}
@@ -64,21 +101,16 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 
 //ReStock - this will reclaim resources for a given lease
 func (s *Lease) ReStock() {
-	switch s.Sku {
-	case Sku2CSmall:
+	if skuConstructor, ok := s.availableSkus[s.Sku]; ok {
 		s.Task.Status = TaskStatusUnavailable
 
 		if s.InventoryAvailable() {
-			httpClient := vcloudclient.DefaultClient()
-			baseURI := fmt.Sprintf("%s", s.ProcurementMeta["base_uri"])
-			sku := &skus.Sku2CSmall{
-				Client: vcloudclient.NewVCDClient(httpClient, baseURI),
-			}
-			s.Task.Status, s.ConsumerMeta = sku.ReStock(s.ProcurementMeta)
+			sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
+			s.Task.Status, s.ConsumerMeta = sku.ReStock()
 		}
 		s.taskManager.SaveTask(s.Task)
 
-	default:
+	} else {
 		s.Task.Status = TaskStatusUnavailable
 		s.taskManager.SaveTask(s.Task)
 	}
@@ -86,18 +118,17 @@ func (s *Lease) ReStock() {
 
 //Procurement - method to issue a procurement request for the given lease item.
 func (s *Lease) Procurement() {
-	switch s.Sku {
-	case Sku2CSmall:
+
+	if skuConstructor, ok := s.availableSkus[s.Sku]; ok {
 		s.Task.Status = TaskStatusUnavailable
 
 		if s.InventoryAvailable() {
-			sku := skus.New2CSmallSku(vcloudclient.NewVCDClient(new(http.Client), ""), s.taskManager)
-			sku.TaskManager = s.taskManager
-			s.Task.Status, s.ConsumerMeta = sku.Procurement(s.ProcurementMeta)
+			sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
+			s.Task.Status, s.ConsumerMeta = sku.Procurement()
 		}
 		s.taskManager.SaveTask(s.Task)
 
-	default:
+	} else {
 		s.Task.Status = TaskStatusUnavailable
 		s.taskManager.SaveTask(s.Task)
 	}

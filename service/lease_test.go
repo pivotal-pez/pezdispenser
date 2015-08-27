@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
 	. "github.com/pivotal-pez/pezdispenser/service"
+	"github.com/pivotal-pez/pezdispenser/skus"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
@@ -19,7 +20,9 @@ var _ = Describe("Lease", func() {
 	Describe("NewLease", func() {
 		Context("calling new lease", func() {
 			It("should yield a lease valid lease", func() {
-				lease := NewLease(new(fakes.FakeCollection))
+				lease := NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 				Ω(lease).ShouldNot(BeNil())
 			})
 		})
@@ -31,7 +34,9 @@ var _ = Describe("Lease", func() {
 				lease *Lease
 			)
 			BeforeEach(func() {
-				lease = NewLease(new(fakes.FakeCollection))
+				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 			})
 			It("should indicate a unavailable status of the inventory item", func() {
 				yesno := lease.InventoryAvailable()
@@ -48,7 +53,9 @@ var _ = Describe("Lease", func() {
 				col.ControlTask = taskmanager.Task{
 					Status: TaskStatusAvailable,
 				}
-				lease = NewLease(col)
+				lease = NewLease(col, map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 			})
 			It("should indicate a available status of the inventory item", func() {
 				yesno := lease.InventoryAvailable()
@@ -63,7 +70,9 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				col := new(fakes.FakeCollection)
 				col.ErrControl = mgo.ErrNotFound
-				lease = NewLease(col)
+				lease = NewLease(col, map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 				lease.InventoryID = bson.NewObjectId().Hex()
 			})
 			It("should indicate a available status of the inventory item", func() {
@@ -81,7 +90,9 @@ var _ = Describe("Lease", func() {
 			)
 			BeforeEach(func() {
 				request = new(http.Request)
-				lease = NewLease(new(fakes.FakeCollection))
+				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 			})
 			It("should return statuscode not found", func() {
 				statusCode, _ := lease.Post(fakes.MockLogger, request)
@@ -97,7 +108,9 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(new(fakes.FakeCollection))
+				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 			})
 
 			It("should return the lease object as the response", func() {
@@ -118,7 +131,9 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(new(fakes.FakeCollection))
+				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 			})
 
 			It("should populate the lease's fields with the given lease", func() {
@@ -138,7 +153,9 @@ var _ = Describe("Lease", func() {
 			)
 
 			BeforeEach(func() {
-				lease = NewLease(new(fakes.FakeCollection))
+				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 				request = new(http.Request)
 			})
 
@@ -158,7 +175,9 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(new(fakes.FakeCollection))
+				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 				lease.SetTask(new(taskmanager.Task))
 				lease.InitFromHTTPRequest(request)
 			})
@@ -177,7 +196,9 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","sku":"2c.small", "inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(new(fakes.FakeCollection))
+				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+					"2c.small": new(fakes.FakeSku),
+				})
 				lease.SetTask(new(taskmanager.Task))
 				lease.InitFromHTTPRequest(request)
 			})
@@ -199,7 +220,9 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(new(fakes.FakeCollection))
+				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 				lease.SetTask(new(taskmanager.Task))
 				lease.InitFromHTTPRequest(request)
 			})
@@ -214,7 +237,9 @@ var _ = Describe("Lease", func() {
 	Describe(".SetTask()", func() {
 		Context("calling with a valid task on an initialized lease", func() {
 			var (
-				lease       = NewLease(new(fakes.FakeCollection))
+				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
 				controlTask = new(taskmanager.Task)
 			)
 			BeforeEach(func() {

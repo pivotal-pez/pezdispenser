@@ -1,6 +1,9 @@
 package pezdispenser
 
-import "errors"
+import (
+	"errors"
+	"net/http"
+)
 
 const (
 	//TaskStatusAvailable - this means the task is in an avaiable state
@@ -14,12 +17,9 @@ const (
 	//TaskCollectionName - collection name for tasks
 	TaskCollectionName = "dispenser_tasks"
 	//SuccessStatusResponseTaskByID - success statuscode for gettaskbyidcontroller
-	SuccessStatusResponseTaskByID = 200
+	SuccessStatusResponseTaskByID = http.StatusOK
 	//FailureStatusResponseTaskByID - failure statuscode for gettaskbyidcontroller
-	FailureStatusResponseTaskByID = 404
-	//Sku2CSmall - lease sku type indicator. to be replaced with a cleaner injected pattern
-	Sku2CSmall = "2c.small"
-
+	FailureStatusResponseTaskByID = http.StatusNotFound
 	//CallerPostLease --
 	CallerPostLease = "post_lease"
 )
