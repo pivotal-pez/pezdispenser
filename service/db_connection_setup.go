@@ -5,7 +5,7 @@ import (
 
 	"labix.org/v2/mgo"
 
-	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/service/integrations"
 )
 
 func setupDB(dialer integrations.CollectionDialer, URI string, collectionName string) (collection integrations.Collection) {

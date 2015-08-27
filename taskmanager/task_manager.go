@@ -3,7 +3,7 @@ package taskmanager
 import (
 	"time"
 
-	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"labix.org/v2/mgo/bson"
 )
 

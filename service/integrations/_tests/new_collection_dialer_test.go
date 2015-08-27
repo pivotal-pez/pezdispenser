@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
-	. "github.com/pivotal-pez/pezdispenser/service/_integrations"
+	. "github.com/pivotal-pez/pezdispenser/service/integrations"
 )
 
 var _ = Describe("GetTaskByIdController()", func() {

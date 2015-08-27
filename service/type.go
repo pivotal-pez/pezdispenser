@@ -3,7 +3,7 @@ package pezdispenser
 import (
 	"time"
 
-	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/skus"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"labix.org/v2/mgo"

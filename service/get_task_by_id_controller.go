@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
-	"github.com/pivotal-pez/pezdispenser/service/_integrations"
+	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
