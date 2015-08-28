@@ -61,9 +61,10 @@ var _ = Describe("TaskManager", func() {
 		})
 		Context("when called", func() {
 			It("Should return a newly initialized task", func() {
+				controlTimestampEpoch := time.Now().UnixNano()
 				t := tm.NewTask("random.skutype", TaskLongPollQueue, "processing")
 				Ω(t.ID.Hex()).ShouldNot(BeEmpty())
-				Ω(t.Timestamp).ShouldNot(Equal(time.Time{}))
+				Ω(t.Timestamp).Should(BeNumerically(">", controlTimestampEpoch))
 			})
 		})
 	})

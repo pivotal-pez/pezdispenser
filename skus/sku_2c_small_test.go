@@ -13,6 +13,8 @@ var _ = Describe("Sku2CSmall", func() {
 		Context("when called", func() {
 			It("should do nothing right now", func() {
 				s := new(Sku2CSmall)
+				s.Name = SkuName2CSmall
+				s.TaskManager = new(fakes.FakeTaskManager)
 				s.PollForTasks()
 				Ω(true).Should(BeTrue())
 			})
@@ -46,6 +48,7 @@ var _ = Describe("Sku2CSmall", func() {
 	Describe(".ReStock()", func() {
 		Context("when called with valid metadata", func() {
 			var sku Sku
+			controlTaskHref := "myfakehref"
 			BeforeEach(func() {
 				fakeClient := new(fakes.FakeVCDClient)
 				fakeClient.FakeVAppTemplateRecord = new(vcloudclient.VAppTemplateRecord)
@@ -54,7 +57,7 @@ var _ = Describe("Sku2CSmall", func() {
 				fakeClient.FakeVApp = new(vcloudclient.VApp)
 				fakeClient.FakeVApp.Tasks = vcloudclient.TasksElem{}
 				fakeClient.FakeVApp.Tasks.Task = vcloudclient.TaskElem{}
-				fakeClient.FakeVApp.Tasks.Task.Href = "faketaskhref"
+				fakeClient.FakeVApp.Tasks.Task.Href = controlTaskHref
 
 				sku = &Sku2CSmall{
 					Client:          fakeClient,
@@ -63,8 +66,11 @@ var _ = Describe("Sku2CSmall", func() {
 				}
 			})
 			It("should return a status indicating the current status", func() {
-				status, _ := sku.ReStock()
-				Ω(status).Should(Equal(StatusProcessing))
+				status, meta := sku.ReStock()
+				Ω(status).Should(Equal(StatusOutsourced))
+				Ω(meta["vcd_task_element_href"]).Should(Equal(controlTaskHref))
+				Ω(meta["task_action"]).Should(Equal(TaskActionUnDeploy))
+				Ω(meta["subtask_id"]).ShouldNot(BeEmpty())
 			})
 		})
 	})

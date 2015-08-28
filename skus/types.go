@@ -17,7 +17,7 @@ type (
 	Sku2CSmall struct {
 		Client          vcdClient
 		TaskManager     TaskManager
-		name            string
+		Name            string
 		ProcurementMeta map[string]interface{}
 	}
 

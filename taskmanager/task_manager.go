@@ -28,6 +28,8 @@ func (s *TaskManager) SaveTask(t *Task) (*Task, error) {
 //FindLockFirstCallerName - find and lock the first matching task, then return
 //it
 func (s *TaskManager) FindLockFirstCallerName(callerName string) (t *Task, err error) {
+	t = new(Task)
+	s.taskCollection.FindAndModify(nil, nil, t)
 	return
 }
 
@@ -48,7 +50,7 @@ func (s *TaskManager) NewTask(callerName string, profile ProfileType, status str
 	t.Profile = profile
 	t.Status = status
 	t.ID = bson.NewObjectId()
-	t.Timestamp = time.Now()
+	t.Timestamp = time.Now().UnixNano()
 	t.MetaData = make(map[string]interface{})
 	return
 }

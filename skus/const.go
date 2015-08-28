@@ -13,4 +13,6 @@ const (
 	VCDTaskElementHrefMetaName = "vcd_task_element_href"
 	//TaskActionUnDeploy --
 	TaskActionUnDeploy = "undeploy_vapp"
+	//SkuName2CSmall --
+	SkuName2CSmall = "2c.small"
 )

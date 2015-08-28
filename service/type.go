@@ -1,8 +1,6 @@
 package pezdispenser
 
 import (
-	"time"
-
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/skus"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
@@ -45,8 +43,8 @@ type (
 		UserName        string                 `json:"username"`
 		Sku             string                 `json:"sku"`
 		LeaseDuration   float64                `json:"lease_duration"`
-		LeaseEndDate    time.Time              `json:"lease_end_date"`
-		LeaseStartDate  time.Time              `json:"lease_start_date"`
+		LeaseEndDate    int64                  `json:"lease_end_date"`
+		LeaseStartDate  int64                  `json:"lease_start_date"`
 		ConsumerMeta    map[string]interface{} `json:"consumer_meta"`
 		ProcurementMeta map[string]interface{} `json:"procurement_meta"`
 		Task            *taskmanager.Task      `json:"task"`

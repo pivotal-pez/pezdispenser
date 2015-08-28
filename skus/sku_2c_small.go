@@ -16,7 +16,7 @@ func (s *Sku2CSmall) New(tm TaskManager, procurementMeta map[string]interface{})
 		Client:          vcloudclient.NewVCDClient(httpClient, baseURI),
 		ProcurementMeta: procurementMeta,
 		TaskManager:     tm,
-		name:            "2c.small",
+		Name:            SkuName2CSmall,
 	}
 }
 
@@ -36,11 +36,14 @@ func (s *Sku2CSmall) ReStock() (status string, taskMeta map[string]interface{}) 
 	s.Client.Auth(user, pass)
 
 	if vcdResponseTaskElement, err := s.Client.UnDeployVApp(vAppID); err == nil {
-		status = StatusProcessing
-		task := s.TaskManager.NewTask(s.name, taskmanager.TaskLongPollQueue, status)
+		status = StatusOutsourced
+		task := s.TaskManager.NewTask(s.Name, taskmanager.TaskLongPollQueue, StatusProcessing)
 		task.MetaData = s.ProcurementMeta
 		task.MetaData[VCDTaskElementHrefMetaName] = vcdResponseTaskElement.Href
 		task.MetaData[taskmanager.TaskActionMetaName] = TaskActionUnDeploy
+		taskMeta[VCDTaskElementHrefMetaName] = vcdResponseTaskElement.Href
+		taskMeta[taskmanager.TaskActionMetaName] = TaskActionUnDeploy
+		taskMeta["subtask_id"] = task.ID.Hex()
 		s.TaskManager.SaveTask(task)
 
 	} else {
@@ -51,5 +54,7 @@ func (s *Sku2CSmall) ReStock() (status string, taskMeta map[string]interface{}) 
 
 //PollForTasks - this is a method for polling the current long poll task queue and acting on it
 func (s *Sku2CSmall) PollForTasks() {
-
+	task, err := s.TaskManager.FindLockFirstCallerName(s.Name)
+	fmt.Println("task:", task)
+	fmt.Println("error:", err)
 }

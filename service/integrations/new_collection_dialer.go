@@ -33,6 +33,16 @@ func (s *CollectionRepo) FindOne(id string, result interface{}) (err error) {
 	return
 }
 
+//FindAndModify -- execute a normal upsert
+func (s *CollectionRepo) FindAndModify(selector interface{}, update interface{}, result interface{}) (info *mgo.ChangeInfo, err error) {
+	change := mgo.Change{
+		Update:    update.(bson.M),
+		ReturnNew: false,
+	}
+	info, err = s.Col.Find(selector.(bson.M)).Apply(change, result)
+	return
+}
+
 //UpsertID -- upserts the given object to the given id
 func (s *CollectionRepo) UpsertID(id interface{}, update interface{}) (info *mgo.ChangeInfo, err error) {
 	info, err = s.Col.UpsertId(id, update)

@@ -30,7 +30,7 @@ func (s *Lease) Delete(logger *log.Logger, req *http.Request) (statusCode int, r
 	var (
 		err       error
 		newTaskID = bson.NewObjectId().Hex()
-		timestamp = time.Now()
+		timestamp = time.Now().UnixNano()
 		task      = &taskmanager.Task{
 			ID:         bson.ObjectIdHex(newTaskID),
 			Status:     TaskStatusStarted,
@@ -67,7 +67,7 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 	var (
 		err       error
 		newTaskID = bson.NewObjectId().Hex()
-		timestamp = time.Now()
+		timestamp = time.Now().UnixNano()
 		task      = &taskmanager.Task{
 			ID:         bson.ObjectIdHex(newTaskID),
 			Status:     TaskStatusStarted,
@@ -166,7 +166,7 @@ func (s *Lease) InventoryAvailable() (available bool) {
 
 	} else if err == mgo.ErrNotFound {
 		task.ID = bson.ObjectIdHex(s.InventoryID)
-		task.Timestamp = time.Now()
+		task.Timestamp = time.Now().UnixNano()
 		task.Status = TaskStatusAvailable
 		task.MetaData = s.ProcurementMeta
 		s.taskManager.SaveTask(task)

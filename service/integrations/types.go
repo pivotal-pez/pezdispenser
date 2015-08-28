@@ -9,6 +9,7 @@ type (
 		Close()
 		FindOne(id string, result interface{}) (err error)
 		UpsertID(selector interface{}, update interface{}) (info *mgo.ChangeInfo, err error)
+		FindAndModify(selector interface{}, update interface{}, target interface{}) (info *mgo.ChangeInfo, err error)
 		Count() (int, error)
 	}
 

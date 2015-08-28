@@ -272,7 +272,7 @@ func (s *FakeTaskManager) NewTask(callerName string, profile taskmanager.Profile
 	t.Profile = profile
 	t.Status = status
 	t.ID = bson.NewObjectId()
-	t.Timestamp = time.Now()
+	t.Timestamp = time.Now().UnixNano()
 	t.MetaData = make(map[string]interface{})
 
 	return
@@ -301,6 +301,11 @@ func (s *FakeCollection) Close() {
 //Wake -
 func (s *FakeCollection) Wake() {
 
+}
+
+//FindAndModify -
+func (s *FakeCollection) FindAndModify(selector interface{}, update interface{}, result interface{}) (info *mgo.ChangeInfo, err error) {
+	return
 }
 
 //UpsertID -

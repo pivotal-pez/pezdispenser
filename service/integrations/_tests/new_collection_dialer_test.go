@@ -3,6 +3,7 @@ package integrations_test
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"labix.org/v2/mgo/bson"
 
@@ -10,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
 	. "github.com/pivotal-pez/pezdispenser/service/integrations"
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
 var _ = Describe("GetTaskByIdController()", func() {
@@ -38,6 +40,45 @@ var _ = Describe("GetTaskByIdController()", func() {
 
 			It("should be able to connect", func() {
 				Ω(err).ShouldNot(HaveOccurred())
+			})
+
+			Describe(".FindAndModify()", func() {
+				controlCallerName := "fake.caller"
+				controlStatus := "doing---stuff"
+				controlEndStatus := "closed"
+				Context("when the given selector finds a match", func() {
+					var (
+						controlTask *taskmanager.Task
+						tm          *taskmanager.TaskManager
+					)
+					BeforeEach(func() {
+						tm = taskmanager.NewTaskManager(col)
+						controlTask = tm.NewTask(controlCallerName, taskmanager.TaskLongPollQueue, controlStatus)
+						controlTask.Expires = time.Now().UnixNano()
+						tm.SaveTask(controlTask)
+					})
+					AfterEach(func() {
+						controlTask.Status = controlEndStatus
+						tm.SaveTask(controlTask)
+					})
+					It("should update the object and return its value", func() {
+						nowEpoch := time.Now().UnixNano()
+						taskOutput := new(taskmanager.Task)
+						ci, err := col.FindAndModify(
+							bson.M{
+								"caller_name": controlCallerName,
+								"expires":     bson.M{"$lte": nowEpoch},
+							},
+							bson.M{
+								"expires": time.Now().Add(5 * time.Minute).UnixNano(),
+							},
+							taskOutput,
+						)
+						Ω(err).ShouldNot(HaveOccurred())
+						Ω(ci.Updated).Should(Equal(1))
+						Ω(taskOutput).Should(Equal(controlTask))
+					})
+				})
 			})
 
 			Describe("UpsertID()", func() {
