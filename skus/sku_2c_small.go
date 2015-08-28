@@ -54,7 +54,7 @@ func (s *Sku2CSmall) ReStock() (status string, taskMeta map[string]interface{}) 
 
 //PollForTasks - this is a method for polling the current long poll task queue and acting on it
 func (s *Sku2CSmall) PollForTasks() {
-	task, err := s.TaskManager.FindLockFirstCallerName(s.Name)
+	task, err := s.TaskManager.FindAndStallTaskForCaller(s.Name)
 	fmt.Println("task:", task)
 	fmt.Println("error:", err)
 }

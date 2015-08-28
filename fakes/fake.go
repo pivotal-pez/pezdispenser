@@ -250,8 +250,8 @@ func (s *FakeTaskManager) SaveTask(t *taskmanager.Task) (*taskmanager.Task, erro
 	return t, nil
 }
 
-//FindLockFirstCallerName --
-func (s *FakeTaskManager) FindLockFirstCallerName(callerName string) (t *taskmanager.Task, err error) {
+//FindAndStallTaskForCaller --
+func (s *FakeTaskManager) FindAndStallTaskForCaller(callerName string) (t *taskmanager.Task, err error) {
 	return
 }
 

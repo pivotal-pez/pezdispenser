@@ -25,11 +25,25 @@ func (s *TaskManager) SaveTask(t *Task) (*Task, error) {
 	return t, err
 }
 
-//FindLockFirstCallerName - find and lock the first matching task, then return
+//FindAndStallTaskForCaller - find and lock the first matching task, then return
 //it
-func (s *TaskManager) FindLockFirstCallerName(callerName string) (t *Task, err error) {
-	t = new(Task)
-	s.taskCollection.FindAndModify(nil, nil, t)
+func (s *TaskManager) FindAndStallTaskForCaller(callerName string) (task *Task, err error) {
+	nowEpoch := time.Now().UnixNano()
+	task = new(Task)
+	s.taskCollection.FindAndModify(
+		bson.M{
+			"caller_name": callerName,
+			"profile":     TaskLongPollQueue,
+			"expires": bson.M{
+				"$lte": nowEpoch,
+				"$ne":  0,
+			},
+		},
+		bson.M{
+			"expires": time.Now().Add(5 * time.Minute).UnixNano(),
+		},
+		task,
+	)
 	return
 }
 

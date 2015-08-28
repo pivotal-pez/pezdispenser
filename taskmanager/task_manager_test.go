@@ -19,7 +19,7 @@ var _ = Describe("TaskManager", func() {
 		})
 		Context("when called", func() {
 			It("Should do nothing right now", func() {
-				tm.FindLockFirstCallerName("")
+				tm.FindAndStallTaskForCaller("")
 				Ω(true).Should(BeTrue())
 			})
 		})

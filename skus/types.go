@@ -31,7 +31,7 @@ type (
 	//TaskManager - an interface representing a taskmanager object
 	TaskManager interface {
 		SaveTask(t *taskmanager.Task) (*taskmanager.Task, error)
-		FindLockFirstCallerName(callerName string) (t *taskmanager.Task, err error)
+		FindAndStallTaskForCaller(callerName string) (t *taskmanager.Task, err error)
 		FindTask(id string) (t *taskmanager.Task, err error)
 		NewTask(n string, p taskmanager.ProfileType, s string) (t *taskmanager.Task)
 	}
