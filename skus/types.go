@@ -32,7 +32,6 @@ type (
 	TaskManager interface {
 		SaveTask(t *taskmanager.Task) (*taskmanager.Task, error)
 		FindLockFirstCallerName(callerName string) (t *taskmanager.Task, err error)
-		UnLockTask(id string) (t *taskmanager.Task, err error)
 		FindTask(id string) (t *taskmanager.Task, err error)
 		NewTask(n string, p taskmanager.ProfileType, s string) (t *taskmanager.Task)
 	}

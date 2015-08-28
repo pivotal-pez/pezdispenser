@@ -255,11 +255,6 @@ func (s *FakeTaskManager) FindLockFirstCallerName(callerName string) (t *taskman
 	return
 }
 
-//UnLockTask --
-func (s *FakeTaskManager) UnLockTask(id string) (t *taskmanager.Task, err error) {
-	return
-}
-
 //FindTask --
 func (s *FakeTaskManager) FindTask(id string) (t *taskmanager.Task, err error) {
 	return

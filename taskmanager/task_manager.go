@@ -33,11 +33,6 @@ func (s *TaskManager) FindLockFirstCallerName(callerName string) (t *Task, err e
 	return
 }
 
-//UnLockTask - this will unlock a task with given id
-func (s *TaskManager) UnLockTask(id string) (t *Task, err error) {
-	return
-}
-
 //FindTask - this will find and return a task with a given ID
 func (s *TaskManager) FindTask(id string) (t *Task, err error) {
 	return

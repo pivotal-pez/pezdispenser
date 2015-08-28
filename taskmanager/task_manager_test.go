@@ -25,20 +25,6 @@ var _ = Describe("TaskManager", func() {
 		})
 	})
 
-	Describe(".UnLockTask()", func() {
-		var tm *TaskManager
-
-		BeforeEach(func() {
-			tm = NewTaskManager(new(fakes.FakeCollection))
-		})
-		Context("when called", func() {
-			It("Should do nothing right now", func() {
-				tm.UnLockTask("")
-				Ω(true).Should(BeTrue())
-			})
-		})
-	})
-
 	Describe(".FindTask()", func() {
 		var tm *TaskManager
 
