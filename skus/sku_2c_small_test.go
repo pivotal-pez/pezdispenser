@@ -5,18 +5,84 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
 	. "github.com/pivotal-pez/pezdispenser/skus"
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 )
 
 var _ = Describe("Sku2CSmall", func() {
 	Describe(".PollForTasks()", func() {
-		Context("when called", func() {
-			It("should do nothing right now", func() {
-				s := new(Sku2CSmall)
-				s.Name = SkuName2CSmall
-				s.TaskManager = new(fakes.FakeTaskManager)
+		Context("when the outsourced task is found to be in a success state", func() {
+
+			It("execute expire the current task and set status to success", func() {
+				s, spyTask, _ := fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
 				s.PollForTasks()
-				Ω(true).Should(BeTrue())
+				Ω(spyTask.Status).Should(Equal(vcloudclient.TaskStatusSuccess))
+				Ω(spyTask.Expires).Should(Equal(taskmanager.ExpiredTask))
+			})
+
+			Context("with a task action of un-deploy", func() {
+				var (
+					sku          *Sku2CSmall
+					spyTask      *taskmanager.Task
+					spySavedTask *taskmanager.Task
+				)
+				BeforeEach(func() {
+					sku, spyTask, spySavedTask = fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
+					spyTask.MetaData = map[string]interface{}{
+						taskmanager.TaskActionMetaName: TaskActionUnDeploy,
+						VCDUsernameField:               "fakeuser",
+						VCDPasswordField:               "fakepass",
+						VCDTemplateNameField:           "PaaSSlot-10",
+						VCDAppIDField:                  "myapp-id",
+						VCDBaseURIField:                "vcd_base_uri.com",
+					}
+				})
+				It("should move on to deploy a new 2c vapp", func() {
+					Ω(spySavedTask).ShouldNot(Equal(spyTask))
+					sku.PollForTasks()
+					Ω(spySavedTask).ShouldNot(BeNil())
+					Ω(spySavedTask).Should(Equal(spyTask))
+				})
+			})
+		})
+		Context("when the outsourced task is found to be in a not yet done state", func() {
+			It("should update status and move on", func() {
+				s, spyTask, _ := fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusRunning)
+				controlStatus := spyTask.Status
+				controlExpires := spyTask.Expires
+				s.PollForTasks()
+				Ω(spyTask.Status).ShouldNot(Equal(controlStatus))
+				Ω(spyTask.Expires).Should(Equal(controlExpires))
+				Ω(spyTask.Expires).ShouldNot(Equal(taskmanager.ExpiredTask))
+			})
+		})
+		Context("when the outsourced task is found to be in a failed state", func() {
+			Context("with a status of error", func() {
+				s, spyTask, _ := fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusError)
+
+				It("should expire the task and set status error", func() {
+					s.PollForTasks()
+					Ω(spyTask.Status).Should(Equal(vcloudclient.TaskStatusError))
+					Ω(spyTask.Expires).Should(Equal(taskmanager.ExpiredTask))
+				})
+			})
+			Context("with a status of aborted", func() {
+				s, spyTask, _ := fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusAborted)
+
+				It("should expire the task and set status of aborted", func() {
+					s.PollForTasks()
+					Ω(spyTask.Status).Should(Equal(vcloudclient.TaskStatusAborted))
+					Ω(spyTask.Expires).Should(Equal(taskmanager.ExpiredTask))
+				})
+			})
+			Context("with a status of canceled", func() {
+				s, spyTask, _ := fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusCanceled)
+
+				It("should expire the task and set status canceled", func() {
+					s.PollForTasks()
+					Ω(spyTask.Status).Should(Equal(vcloudclient.TaskStatusCanceled))
+					Ω(spyTask.Expires).Should(Equal(taskmanager.ExpiredTask))
+				})
 			})
 		})
 	})

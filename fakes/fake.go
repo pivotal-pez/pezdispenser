@@ -2,6 +2,7 @@ package fakes
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -51,6 +52,32 @@ const (
 			}`
 )
 
+func MakeFakeSku2CSmall(status string) (*skus.Sku2CSmall, *taskmanager.Task, *taskmanager.Task) {
+	s := new(skus.Sku2CSmall)
+	spyTask := &taskmanager.Task{
+		ID:      bson.NewObjectId(),
+		Expires: time.Now().UnixNano(),
+		MetaData: map[string]interface{}{
+			skus.VCDTaskElementHrefMetaName: "vcdTask.url.com/hithere",
+		},
+	}
+	s.Client = &FakeVCDClient{
+		FakeVApp:               new(vcloudclient.VApp),
+		FakeVAppTemplateRecord: new(vcloudclient.VAppTemplateRecord),
+		ErrPollTaskURL:         nil,
+		FakeTaskElem: &vcloudclient.TaskElem{
+			Status: status,
+		},
+	}
+	myFakeManager := &FakeTaskManager{
+		ReturnedTask: spyTask,
+		SpyTaskSaved: new(taskmanager.Task),
+	}
+	fmt.Println("init or no?", myFakeManager.SpyTaskSaved)
+	s.TaskManager = myFakeManager
+	return s, spyTask, myFakeManager.SpyTaskSaved
+}
+
 //FakeSku -- a fake sku object
 type FakeSku struct{}
 
@@ -82,6 +109,13 @@ type FakeVCDClient struct {
 	ErrDeployFake          error
 	ErrQueryFake           error
 	ErrAuthFake            error
+	ErrPollTaskURL         error
+	FakeTaskElem           *vcloudclient.TaskElem
+}
+
+//PollTaskURL -- fake a poll url call
+func (s *FakeVCDClient) PollTaskURL(taskURL string) (task *vcloudclient.TaskElem, err error) {
+	return s.FakeTaskElem, s.ErrPollTaskURL
 }
 
 //DeployVApp - fake out calling deploy vapp
@@ -243,16 +277,23 @@ func (s *MockClientDoer) Do(rq *http.Request) (rs *http.Response, e error) {
 
 //FakeTaskManager - this is a fake representation of the task manager
 type FakeTaskManager struct {
+	SpyTaskSaved *taskmanager.Task
+	ReturnedTask *taskmanager.Task
+	ReturnedErr  error
 }
 
 //SaveTask --
 func (s *FakeTaskManager) SaveTask(t *taskmanager.Task) (*taskmanager.Task, error) {
-	return t, nil
+
+	if s.SpyTaskSaved != nil {
+		*s.SpyTaskSaved = *t
+	}
+	return t, s.ReturnedErr
 }
 
 //FindAndStallTaskForCaller --
 func (s *FakeTaskManager) FindAndStallTaskForCaller(callerName string) (t *taskmanager.Task, err error) {
-	return
+	return s.ReturnedTask, s.ReturnedErr
 }
 
 //FindTask --
@@ -269,7 +310,6 @@ func (s *FakeTaskManager) NewTask(callerName string, profile taskmanager.Profile
 	t.ID = bson.NewObjectId()
 	t.Timestamp = time.Now().UnixNano()
 	t.MetaData = make(map[string]interface{})
-
 	return
 }
 

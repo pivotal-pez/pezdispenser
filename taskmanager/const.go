@@ -12,4 +12,7 @@ const (
 
 	//TaskActionMetaName --
 	TaskActionMetaName = "task_action"
+
+	//ExpiredTask -
+	ExpiredTask int64 = 0
 )

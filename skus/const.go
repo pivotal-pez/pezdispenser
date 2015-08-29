@@ -15,4 +15,16 @@ const (
 	TaskActionUnDeploy = "undeploy_vapp"
 	//SkuName2CSmall --
 	SkuName2CSmall = "2c.small"
+	//VCDUsernameField - name of the field in Procurement meta containing username for vcd
+	VCDUsernameField = "vcd_username"
+	//VCDPasswordField - name of the field in Procurement meta containing password for vcd
+	VCDPasswordField = "vcd_password"
+	//VCDAppIDField - name of the field in Procurement meta containing appid for vcd
+	VCDAppIDField = "vapp_id"
+	//VCDBaseURIField - name of the field in Procurement meta containing baseuri for vcd
+	VCDBaseURIField = "base_uri"
+	//VCDTemplateNameField - name of the field in Procurement meta containing template name for vcd
+	VCDTemplateNameField = "template_name"
+	//SubTaskIDField - name of the field in Task meta containing subtask id for vcd
+	SubTaskIDField = "subtask_id"
 )

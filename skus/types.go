@@ -17,7 +17,6 @@ type (
 	Sku2CSmall struct {
 		Client          vcdClient
 		TaskManager     TaskManager
-		Name            string
 		ProcurementMeta map[string]interface{}
 	}
 
@@ -26,6 +25,7 @@ type (
 		DeployVApp(templateName, templateHref, vcdHref string) (vapp *vcloudclient.VApp, err error)
 		Auth(username, password string) (err error)
 		QueryTemplate(templateName string) (vappTemplate *vcloudclient.VAppTemplateRecord, err error)
+		PollTaskURL(string) (*vcloudclient.TaskElem, error)
 	}
 
 	//TaskManager - an interface representing a taskmanager object

@@ -16,6 +16,21 @@ const (
 	DeleteVappSuccessStatusCode = 201
 	//TaskPollSuccessStatusCode - successfull statuscode on a call to the task api endpoint
 	TaskPollSuccessStatusCode = 200
+	//TaskStatusQueued (The task has been queued for execution.),
+	TaskStatusQueued = "queued"
+	//TaskStatusPreRunning (The task is awaiting preprocessing or, if it is a blocking task, administrative action.),
+	TaskStatusPreRunning = "preRunning"
+	//TaskStatusRunning (The task is runnning.),
+	TaskStatusRunning = "running"
+	//TaskStatusSuccess (The task completed with a status of success.),
+	TaskStatusSuccess = "success"
+	//TaskStatusError (The task encountered an error while running.),
+	TaskStatusError = "error"
+	//TaskStatusCanceled (The task was canceled by the owner or an administrator.),
+	TaskStatusCanceled = "canceled"
+	//TaskStatusAborted (The task was aborted by an administrative action.)
+	TaskStatusAborted = "aborted"
+
 	vCDVAppDeletePathFormat   = "/vApp/%s"
 	vCDVAppUnDeployPathFormat = "/vApp/%s/action/undeploy"
 	vCDAuthURIPath            = "/api/sessions"

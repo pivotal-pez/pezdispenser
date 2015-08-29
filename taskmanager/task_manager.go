@@ -36,7 +36,7 @@ func (s *TaskManager) FindAndStallTaskForCaller(callerName string) (task *Task, 
 			"profile":     TaskLongPollQueue,
 			"expires": bson.M{
 				"$lte": nowEpoch,
-				"$ne":  0,
+				"$ne":  ExpiredTask,
 			},
 		},
 		bson.M{
