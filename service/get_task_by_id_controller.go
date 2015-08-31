@@ -28,7 +28,7 @@ func GetTaskByIDController(taskServiceURI string, collectionDialer integrations.
 		if err = taskCollection.FindOne(taskID, task); err == nil {
 			logger.Println("task search complete")
 			statusCode = http.StatusOK
-			response = task
+			response = task.GetRedactedVersion()
 
 		} else {
 			response = map[string]string{"error": err.Error()}

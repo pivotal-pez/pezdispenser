@@ -34,9 +34,12 @@ var _ = Describe("GetTaskByIdController()", func() {
 			handler(martini.Params{"id": controlID}, fakes.MockLogger, renderer)
 		})
 
-		It("should return the task object w/ a 200 statusCode", func() {
+		It("should return the RedactedTasktask object w/ a 200 statusCode", func() {
 			Ω(renderer.SpyStatus).Should(Equal(http.StatusOK))
-			Ω(*(renderer.SpyValue.(*taskmanager.Task))).Should(Equal(controlResponseValue))
+			Ω(func() {
+				_ = renderer.SpyValue.(*taskmanager.Task)
+			}).Should(Panic())
+			Ω(renderer.SpyValue.(taskmanager.RedactedTask)).Should(Equal(controlResponseValue.GetRedactedVersion()))
 		})
 	})
 })
