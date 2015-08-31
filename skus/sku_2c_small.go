@@ -37,11 +37,11 @@ func (s *Sku2CSmall) ReStock() (status string, taskMeta map[string]interface{}) 
 	if vcdResponseTaskElement, err := s.Client.UnDeployVApp(vAppID); err == nil {
 		status = StatusOutsourced
 		task := s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusProcessing)
-		task.MetaData = s.ProcurementMeta
-		task.MetaData[VCDTaskElementHrefMetaName] = vcdResponseTaskElement.Href
-		task.MetaData[taskmanager.TaskActionMetaName] = TaskActionUnDeploy
-		taskMeta[VCDTaskElementHrefMetaName] = vcdResponseTaskElement.Href
-		taskMeta[taskmanager.TaskActionMetaName] = TaskActionUnDeploy
+		task.PrivateMetaData = s.ProcurementMeta
+		task.SetPrivateMeta(VCDTaskElementHrefMetaName, vcdResponseTaskElement.Href)
+		task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionUnDeploy)
+		task.SetPrivateMeta(VCDTaskElementHrefMetaName, vcdResponseTaskElement.Href)
+		task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionUnDeploy)
 		taskMeta[SubTaskIDField] = task.ID.Hex()
 		s.TaskManager.SaveTask(task)
 
@@ -60,11 +60,11 @@ func (s *Sku2CSmall) PollForTasks() {
 	)
 	task, err = s.TaskManager.FindAndStallTaskForCaller(SkuName2CSmall)
 
-	if vcdTaskURI := fmt.Sprintf("%s", task.MetaData[VCDTaskElementHrefMetaName]); vcdTaskURI != "" {
+	if vcdTaskURI := fmt.Sprintf("%s", task.GetPrivateMeta(VCDTaskElementHrefMetaName)); vcdTaskURI != "" {
 
 		if s.Client == nil {
 			httpClient := vcloudclient.DefaultClient()
-			s.Client = vcloudclient.NewVCDClient(httpClient, fmt.Sprintf("%s", task.MetaData[VCDBaseURIField]))
+			s.Client = vcloudclient.NewVCDClient(httpClient, fmt.Sprintf("%s", task.GetPrivateMeta(VCDBaseURIField)))
 		}
 
 		if vcdTaskElement, err = s.Client.PollTaskURL(vcdTaskURI); err == nil {
@@ -81,7 +81,7 @@ func (s *Sku2CSmall) evaluateStatus(status string, task *taskmanager.Task) {
 	case vcloudclient.TaskStatusSuccess:
 		s.expireLongRunningTask(task)
 
-		if task.MetaData[taskmanager.TaskActionMetaName] == TaskActionUnDeploy {
+		if task.GetPrivateMeta(taskmanager.TaskActionMetaName) == TaskActionUnDeploy {
 			s.deployNew2CSmall(task)
 		}
 
@@ -93,9 +93,9 @@ func (s *Sku2CSmall) evaluateStatus(status string, task *taskmanager.Task) {
 func (s *Sku2CSmall) deployNew2CSmall(task *taskmanager.Task) {
 	var (
 		err          error
-		username     = fmt.Sprintf("%s", task.MetaData[VCDUsernameField])
-		password     = fmt.Sprintf("%s", task.MetaData[VCDPasswordField])
-		templatename = fmt.Sprintf("%s", task.MetaData[VCDTemplateNameField])
+		username     = fmt.Sprintf("%s", task.GetPrivateMeta(VCDUsernameField))
+		password     = fmt.Sprintf("%s", task.GetPrivateMeta(VCDPasswordField))
+		templatename = fmt.Sprintf("%s", task.GetPrivateMeta(VCDTemplateNameField))
 		vapp         *vcloudclient.VApp
 		vappTemplate *vcloudclient.VAppTemplateRecord
 		newTask      *taskmanager.Task
@@ -109,7 +109,7 @@ func (s *Sku2CSmall) deployNew2CSmall(task *taskmanager.Task) {
 
 		} else {
 			newTask = s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusOutsourced)
-			newTask.MetaData[VCDTaskElementHrefMetaName] = vapp.Tasks.Task.Href
+			newTask.SetPrivateMeta(VCDTaskElementHrefMetaName, vapp.Tasks.Task.Href)
 		}
 		newTask, err = s.TaskManager.SaveTask(newTask)
 		fmt.Println("this is what was returned: ", newTask)

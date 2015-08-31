@@ -57,7 +57,7 @@ func MakeFakeSku2CSmall(status string) (*skus.Sku2CSmall, *taskmanager.Task, *ta
 	spyTask := &taskmanager.Task{
 		ID:      bson.NewObjectId(),
 		Expires: time.Now().UnixNano(),
-		MetaData: map[string]interface{}{
+		PrivateMetaData: map[string]interface{}{
 			skus.VCDTaskElementHrefMetaName: "vcdTask.url.com/hithere",
 		},
 	}
@@ -310,15 +310,17 @@ func (s *FakeTaskManager) NewTask(callerName string, profile taskmanager.Profile
 	t.ID = bson.NewObjectId()
 	t.Timestamp = time.Now().UnixNano()
 	t.MetaData = make(map[string]interface{})
+	t.PrivateMetaData = make(map[string]interface{})
 	return
 }
 
 //FakeTask -
 type FakeTask struct {
-	ID        bson.ObjectId          `bson:"_id"`
-	Timestamp time.Time              `bson:"timestamp"`
-	Status    string                 `bson:"status"`
-	MetaData  map[string]interface{} `bson:"metadata"`
+	ID              bson.ObjectId          `bson:"_id"`
+	Timestamp       time.Time              `bson:"timestamp"`
+	Status          string                 `bson:"status"`
+	MetaData        map[string]interface{} `bson:"metadata"`
+	PrivateMetaData map[string]interface{} `bson:"private_metadata"`
 }
 
 //FakeCollection -

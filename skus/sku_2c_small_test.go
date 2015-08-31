@@ -28,7 +28,7 @@ var _ = Describe("Sku2CSmall", func() {
 				)
 				BeforeEach(func() {
 					sku, spyTask, spySavedTask = fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
-					spyTask.MetaData = map[string]interface{}{
+					spyTask.PrivateMetaData = map[string]interface{}{
 						taskmanager.TaskActionMetaName: TaskActionUnDeploy,
 						VCDUsernameField:               "fakeuser",
 						VCDPasswordField:               "fakepass",
@@ -134,9 +134,7 @@ var _ = Describe("Sku2CSmall", func() {
 			It("should return a status indicating the current status", func() {
 				status, meta := sku.ReStock()
 				Ω(status).Should(Equal(StatusOutsourced))
-				Ω(meta["vcd_task_element_href"]).Should(Equal(controlTaskHref))
-				Ω(meta["task_action"]).Should(Equal(TaskActionUnDeploy))
-				Ω(meta["subtask_id"]).ShouldNot(BeEmpty())
+				Ω(meta[SubTaskIDField]).ShouldNot(BeEmpty())
 			})
 		})
 	})
