@@ -1,6 +1,8 @@
 package skus_test
 
 import (
+	"time"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
@@ -94,6 +96,9 @@ var _ = Describe("Sku2CSmall", func() {
 					"base_uri": "random.com",
 				}
 				s := new(Sku2CSmall)
+				s.ProcurementMeta = map[string]interface{}{
+					LeaseExpiresFieldName: time.Now().UnixNano(),
+				}
 				sku := s.New(new(fakes.FakeTaskManager), controlMeta)
 				skuCast := sku.(*Sku2CSmall)
 				Ω(skuCast.ProcurementMeta).Should(Equal(controlMeta))
@@ -105,7 +110,12 @@ var _ = Describe("Sku2CSmall", func() {
 		Context("when called with valid metadata", func() {
 			It("should return a status complete", func() {
 				s := new(Sku2CSmall)
-				status, _ := s.Procurement()
+				s.ProcurementMeta = map[string]interface{}{
+					LeaseExpiresFieldName: time.Now().UnixNano(),
+				}
+				sku := s.New(new(fakes.FakeTaskManager), s.ProcurementMeta)
+				skuCast := sku.(*Sku2CSmall)
+				status, _ := skuCast.Procurement()
 				Ω(status).Should(Equal(StatusComplete))
 			})
 		})

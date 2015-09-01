@@ -22,6 +22,8 @@ const (
 	FailureStatusResponseTaskByID = http.StatusNotFound
 	//CallerPostLease --
 	CallerPostLease = "post_lease"
+	//LeaseExpiresFieldName ----
+	LeaseExpiresFieldName = "lease_expires"
 )
 
 var (

@@ -123,6 +123,7 @@ func (s *Lease) Procurement() {
 		s.Task.Status = TaskStatusUnavailable
 
 		if s.InventoryAvailable() {
+			s.ProcurementMeta[LeaseExpiresFieldName] = s.LeaseEndDate
 			sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
 			s.Task.Status, s.ConsumerMeta = sku.Procurement()
 		}

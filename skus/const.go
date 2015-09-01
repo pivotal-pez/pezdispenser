@@ -13,6 +13,8 @@ const (
 	VCDTaskElementHrefMetaName = "vcd_task_element_href"
 	//TaskActionUnDeploy --
 	TaskActionUnDeploy = "undeploy_vapp"
+	//TaskActionSelfDestruct --
+	TaskActionSelfDestruct = "self_destruct"
 	//SkuName2CSmall --
 	SkuName2CSmall = "2c.small"
 	//VCDUsernameField - name of the field in Procurement meta containing username for vcd
@@ -27,4 +29,6 @@ const (
 	VCDTemplateNameField = "template_name"
 	//SubTaskIDField - name of the field in Task meta containing subtask id for vcd
 	SubTaskIDField = "subtask_id"
+	//LeaseExpiresFieldName --
+	LeaseExpiresFieldName = "lease_expires"
 )

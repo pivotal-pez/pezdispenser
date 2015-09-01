@@ -23,6 +23,11 @@ func (s *Sku2CSmall) New(tm TaskManager, procurementMeta map[string]interface{})
 //object
 func (s *Sku2CSmall) Procurement() (status string, taskMeta map[string]interface{}) {
 	status = StatusComplete
+	task := s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusProcessing)
+	task.PrivateMetaData = s.ProcurementMeta
+	task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionSelfDestruct)
+	task.Expires = task.GetPrivateMeta(LeaseExpiresFieldName).(int64)
+	s.TaskManager.SaveTask(task)
 	return
 }
 
