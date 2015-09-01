@@ -108,15 +108,33 @@ var _ = Describe("Sku2CSmall", func() {
 
 	Describe(".Procurement()", func() {
 		Context("when called with valid metadata", func() {
-			It("should return a status complete", func() {
+			var (
+				status          string
+				meta            map[string]interface{}
+				fakeTaskManager = new(fakes.FakeTaskManager)
+			)
+			BeforeEach(func() {
 				s := new(Sku2CSmall)
 				s.ProcurementMeta = map[string]interface{}{
 					LeaseExpiresFieldName: time.Now().UnixNano(),
 				}
-				sku := s.New(new(fakes.FakeTaskManager), s.ProcurementMeta)
+				fakeTaskManager.SpyTaskSaved = new(taskmanager.Task)
+				sku := s.New(fakeTaskManager, s.ProcurementMeta)
 				skuCast := sku.(*Sku2CSmall)
-				status, _ := skuCast.Procurement()
+				status, meta = skuCast.Procurement()
+			})
+
+			It("should return a status complete", func() {
 				Ω(status).Should(Equal(StatusComplete))
+			})
+
+			It("should return no meta data", func() {
+				Ω(meta).Should(BeEmpty())
+			})
+
+			It("should create a self-destruct lease task", func() {
+				Ω(fakeTaskManager.SpyTaskSaved).ShouldNot(BeNil())
+				Ω(fakeTaskManager.SpyTaskSaved.GetPrivateMeta(taskmanager.TaskActionMetaName)).Should(Equal(TaskActionSelfDestruct))
 			})
 		})
 	})
