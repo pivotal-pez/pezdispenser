@@ -59,6 +59,7 @@ func MakeFakeSku2CSmall(status string) (*skus.Sku2CSmall, *taskmanager.Task, *ta
 		Expires: time.Now().UnixNano(),
 		PrivateMetaData: map[string]interface{}{
 			skus.VCDTaskElementHrefMetaName: "vcdTask.url.com/hithere",
+			taskmanager.TaskActionMetaName:  skus.TaskActionUnDeploy,
 		},
 	}
 	s.Client = &FakeVCDClient{

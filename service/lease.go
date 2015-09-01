@@ -124,6 +124,7 @@ func (s *Lease) Procurement() {
 
 		if s.InventoryAvailable() {
 			s.ProcurementMeta[LeaseExpiresFieldName] = s.LeaseEndDate
+			s.ProcurementMeta[InventoryIDFieldName] = s.InventoryID
 			sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
 			s.Task.Status, s.ConsumerMeta = sku.Procurement()
 		}

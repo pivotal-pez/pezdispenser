@@ -24,6 +24,8 @@ const (
 	CallerPostLease = "post_lease"
 	//LeaseExpiresFieldName ----
 	LeaseExpiresFieldName = "lease_expires"
+	//InventoryIDFieldName ---
+	InventoryIDFieldName = "inventory_id"
 )
 
 var (

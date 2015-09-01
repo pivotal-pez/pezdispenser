@@ -31,4 +31,6 @@ const (
 	SubTaskIDField = "subtask_id"
 	//LeaseExpiresFieldName --
 	LeaseExpiresFieldName = "lease_expires"
+	//InventoryIDFieldName ---
+	InventoryIDFieldName = "inventory_id"
 )

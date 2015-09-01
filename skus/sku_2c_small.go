@@ -2,6 +2,7 @@ package skus
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
@@ -41,7 +42,7 @@ func (s *Sku2CSmall) ReStock() (status string, taskMeta map[string]interface{}) 
 
 	if vcdResponseTaskElement, err := s.Client.UnDeployVApp(vAppID); err == nil {
 		status = StatusOutsourced
-		task := s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusProcessing)
+		task := s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusOutsourced)
 		task.PrivateMetaData = s.ProcurementMeta
 		task.SetPrivateMeta(VCDTaskElementHrefMetaName, vcdResponseTaskElement.Href)
 		task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionUnDeploy)
@@ -59,12 +60,27 @@ func (s *Sku2CSmall) ReStock() (status string, taskMeta map[string]interface{}) 
 //PollForTasks - this is a method for polling the current long poll task queue and acting on it
 func (s *Sku2CSmall) PollForTasks() {
 	var (
+		err  error
+		task *taskmanager.Task
+	)
+	if task, err = s.TaskManager.FindAndStallTaskForCaller(SkuName2CSmall); err == nil {
+
+		switch task.GetPrivateMeta(taskmanager.TaskActionMetaName) {
+		case TaskActionUnDeploy:
+			s.processUnDeployTask(task)
+		}
+		s.TaskManager.SaveTask(task)
+
+	} else {
+		log.Println("Error (2c.small poller): ", err.Error())
+	}
+}
+
+func (s *Sku2CSmall) processUnDeployTask(task *taskmanager.Task) {
+	var (
 		err            error
-		task           *taskmanager.Task
 		vcdTaskElement *vcloudclient.TaskElem
 	)
-	task, err = s.TaskManager.FindAndStallTaskForCaller(SkuName2CSmall)
-
 	if vcdTaskURI := fmt.Sprintf("%s", task.GetPrivateMeta(VCDTaskElementHrefMetaName)); vcdTaskURI != "" {
 
 		if s.Client == nil {
@@ -73,22 +89,21 @@ func (s *Sku2CSmall) PollForTasks() {
 		}
 
 		if vcdTaskElement, err = s.Client.PollTaskURL(vcdTaskURI); err == nil {
-			s.evaluateStatus(vcdTaskElement.Status, task)
+			s.evaluateVCDStatus(vcdTaskElement.Status, task)
+
+		} else {
+			log.Println("Error (poll taskUrl VCD): ", err.Error())
 		}
 	}
-	s.TaskManager.SaveTask(task)
 }
 
-func (s *Sku2CSmall) evaluateStatus(status string, task *taskmanager.Task) {
+func (s *Sku2CSmall) evaluateVCDStatus(status string, task *taskmanager.Task) {
 	task.Status = status
 
 	switch status {
 	case vcloudclient.TaskStatusSuccess:
 		s.expireLongRunningTask(task)
-
-		if task.GetPrivateMeta(taskmanager.TaskActionMetaName) == TaskActionUnDeploy {
-			s.deployNew2CSmall(task)
-		}
+		s.deployNew2CSmall(task)
 
 	case vcloudclient.TaskStatusError, vcloudclient.TaskStatusAborted, vcloudclient.TaskStatusCanceled:
 		s.expireLongRunningTask(task)

@@ -109,14 +109,16 @@ var _ = Describe("Sku2CSmall", func() {
 	Describe(".Procurement()", func() {
 		Context("when called with valid metadata", func() {
 			var (
-				status          string
-				meta            map[string]interface{}
-				fakeTaskManager = new(fakes.FakeTaskManager)
+				status             string
+				meta               map[string]interface{}
+				fakeTaskManager    = new(fakes.FakeTaskManager)
+				controlInventoryID = "random-guid"
 			)
 			BeforeEach(func() {
 				s := new(Sku2CSmall)
 				s.ProcurementMeta = map[string]interface{}{
 					LeaseExpiresFieldName: time.Now().UnixNano(),
+					InventoryIDFieldName:  controlInventoryID,
 				}
 				fakeTaskManager.SpyTaskSaved = new(taskmanager.Task)
 				sku := s.New(fakeTaskManager, s.ProcurementMeta)
@@ -135,6 +137,7 @@ var _ = Describe("Sku2CSmall", func() {
 			It("should create a self-destruct lease task", func() {
 				Ω(fakeTaskManager.SpyTaskSaved).ShouldNot(BeNil())
 				Ω(fakeTaskManager.SpyTaskSaved.GetPrivateMeta(taskmanager.TaskActionMetaName)).Should(Equal(TaskActionSelfDestruct))
+				Ω(fakeTaskManager.SpyTaskSaved.GetPrivateMeta(InventoryIDFieldName)).Should(Equal(controlInventoryID))
 			})
 		})
 	})
