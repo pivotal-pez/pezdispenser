@@ -10,9 +10,8 @@ import (
 )
 
 //PostLeaseController - this is the controller to handle a get task call
-func PostLeaseController(taskServiceURI string, collectionDialer integrations.CollectionDialer) martini.Handler {
-	taskCollection := setupDB(collectionDialer, taskServiceURI, TaskCollectionName)
-	return func(logger *log.Logger, r render.Render, req *http.Request) {
+func PostLeaseController() martini.Handler {
+	return func(logger *log.Logger, r render.Render, req *http.Request, taskCollection integrations.Collection) {
 		lease := NewLease(taskCollection, GetAvailableInventory(taskCollection))
 		statusCode, response := lease.Post(logger, req)
 		r.JSON(statusCode, response)
@@ -20,9 +19,8 @@ func PostLeaseController(taskServiceURI string, collectionDialer integrations.Co
 }
 
 //DeleteLeaseController - this is the controller to handle a get task call
-func DeleteLeaseController(taskServiceURI string, collectionDialer integrations.CollectionDialer) martini.Handler {
-	taskCollection := setupDB(collectionDialer, taskServiceURI, TaskCollectionName)
-	return func(logger *log.Logger, r render.Render, req *http.Request) {
+func DeleteLeaseController() martini.Handler {
+	return func(logger *log.Logger, r render.Render, req *http.Request, taskCollection integrations.Collection) {
 		lease := NewLease(taskCollection, GetAvailableInventory(taskCollection))
 		statusCode, response := lease.Delete(logger, req)
 		r.JSON(statusCode, response)

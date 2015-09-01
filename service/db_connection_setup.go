@@ -8,7 +8,7 @@ import (
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 )
 
-func setupDB(dialer integrations.CollectionDialer, URI string, collectionName string) (collection integrations.Collection) {
+func SetupDB(dialer integrations.CollectionDialer, URI string, collectionName string) (collection integrations.Collection) {
 	var (
 		err      error
 		dialInfo *mgo.DialInfo

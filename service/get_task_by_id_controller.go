@@ -11,10 +11,8 @@ import (
 )
 
 //GetTaskByIDController - this is the controller to handle a get task call
-func GetTaskByIDController(taskServiceURI string, collectionDialer integrations.CollectionDialer) martini.Handler {
-	taskCollection := setupDB(collectionDialer, taskServiceURI, TaskCollectionName)
-
-	return func(params martini.Params, logger *log.Logger, r render.Render) {
+func GetTaskByIDController() martini.Handler {
+	return func(params martini.Params, logger *log.Logger, r render.Render, taskCollection integrations.Collection) {
 		var (
 			err        error
 			response   interface{}

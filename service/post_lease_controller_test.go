@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
 	. "github.com/pivotal-pez/pezdispenser/service"
+	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
@@ -19,7 +20,7 @@ var _ = Describe("lease controllers", func() {
 		Context("when the handler response is called with a lease params value", func() {
 			var (
 				fakeURI              = "mongodb://c39642c7-xxxx-xxxx-xxxx-db67a3bbc98f:xxxx4b827xxxx4393dcxxxx3533xxxx@1.1.1.1:27017/70ef645b-xxxx-xxxx-xxxx-94d5b0e5107f"
-				handler              func(log *log.Logger, r render.Render, req *http.Request)
+				handler              func(log *log.Logger, r render.Render, req *http.Request, t integrations.Collection)
 				renderer             *fakes.FakeRenderer
 				controlResponseValue = taskmanager.Task{
 					Status: "rockin and rollin",
@@ -30,7 +31,8 @@ var _ = Describe("lease controllers", func() {
 			)
 
 			BeforeEach(func() {
-				handler = DeleteLeaseController(fakeURI, fakes.FakeNewCollectionDialer(controlResponseValue)).(func(log *log.Logger, r render.Render, req *http.Request))
+				taskCollection := SetupDB(fakes.FakeNewCollectionDialer(controlResponseValue), fakeURI, TaskCollectionName)
+				handler = DeleteLeaseController().(func(log *log.Logger, r render.Render, req *http.Request, t integrations.Collection))
 				renderer = new(fakes.FakeRenderer)
 				request := new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{
@@ -39,7 +41,7 @@ var _ = Describe("lease controllers", func() {
 				"username": "someone",
 				"lease_duration": 14
 			}`)}
-				handler(fakes.MockLogger, renderer, request)
+				handler(fakes.MockLogger, renderer, request, taskCollection)
 			})
 
 			It("should return the task object w/ a 200 statusCode", func() {
@@ -53,7 +55,7 @@ var _ = Describe("lease controllers", func() {
 		Context("when the handler response is called with a lease params value", func() {
 			var (
 				fakeURI              = "mongodb://c39642c7-xxxx-xxxx-xxxx-db67a3bbc98f:xxxx4b827xxxx4393dcxxxx3533xxxx@1.1.1.1:27017/70ef645b-xxxx-xxxx-xxxx-94d5b0e5107f"
-				handler              func(log *log.Logger, r render.Render, req *http.Request)
+				handler              func(log *log.Logger, r render.Render, req *http.Request, t integrations.Collection)
 				renderer             *fakes.FakeRenderer
 				controlResponseValue = taskmanager.Task{
 					Status: "rockin and rollin",
@@ -64,7 +66,9 @@ var _ = Describe("lease controllers", func() {
 			)
 
 			BeforeEach(func() {
-				handler = PostLeaseController(fakeURI, fakes.FakeNewCollectionDialer(controlResponseValue)).(func(log *log.Logger, r render.Render, req *http.Request))
+
+				taskCollection := SetupDB(fakes.FakeNewCollectionDialer(controlResponseValue), fakeURI, TaskCollectionName)
+				handler = PostLeaseController().(func(log *log.Logger, r render.Render, req *http.Request, t integrations.Collection))
 				renderer = new(fakes.FakeRenderer)
 				request := new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{
@@ -73,7 +77,7 @@ var _ = Describe("lease controllers", func() {
 				"username": "someone",
 				"lease_duration": 14
 			}`)}
-				handler(fakes.MockLogger, renderer, request)
+				handler(fakes.MockLogger, renderer, request, taskCollection)
 			})
 
 			It("should return the task object w/ a 200 statusCode", func() {
