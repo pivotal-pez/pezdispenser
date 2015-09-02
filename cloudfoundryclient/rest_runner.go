@@ -2,6 +2,7 @@ package cloudfoundryclient
 
 import "net/http"
 
+//Run - runs the rest call
 func (s *RestRunner) Run() {
 	var (
 		req *http.Request

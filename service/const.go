@@ -8,6 +8,8 @@ import (
 const (
 	//TaskStatusAvailable - this means the task is in an avaiable state
 	TaskStatusAvailable = "available"
+	//TaskStatusRestocking - reclaiming inventory and restocking
+	TaskStatusRestocking = "restocking"
 	//TaskStatusUnavailable - unavailable procurement request
 	TaskStatusUnavailable = "unavailable"
 	//TaskStatusStarted - started this task

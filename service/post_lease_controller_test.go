@@ -44,8 +44,8 @@ var _ = Describe("lease controllers", func() {
 				handler(fakes.MockLogger, renderer, request, taskCollection)
 			})
 
-			It("should return the task object w/ a 200 statusCode", func() {
-				Ω(renderer.SpyStatus).Should(Equal(http.StatusCreated))
+			It("should return the task object w/ a statusCode accepted", func() {
+				Ω(renderer.SpyStatus).Should(Equal(http.StatusAccepted))
 				Ω(renderer.SpyValue.(*Lease).Task.Status).Should(Equal(TaskStatusUnavailable))
 				Ω(renderer.SpyValue.(*Lease).Task.Timestamp).ShouldNot(Equal(time.Time{}))
 			})

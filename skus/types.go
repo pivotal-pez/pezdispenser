@@ -8,8 +8,8 @@ import (
 type (
 	//Sku - interface for a sku object
 	Sku interface {
-		Procurement() (status string, taskMeta map[string]interface{})
-		ReStock() (status string, taskMeta map[string]interface{})
+		Procurement() *taskmanager.Task
+		ReStock() *taskmanager.Task
 		PollForTasks()
 		New(tm TaskManager, procurementMeta map[string]interface{}) Sku
 	}

@@ -38,15 +38,14 @@ type (
 		taskCollection  integrations.Collection
 		taskManager     *taskmanager.TaskManager
 		availableSkus   map[string]skus.Sku
-		ID              string                 `json:"_id"`
-		InventoryID     string                 `json:"inventory_id"`
-		UserName        string                 `json:"username"`
-		Sku             string                 `json:"sku"`
-		LeaseDuration   float64                `json:"lease_duration"`
-		LeaseEndDate    int64                  `json:"lease_end_date"`
-		LeaseStartDate  int64                  `json:"lease_start_date"`
-		ConsumerMeta    map[string]interface{} `json:"consumer_meta"`
-		ProcurementMeta map[string]interface{} `json:"procurement_meta"`
-		Task            *taskmanager.Task      `json:"task"`
+		ID              string                   `json:"_id"`
+		InventoryID     string                   `json:"inventory_id"`
+		UserName        string                   `json:"username"`
+		Sku             string                   `json:"sku"`
+		LeaseDuration   float64                  `json:"lease_duration"`
+		LeaseEndDate    int64                    `json:"lease_end_date"`
+		LeaseStartDate  int64                    `json:"lease_start_date"`
+		ProcurementMeta map[string]interface{}   `json:"procurement_meta"`
+		Task            taskmanager.RedactedTask `json:"task"`
 	}
 )

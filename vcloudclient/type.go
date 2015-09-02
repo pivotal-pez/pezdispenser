@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	//VCDAuth - vcd authentication object
+	//VCDClient - vcd authentication object
 	VCDClient struct {
 		//BaseURI
 		BaseURI string
@@ -36,7 +36,7 @@ type (
 		//Children
 		Children []interface{} `xml:"Children"`
 	}
-	//TasksElem
+	//TasksElem ----
 	TasksElem struct {
 		Task TaskElem `xml:"Task"`
 	}

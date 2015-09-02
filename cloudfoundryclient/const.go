@@ -1,24 +1,27 @@
 package cloudfoundryclient
 
-import "errors"
+import (
+	"errors"
+	"net/http"
+)
 
 const (
 	//OrgCreateSuccessStatusCode - success status code from a call to the org create cc endpoint
-	OrgCreateSuccessStatusCode = 201
+	OrgCreateSuccessStatusCode = http.StatusCreated
 	//OrgEndpoint - the endpoint to hit for org actions
 	OrgEndpoint = "/v2/organizations"
 	//SpacesEndpont - the endpoint to hit for spaces actions
 	SpacesEndpont = "/v2/spaces"
 	//SpacesCreateSuccessStatusCode = success status code of spaces rest call
-	SpacesCreateSuccessStatusCode = 201
+	SpacesCreateSuccessStatusCode = http.StatusCreated
 	//ListUsersEndpoint - get a list of all users in paas
 	ListUsersEndpoint = "/Users"
 	//ListUsersSuccessStatus - success status code for users call
-	ListUsersSuccessStatus = 200
+	ListUsersSuccessStatus = http.StatusOK
 	//InfoURLPath - the endpoint to grab api info data
 	InfoURLPath = "/v2/info"
-	//InfoSuccessStatus
-	InfoSuccessStatus = 200
+	//InfoSuccessStatus --
+	InfoSuccessStatus = http.StatusOK
 	//RoleTypeManager - this is the managers type for role assignments
 	RoleTypeManager = "managers"
 	//RoleTypeUser - this is the users type for role assignments
@@ -28,9 +31,9 @@ const (
 	//RoleCreationURLFormat - formatter string for role creation url generation
 	RoleCreationURLFormat = "%s/%s/%s/%s"
 	//RoleCreateSuccessStatusCode - success status code for role assignment calls
-	RoleCreateSuccessStatusCode = 201
+	RoleCreateSuccessStatusCode = http.StatusCreated
 	//OrgRemoveSuccessStatus - success status code for org removal
-	OrgRemoveSuccessStatus = 204
+	OrgRemoveSuccessStatus = http.StatusNoContent
 )
 
 var (

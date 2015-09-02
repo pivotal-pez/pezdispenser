@@ -15,38 +15,90 @@ var _ = Describe("Sku2CSmall", func() {
 	Describe(".PollForTasks()", func() {
 		Context("when the outsourced task is found to be in a success state", func() {
 
-			It("execute expire the current task and set status to success", func() {
+			It("should expire the current task and set status to success", func() {
 				s, spyTask, _ := fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
 				s.PollForTasks()
 				Ω(spyTask.Status).Should(Equal(vcloudclient.TaskStatusSuccess))
 				Ω(spyTask.Expires).Should(Equal(taskmanager.ExpiredTask))
 			})
+		})
 
-			Context("with a task action of un-deploy", func() {
-				var (
-					sku          *Sku2CSmall
-					spyTask      *taskmanager.Task
-					spySavedTask *taskmanager.Task
-				)
-				BeforeEach(func() {
-					sku, spyTask, spySavedTask = fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
-					spyTask.PrivateMetaData = map[string]interface{}{
-						taskmanager.TaskActionMetaName: TaskActionUnDeploy,
-						VCDUsernameField:               "fakeuser",
-						VCDPasswordField:               "fakepass",
-						VCDTemplateNameField:           "PaaSSlot-10",
-						VCDAppIDField:                  "myapp-id",
-						VCDBaseURIField:                "vcd_base_uri.com",
-					}
-				})
-				It("should move on to deploy a new 2c vapp", func() {
-					Ω(spySavedTask).ShouldNot(Equal(spyTask))
-					sku.PollForTasks()
-					Ω(spySavedTask).ShouldNot(BeNil())
-					Ω(spySavedTask).Should(Equal(spyTask))
-				})
+		Context("when task action value is un-deploy and status is success", func() {
+			var (
+				sku          *Sku2CSmall
+				spyTask      *taskmanager.Task
+				spySavedTask *taskmanager.Task
+			)
+			BeforeEach(func() {
+				sku, spyTask, spySavedTask = fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
+				spyTask.PrivateMetaData = map[string]interface{}{
+					taskmanager.TaskActionMetaName: TaskActionUnDeploy,
+					VCDUsernameField:               "fakeuser",
+					VCDPasswordField:               "fakepass",
+					VCDTemplateNameField:           "PaaSSlot-10",
+					VCDAppIDField:                  "myapp-id",
+					VCDBaseURIField:                "vcd_base_uri.com",
+				}
+			})
+			It("should move on to deploy a new 2c vapp", func() {
+				Ω(spySavedTask).ShouldNot(Equal(spyTask))
+				sku.PollForTasks()
+				Ω(spySavedTask).ShouldNot(BeNil())
+				Ω(spySavedTask).Should(Equal(spyTask))
 			})
 		})
+
+		Context("when task action value is deploy and status is success", func() {
+			var (
+				sku          *Sku2CSmall
+				spyTask      *taskmanager.Task
+				spySavedTask *taskmanager.Task
+			)
+			BeforeEach(func() {
+				sku, spyTask, spySavedTask = fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
+				spyTask.PrivateMetaData = map[string]interface{}{
+					taskmanager.TaskActionMetaName: TaskActionDeploy,
+					VCDUsernameField:               "fakeuser",
+					VCDPasswordField:               "fakepass",
+					VCDTemplateNameField:           "PaaSSlot-10",
+					VCDAppIDField:                  "myapp-id",
+					VCDBaseURIField:                "vcd_base_uri.com",
+				}
+			})
+			It("should show inventory as available", func() {
+				Ω(spySavedTask).ShouldNot(Equal(spyTask))
+				sku.PollForTasks()
+				Ω(spySavedTask.Status).Should(Equal(taskmanager.TaskStatusAvailable))
+			})
+		})
+
+		Context("when task action value is self-destruct and status is success", func() {
+			var (
+				sku          *Sku2CSmall
+				spyTask      *taskmanager.Task
+				spySavedTask *taskmanager.Task
+			)
+			BeforeEach(func() {
+				sku, spyTask, spySavedTask = fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
+				spyTask.PrivateMetaData = map[string]interface{}{
+					taskmanager.TaskActionMetaName: TaskActionSelfDestruct,
+					VCDUsernameField:               "fakeuser",
+					VCDPasswordField:               "fakepass",
+					VCDTemplateNameField:           "PaaSSlot-10",
+					VCDAppIDField:                  "myapp-id",
+					VCDBaseURIField:                "vcd_base_uri.com",
+				}
+			})
+			It("should have kicked off a restock task", func() {
+				sku.PollForTasks()
+				Ω(spySavedTask.PrivateMetaData[taskmanager.TaskActionMetaName]).Should(Equal(TaskActionUnDeploy))
+			})
+			It("should have cleaned up the state of the sku object", func() {
+				sku.PollForTasks()
+				Ω(sku.ProcurementMeta).Should(BeNil())
+			})
+		})
+
 		Context("when the outsourced task is found to be in a not yet done state", func() {
 			It("should update status and move on", func() {
 				s, spyTask, _ := fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusRunning)
@@ -109,8 +161,7 @@ var _ = Describe("Sku2CSmall", func() {
 	Describe(".Procurement()", func() {
 		Context("when called with valid metadata", func() {
 			var (
-				status             string
-				meta               map[string]interface{}
+				task               *taskmanager.Task
 				fakeTaskManager    = new(fakes.FakeTaskManager)
 				controlInventoryID = "random-guid"
 			)
@@ -123,15 +174,15 @@ var _ = Describe("Sku2CSmall", func() {
 				fakeTaskManager.SpyTaskSaved = new(taskmanager.Task)
 				sku := s.New(fakeTaskManager, s.ProcurementMeta)
 				skuCast := sku.(*Sku2CSmall)
-				status, meta = skuCast.Procurement()
+				task = skuCast.Procurement()
 			})
 
 			It("should return a status complete", func() {
-				Ω(status).Should(Equal(StatusComplete))
+				Ω(task.Status).Should(Equal(StatusComplete))
 			})
 
 			It("should return no meta data", func() {
-				Ω(meta).Should(BeEmpty())
+				Ω(task.MetaData).Should(BeEmpty())
 			})
 
 			It("should create a self-destruct lease task", func() {
@@ -163,9 +214,8 @@ var _ = Describe("Sku2CSmall", func() {
 				}
 			})
 			It("should return a status indicating the current status", func() {
-				status, meta := sku.ReStock()
-				Ω(status).Should(Equal(StatusOutsourced))
-				Ω(meta[SubTaskIDField]).ShouldNot(BeEmpty())
+				task := sku.ReStock()
+				Ω(task.Status).Should(Equal(StatusOutsourced))
 			})
 		})
 	})

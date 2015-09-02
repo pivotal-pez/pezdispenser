@@ -52,6 +52,7 @@ const (
 			}`
 )
 
+//MakeFakeSku2CSmall ---
 func MakeFakeSku2CSmall(status string) (*skus.Sku2CSmall, *taskmanager.Task, *taskmanager.Task) {
 	s := new(skus.Sku2CSmall)
 	spyTask := &taskmanager.Task{
@@ -74,22 +75,24 @@ func MakeFakeSku2CSmall(status string) (*skus.Sku2CSmall, *taskmanager.Task, *ta
 		ReturnedTask: spyTask,
 		SpyTaskSaved: new(taskmanager.Task),
 	}
-	fmt.Println("init or no?", myFakeManager.SpyTaskSaved)
 	s.TaskManager = myFakeManager
 	return s, spyTask, myFakeManager.SpyTaskSaved
 }
 
 //FakeSku -- a fake sku object
-type FakeSku struct{}
+type FakeSku struct {
+	ProcurementTask *taskmanager.Task
+	ReStockTask     *taskmanager.Task
+}
 
 //Procurement --
-func (s *FakeSku) Procurement() (status string, taskMeta map[string]interface{}) {
-	return
+func (s *FakeSku) Procurement() (task *taskmanager.Task) {
+	return s.ProcurementTask
 }
 
 //ReStock --
-func (s *FakeSku) ReStock() (status string, taskMeta map[string]interface{}) {
-	return
+func (s *FakeSku) ReStock() (task *taskmanager.Task) {
+	return s.ReStockTask
 }
 
 //PollForTasks --
@@ -99,7 +102,7 @@ func (s *FakeSku) PollForTasks() {
 
 //New --
 func (s *FakeSku) New(tm skus.TaskManager, procurementMeta map[string]interface{}) skus.Sku {
-	return new(FakeSku)
+	return s
 }
 
 //FakeVCDClient - this is a fake vcdclient object
@@ -289,6 +292,7 @@ func (s *FakeTaskManager) SaveTask(t *taskmanager.Task) (*taskmanager.Task, erro
 	if s.SpyTaskSaved != nil {
 		*s.SpyTaskSaved = *t
 	}
+	fmt.Println("we have saved this", s.SpyTaskSaved)
 	return t, s.ReturnedErr
 }
 
@@ -299,7 +303,7 @@ func (s *FakeTaskManager) FindAndStallTaskForCaller(callerName string) (t *taskm
 
 //FindTask --
 func (s *FakeTaskManager) FindTask(id string) (t *taskmanager.Task, err error) {
-	return
+	return s.ReturnedTask, s.ReturnedErr
 }
 
 //NewTask --
@@ -324,11 +328,22 @@ type FakeTask struct {
 	PrivateMetaData map[string]interface{} `bson:"private_metadata"`
 }
 
+//NewFakeCollection ====
+func NewFakeCollection(updated int) *FakeCollection {
+	fakeCol := new(FakeCollection)
+	fakeCol.FakeChangeInfo = &mgo.ChangeInfo{
+		Updated: updated,
+	}
+	return fakeCol
+}
+
 //FakeCollection -
 type FakeCollection struct {
 	mgo.Collection
-	ControlTask taskmanager.Task
-	ErrControl  error
+	ControlTask      taskmanager.Task
+	ErrControl       error
+	FakeChangeInfo   *mgo.ChangeInfo
+	ErrFindAndModify error
 }
 
 //Close -
@@ -343,7 +358,7 @@ func (s *FakeCollection) Wake() {
 
 //FindAndModify -
 func (s *FakeCollection) FindAndModify(selector interface{}, update interface{}, result interface{}) (info *mgo.ChangeInfo, err error) {
-	return
+	return s.FakeChangeInfo, s.ErrFindAndModify
 }
 
 //UpsertID -

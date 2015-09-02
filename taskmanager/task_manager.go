@@ -49,6 +49,8 @@ func (s *TaskManager) FindAndStallTaskForCaller(callerName string) (task *Task, 
 
 //FindTask - this will find and return a task with a given ID
 func (s *TaskManager) FindTask(id string) (t *Task, err error) {
+	t = new(Task)
+	err = s.taskCollection.FindOne(id, t)
 	return
 }
 

@@ -10,6 +10,7 @@ import (
 
 var onceLoadInventoryPoller sync.Once
 
+//GetAvailableInventory - this should return available inventory and start a long task poller
 func GetAvailableInventory(taskCollection integrations.Collection) (inventory map[string]skus.Sku) {
 
 	inventory = map[string]skus.Sku{

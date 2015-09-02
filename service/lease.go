@@ -18,45 +18,31 @@ import (
 
 //NewLease - create and return a new lease object
 func NewLease(taskCollection integrations.Collection, availableSkus map[string]skus.Sku) *Lease {
+
 	return &Lease{
 		taskCollection: taskCollection,
 		taskManager:    taskmanager.NewTaskManager(taskCollection),
 		availableSkus:  availableSkus,
+		Task:           new(taskmanager.Task).GetRedactedVersion(),
 	}
 }
 
 //Delete - handle a delete lease call
 func (s *Lease) Delete(logger *log.Logger, req *http.Request) (statusCode int, response interface{}) {
 	var (
-		err       error
-		newTaskID = bson.NewObjectId().Hex()
-		timestamp = time.Now().UnixNano()
-		task      = &taskmanager.Task{
-			ID:         bson.ObjectIdHex(newTaskID),
-			Status:     TaskStatusStarted,
-			Timestamp:  timestamp,
-			MetaData:   make(map[string]interface{}),
-			Profile:    taskmanager.TaskLeaseReStock,
-			CallerName: CallerPostLease,
-		}
+		err error
 	)
 	statusCode = http.StatusNotFound
 	s.taskCollection.Wake()
 	logger.Println("collection dialed successfully")
 
-	if _, err = s.taskCollection.UpsertID(newTaskID, task); err == nil {
-		s.SetTask(task)
-		logger.Println("task created")
+	if err = s.InitFromHTTPRequest(req); err == nil {
+		logger.Println("restocking inventory...")
+		s.ReStock()
+		statusCode = http.StatusAccepted
+		response = s
 
-		if err = s.InitFromHTTPRequest(req); err == nil {
-			logger.Println("restocking inventory...")
-			s.ReStock()
-			statusCode = http.StatusCreated
-			response = s
-		}
-	}
-
-	if err != nil {
+	} else {
 		response = map[string]string{"error": err.Error()}
 	}
 	return
@@ -65,35 +51,19 @@ func (s *Lease) Delete(logger *log.Logger, req *http.Request) (statusCode int, r
 //Post - handle a post lease call
 func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, response interface{}) {
 	var (
-		err       error
-		newTaskID = bson.NewObjectId().Hex()
-		timestamp = time.Now().UnixNano()
-		task      = &taskmanager.Task{
-			ID:         bson.ObjectIdHex(newTaskID),
-			Status:     TaskStatusStarted,
-			Timestamp:  timestamp,
-			MetaData:   make(map[string]interface{}),
-			Profile:    taskmanager.TaskLeaseProcurement,
-			CallerName: CallerPostLease,
-		}
+		err error
 	)
 	statusCode = http.StatusNotFound
 	s.taskCollection.Wake()
 	logger.Println("collection dialed successfully")
 
-	if _, err = s.taskCollection.UpsertID(newTaskID, task); err == nil {
-		s.SetTask(task)
-		logger.Println("task created")
+	if err = s.InitFromHTTPRequest(req); err == nil {
+		logger.Println("obtaining lease...")
+		s.Procurement()
+		statusCode = http.StatusCreated
+		response = s
 
-		if err = s.InitFromHTTPRequest(req); err == nil {
-			logger.Println("obtaining lease...")
-			s.Procurement()
-			statusCode = http.StatusCreated
-			response = s
-		}
-	}
-
-	if err != nil {
+	} else {
 		response = map[string]string{"error": err.Error()}
 	}
 	return
@@ -101,18 +71,14 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 
 //ReStock - this will reclaim resources for a given lease
 func (s *Lease) ReStock() {
-	if skuConstructor, ok := s.availableSkus[s.Sku]; ok {
-		s.Task.Status = TaskStatusUnavailable
 
-		if s.InventoryAvailable() {
-			sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
-			s.Task.Status, s.ConsumerMeta = sku.ReStock()
-		}
-		s.taskManager.SaveTask(s.Task)
+	if skuConstructor, ok := s.availableSkus[s.Sku]; ok {
+		s.ProcurementMeta[InventoryIDFieldName] = s.InventoryID
+		sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
+		s.Task = sku.ReStock().GetRedactedVersion()
 
 	} else {
 		s.Task.Status = TaskStatusUnavailable
-		s.taskManager.SaveTask(s.Task)
 	}
 }
 
@@ -122,17 +88,15 @@ func (s *Lease) Procurement() {
 	if skuConstructor, ok := s.availableSkus[s.Sku]; ok {
 		s.Task.Status = TaskStatusUnavailable
 
-		if s.InventoryAvailable() {
+		if s.InventoryAvailable() == true {
 			s.ProcurementMeta[LeaseExpiresFieldName] = s.LeaseEndDate
 			s.ProcurementMeta[InventoryIDFieldName] = s.InventoryID
 			sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
-			s.Task.Status, s.ConsumerMeta = sku.Procurement()
+			s.Task = sku.Procurement().GetRedactedVersion()
 		}
-		s.taskManager.SaveTask(s.Task)
 
 	} else {
 		s.Task.Status = TaskStatusUnavailable
-		s.taskManager.SaveTask(s.Task)
 	}
 }
 
@@ -147,13 +111,11 @@ func (s *Lease) InitFromHTTPRequest(req *http.Request) (err error) {
 	} else {
 		err = ErrEmptyBody
 	}
-	return
-}
 
-//SetTask - add a task to the lease object
-func (s *Lease) SetTask(task *taskmanager.Task) {
-	s.Task = task
-	s.taskManager.SaveTask(s.Task)
+	if s.ProcurementMeta == nil {
+		s.ProcurementMeta = make(map[string]interface{})
+	}
+	return
 }
 
 //InventoryAvailable - lets check if a inventory management task exists for this
@@ -163,16 +125,29 @@ func (s *Lease) InventoryAvailable() (available bool) {
 	task := new(taskmanager.Task)
 	available = false
 
-	if err := s.taskCollection.FindOne(s.InventoryID, task); task.Status == TaskStatusAvailable {
+	ci, err := s.taskCollection.FindAndModify(
+		bson.M{
+			"_id":    s.InventoryID,
+			"status": TaskStatusAvailable,
+		},
+		bson.M{
+			"status": TaskStatusUnavailable,
+		},
+		task,
+	)
+	if ci.Updated == 1 {
 		available = true
 
-	} else if err == mgo.ErrNotFound {
-		task.ID = bson.ObjectIdHex(s.InventoryID)
-		task.Timestamp = time.Now().UnixNano()
-		task.Status = TaskStatusAvailable
-		task.MetaData = s.ProcurementMeta
-		s.taskManager.SaveTask(task)
-		available = true
+	} else if err == nil && ci.Updated <= 0 {
+
+		if err := s.taskCollection.FindOne(s.InventoryID, task); err == mgo.ErrNotFound {
+			task.ID = bson.ObjectIdHex(s.InventoryID)
+			task.Timestamp = time.Now().UnixNano()
+			task.Status = TaskStatusAvailable
+			task.MetaData = s.ProcurementMeta
+			s.taskManager.SaveTask(task)
+			available = true
+		}
 	}
 	return
 }

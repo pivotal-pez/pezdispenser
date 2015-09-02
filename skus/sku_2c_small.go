@@ -22,38 +22,58 @@ func (s *Sku2CSmall) New(tm TaskManager, procurementMeta map[string]interface{})
 
 //Procurement - this method will walk the procurement flow for the 2csmall
 //object
-func (s *Sku2CSmall) Procurement() (status string, taskMeta map[string]interface{}) {
-	status = StatusComplete
+func (s *Sku2CSmall) Procurement() (task *taskmanager.Task) {
+	task = s.createResponseTaskWithConsumerMetaData()
+	s.createSelfDestructTask()
+	return
+}
+
+func (s *Sku2CSmall) createResponseTaskWithConsumerMetaData() (task *taskmanager.Task) {
+	task = s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusComplete)
+	//	task.MetaData["username"] = ""
+	//	task.MetaData["password"] = ""
+	//	task.MetaData["url"] = ""
+	s.TaskManager.SaveTask(task)
+	return
+}
+
+func (s *Sku2CSmall) createSelfDestructTask() {
 	task := s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusProcessing)
 	task.PrivateMetaData = s.ProcurementMeta
 	task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionSelfDestruct)
 	task.Expires = task.GetPrivateMeta(LeaseExpiresFieldName).(int64)
 	s.TaskManager.SaveTask(task)
-	return
 }
 
 //ReStock - this method will walk the restock flow for the 2csmall object
-func (s *Sku2CSmall) ReStock() (status string, taskMeta map[string]interface{}) {
-	taskMeta = make(map[string]interface{})
+func (s *Sku2CSmall) ReStock() (task *taskmanager.Task) {
+
+	if vcdResponseTaskElement, err := s.undeployVapp(); err == nil {
+		task = s.createUndeployPollingTask(vcdResponseTaskElement)
+
+	} else {
+		task = new(taskmanager.Task)
+		task.Status = StatusFailed
+	}
+	s.TaskManager.SaveTask(task)
+	return
+}
+
+func (s *Sku2CSmall) undeployVapp() (*vcloudclient.TaskElem, error) {
 	user := fmt.Sprintf("%s", s.ProcurementMeta[VCDUsernameField])
 	pass := fmt.Sprintf("%s", s.ProcurementMeta[VCDPasswordField])
 	vAppID := fmt.Sprintf("%s", s.ProcurementMeta[VCDAppIDField])
 	s.Client.Auth(user, pass)
+	return s.Client.UnDeployVApp(vAppID)
+}
 
-	if vcdResponseTaskElement, err := s.Client.UnDeployVApp(vAppID); err == nil {
-		status = StatusOutsourced
-		task := s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusOutsourced)
-		task.PrivateMetaData = s.ProcurementMeta
-		task.SetPrivateMeta(VCDTaskElementHrefMetaName, vcdResponseTaskElement.Href)
-		task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionUnDeploy)
-		task.SetPrivateMeta(VCDTaskElementHrefMetaName, vcdResponseTaskElement.Href)
-		task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionUnDeploy)
-		taskMeta[SubTaskIDField] = task.ID.Hex()
-		s.TaskManager.SaveTask(task)
-
-	} else {
-		status = StatusFailed
-	}
+func (s *Sku2CSmall) createUndeployPollingTask(vcdResponseTaskElement *vcloudclient.TaskElem) (task *taskmanager.Task) {
+	task = s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusOutsourced)
+	task.PrivateMetaData = s.ProcurementMeta
+	task.SetPrivateMeta(VCDTaskElementHrefMetaName, vcdResponseTaskElement.Href)
+	task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionUnDeploy)
+	task.SetPrivateMeta(VCDTaskElementHrefMetaName, vcdResponseTaskElement.Href)
+	task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionUnDeploy)
 	return
 }
 
@@ -64,11 +84,7 @@ func (s *Sku2CSmall) PollForTasks() {
 		task *taskmanager.Task
 	)
 	if task, err = s.TaskManager.FindAndStallTaskForCaller(SkuName2CSmall); err == nil {
-
-		switch task.GetPrivateMeta(taskmanager.TaskActionMetaName) {
-		case TaskActionUnDeploy:
-			s.processUnDeployTask(task)
-		}
+		s.handleTaskTypes(task)
 		s.TaskManager.SaveTask(task)
 
 	} else {
@@ -76,7 +92,39 @@ func (s *Sku2CSmall) PollForTasks() {
 	}
 }
 
-func (s *Sku2CSmall) processUnDeployTask(task *taskmanager.Task) {
+func (s *Sku2CSmall) handleTaskTypes(task *taskmanager.Task) {
+	switch task.GetPrivateMeta(taskmanager.TaskActionMetaName) {
+	case TaskActionUnDeploy:
+		s.processVCDTask(task, s.deployNew2CSmall)
+
+	case TaskActionDeploy:
+		s.processVCDTask(task, s.deployComplete)
+
+	case TaskActionSelfDestruct:
+		s.processSelfDestructTask(task)
+	}
+}
+
+func (s *Sku2CSmall) processSelfDestructTask(task *taskmanager.Task) {
+	s.expireLongRunningTask(task)
+	s.ProcurementMeta = task.PrivateMetaData
+	s.ReStock()
+	s.ProcurementMeta = nil
+}
+
+func (s *Sku2CSmall) deployComplete(task *taskmanager.Task) {
+	inventoryID := fmt.Sprintf("%s", task.GetPrivateMeta(InventoryIDFieldName))
+	s.setInventoryStatusToAvailable(inventoryID)
+}
+
+func (s *Sku2CSmall) setInventoryStatusToAvailable(inventoryID string) {
+	if inventoryTask, err := s.TaskManager.FindTask(inventoryID); err == nil {
+		inventoryTask.Status = taskmanager.TaskStatusAvailable
+		s.TaskManager.SaveTask(inventoryTask)
+	}
+}
+
+func (s *Sku2CSmall) processVCDTask(task *taskmanager.Task, successCallback func(*taskmanager.Task)) {
 	var (
 		err            error
 		vcdTaskElement *vcloudclient.TaskElem
@@ -89,7 +137,7 @@ func (s *Sku2CSmall) processUnDeployTask(task *taskmanager.Task) {
 		}
 
 		if vcdTaskElement, err = s.Client.PollTaskURL(vcdTaskURI); err == nil {
-			s.evaluateVCDStatus(vcdTaskElement.Status, task)
+			s.evaluateVCDTaskStatus(vcdTaskElement.Status, task, successCallback)
 
 		} else {
 			log.Println("Error (poll taskUrl VCD): ", err.Error())
@@ -97,13 +145,13 @@ func (s *Sku2CSmall) processUnDeployTask(task *taskmanager.Task) {
 	}
 }
 
-func (s *Sku2CSmall) evaluateVCDStatus(status string, task *taskmanager.Task) {
+func (s *Sku2CSmall) evaluateVCDTaskStatus(status string, task *taskmanager.Task, successCallback func(*taskmanager.Task)) {
 	task.Status = status
 
 	switch status {
 	case vcloudclient.TaskStatusSuccess:
 		s.expireLongRunningTask(task)
-		s.deployNew2CSmall(task)
+		successCallback(task)
 
 	case vcloudclient.TaskStatusError, vcloudclient.TaskStatusAborted, vcloudclient.TaskStatusCanceled:
 		s.expireLongRunningTask(task)
@@ -112,28 +160,35 @@ func (s *Sku2CSmall) evaluateVCDStatus(status string, task *taskmanager.Task) {
 
 func (s *Sku2CSmall) deployNew2CSmall(task *taskmanager.Task) {
 	var (
-		err          error
+		newTask *taskmanager.Task
+	)
+
+	if vapp, err := s.deployVappFromTemplate(task); err == nil {
+		newTask = s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusOutsourced)
+		newTask.SetPrivateMeta(VCDTaskElementHrefMetaName, vapp.Tasks.Task.Href)
+		newTask.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionDeploy)
+
+	} else {
+		newTask = s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusFailed)
+	}
+	s.TaskManager.SaveTask(newTask)
+	task.SetPublicMeta(taskmanager.TaskChildID, newTask.ID)
+	s.TaskManager.SaveTask(task)
+}
+
+func (s *Sku2CSmall) deployVappFromTemplate(task *taskmanager.Task) (vapp *vcloudclient.VApp, err error) {
+	var (
 		username     = fmt.Sprintf("%s", task.GetPrivateMeta(VCDUsernameField))
 		password     = fmt.Sprintf("%s", task.GetPrivateMeta(VCDPasswordField))
 		templatename = fmt.Sprintf("%s", task.GetPrivateMeta(VCDTemplateNameField))
-		vapp         *vcloudclient.VApp
 		vappTemplate *vcloudclient.VAppTemplateRecord
-		newTask      *taskmanager.Task
 	)
 	s.Client.Auth(username, password)
 
 	if vappTemplate, err = s.Client.QueryTemplate(templatename); err == nil {
-
-		if vapp, err = s.Client.DeployVApp(templatename, vappTemplate.Href, vappTemplate.Vdc); err != nil {
-			newTask = s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusFailed)
-
-		} else {
-			newTask = s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusOutsourced)
-			newTask.SetPrivateMeta(VCDTaskElementHrefMetaName, vapp.Tasks.Task.Href)
-		}
-		newTask, err = s.TaskManager.SaveTask(newTask)
-		fmt.Println("this is what was returned: ", newTask)
+		vapp, err = s.Client.DeployVApp(templatename, vappTemplate.Href, vappTemplate.Vdc)
 	}
+	return
 }
 
 func (s *Sku2CSmall) expireLongRunningTask(task *taskmanager.Task) {

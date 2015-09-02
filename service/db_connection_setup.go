@@ -8,6 +8,7 @@ import (
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 )
 
+//SetupDB - setup your db connection and return a collection interface
 func SetupDB(dialer integrations.CollectionDialer, URI string, collectionName string) (collection integrations.Collection) {
 	var (
 		err      error

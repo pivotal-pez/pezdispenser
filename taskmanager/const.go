@@ -9,10 +9,13 @@ const (
 	TaskInventoryLedger ProfileType = "inventory_ledger"
 	//TaskLongPollQueue --
 	TaskLongPollQueue ProfileType = "longpoll_queue"
-
+	//TaskChildID -- child task spawned from current task
+	TaskChildID = "child_task_id"
 	//TaskActionMetaName --
 	TaskActionMetaName = "task_action"
 
 	//ExpiredTask -
 	ExpiredTask int64 = 0
+	//TaskStatusAvailable --- task status is set to available
+	TaskStatusAvailable = "available"
 )

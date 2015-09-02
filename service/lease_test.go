@@ -34,7 +34,7 @@ var _ = Describe("Lease", func() {
 				lease *Lease
 			)
 			BeforeEach(func() {
-				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(0), map[string]skus.Sku{
 					"": new(fakes.FakeSku),
 				})
 			})
@@ -49,7 +49,7 @@ var _ = Describe("Lease", func() {
 				lease *Lease
 			)
 			BeforeEach(func() {
-				col := new(fakes.FakeCollection)
+				col := fakes.NewFakeCollection(1)
 				col.ControlTask = taskmanager.Task{
 					Status: TaskStatusAvailable,
 				}
@@ -68,7 +68,7 @@ var _ = Describe("Lease", func() {
 				lease *Lease
 			)
 			BeforeEach(func() {
-				col := new(fakes.FakeCollection)
+				col := fakes.NewFakeCollection(0)
 				col.ErrControl = mgo.ErrNotFound
 				lease = NewLease(col, map[string]skus.Sku{
 					"": new(fakes.FakeSku),
@@ -90,7 +90,7 @@ var _ = Describe("Lease", func() {
 			)
 			BeforeEach(func() {
 				request = new(http.Request)
-				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
 					"": new(fakes.FakeSku),
 				})
 			})
@@ -107,17 +107,22 @@ var _ = Describe("Lease", func() {
 			)
 			BeforeEach(func() {
 				request = new(http.Request)
-				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
-					"": new(fakes.FakeSku),
+				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"sku1234", "_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
+				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
+					"sku1234": &fakes.FakeSku{
+						ProcurementTask: &taskmanager.Task{
+							Status: TaskStatusUnavailable,
+						},
+					},
 				})
+				lease.LeaseEndDate = time.Now().UnixNano()
+				lease.ProcurementMeta = make(map[string]interface{})
 			})
 
 			It("should return the lease object as the response", func() {
 				statusCode, response := lease.Post(fakes.MockLogger, request)
 				Ω(statusCode).Should(Equal(http.StatusCreated))
 				Ω(response.(*Lease).Task.Status).Should(Equal(TaskStatusUnavailable))
-				Ω(response.(*Lease).Task.Timestamp).ShouldNot(Equal(time.Time{}))
 			})
 		})
 	})
@@ -131,7 +136,7 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
 					"": new(fakes.FakeSku),
 				})
 			})
@@ -143,7 +148,7 @@ var _ = Describe("Lease", func() {
 				Ω(lease.InventoryID).Should(Equal("kaasd9sd9-98239h23h9-99h3ba993ba9h3ab"))
 				Ω(lease.UserName).Should(Equal("someone"))
 				Ω(lease.LeaseDuration).Should(Equal(float64(14)))
-				Ω(lease.Task).Should(BeNil())
+				Ω(lease.Task).ShouldNot(BeNil())
 			})
 		})
 		Context("called with an invalid request body", func() {
@@ -153,7 +158,7 @@ var _ = Describe("Lease", func() {
 			)
 
 			BeforeEach(func() {
-				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
 					"": new(fakes.FakeSku),
 				})
 				request = new(http.Request)
@@ -167,39 +172,23 @@ var _ = Describe("Lease", func() {
 	})
 
 	Describe(".Procurement()", func() {
-		Context("when calling with a valid lease (default)", func() {
+		Context("when calling with a valid lease", func() {
 			var (
 				lease   *Lease
 				request *http.Request
 			)
 			BeforeEach(func() {
 				request = new(http.Request)
-				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
-					"": new(fakes.FakeSku),
+				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"1234","_id": "917397-292735-98293752935","sku":"2c.small", "inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
+				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
+					"1234": &fakes.FakeSku{
+						ProcurementTask: &taskmanager.Task{
+							Status: TaskStatusRestocking,
+						},
+					},
 				})
-				lease.SetTask(new(taskmanager.Task))
-				lease.InitFromHTTPRequest(request)
-			})
-			It("should update the task status", func() {
-				controlStatus := lease.Task.Status
-				lease.Procurement()
-				Ω(lease.Task.Status).ShouldNot(Equal(controlStatus))
-			})
-		})
-
-		Context("when calling with a valid lease (2c.small)", func() {
-			var (
-				lease   *Lease
-				request *http.Request
-			)
-			BeforeEach(func() {
-				request = new(http.Request)
-				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","sku":"2c.small", "inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
-					"2c.small": new(fakes.FakeSku),
-				})
-				lease.SetTask(new(taskmanager.Task))
+				lease.LeaseEndDate = time.Now().UnixNano()
+				lease.ProcurementMeta = make(map[string]interface{})
 				lease.InitFromHTTPRequest(request)
 			})
 			It("should update the task status", func() {
@@ -219,34 +208,19 @@ var _ = Describe("Lease", func() {
 			)
 			BeforeEach(func() {
 				request = new(http.Request)
-				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
-					"": new(fakes.FakeSku),
+				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"1234","_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
+				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
+					"1234": &fakes.FakeSku{
+						ReStockTask: &taskmanager.Task{
+							Status: TaskStatusRestocking,
+						},
+					},
 				})
-				lease.SetTask(new(taskmanager.Task))
 				lease.InitFromHTTPRequest(request)
 			})
 			It("should update the task status", func() {
-				controlStatus := lease.Task.Status
 				lease.ReStock()
-				Ω(lease.Task.Status).ShouldNot(Equal(controlStatus))
-			})
-		})
-	})
-
-	Describe(".SetTask()", func() {
-		Context("calling with a valid task on an initialized lease", func() {
-			var (
-				lease = NewLease(new(fakes.FakeCollection), map[string]skus.Sku{
-					"": new(fakes.FakeSku),
-				})
-				controlTask = new(taskmanager.Task)
-			)
-			BeforeEach(func() {
-				lease.SetTask(controlTask)
-			})
-			It("should set the task value", func() {
-				Ω(lease.Task).Should(Equal(controlTask))
+				Ω(lease.Task.Status).Should(Equal(TaskStatusRestocking))
 			})
 		})
 	})
