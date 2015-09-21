@@ -53,12 +53,7 @@ deploy:
     - script:
         name: install-packages
         code: |
-          sudo apt-get install software-properties-common python-software-properties -y
           sudo apt-get install -y ssh wget
-          sudo add-apt-repository ppa:gophers/go -y
-          sudo apt-get update -y
-          sudo apt-get install golang-stable -y
-
 
     - wercker/add-ssh-key@1.0.2:
         keyname: PEZ_GITHUB_KEY  
