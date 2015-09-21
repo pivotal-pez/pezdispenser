@@ -74,8 +74,8 @@ deploy:
         code: |
           GOPATH=/tmp go get github.com/xchapter7x/autopilot
           GOPATH=/tmp go get github.com/xchapter7x/deploycloud
-          install-plugin /tmp/bin/autopilot
-          install-plugin /tmp/bin/deploycloud
+          cf install-plugin /tmp/bin/autopilot
+          cf install-plugin /tmp/bin/deploycloud
 
     - script: 
         name: cloud deploy
