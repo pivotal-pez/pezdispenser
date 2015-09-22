@@ -63,19 +63,9 @@ deploy:
         fingerprint: 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48
     
     - script:
-        name: get cf cli
+        name: get cf cli & plugins
         code: |
-          wget http://go-cli.s3-website-us-east-1.amazonaws.com/releases/v6.12.0/cf-linux-amd64.tgz
-          tar -zxvf cf-linux-amd64.tgz
-          mv ./cf /usr/local/bin/
-
-    - script:
-        name: get cf cli plugins
-        code: |
-          GOPATH=/tmp go get github.com/xchapter7x/autopilot
-          GOPATH=/tmp go get github.com/xchapter7x/deploycloud
-          cf install-plugin /tmp/bin/autopilot
-          cf install-plugin /tmp/bin/deploycloud
+          ./setup_cf_cli
 
     - script: 
         name: cloud deploy
