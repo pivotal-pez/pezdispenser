@@ -30,9 +30,6 @@ func (s *Sku2CSmall) Procurement() (task *taskmanager.Task) {
 
 func (s *Sku2CSmall) createResponseTaskWithConsumerMetaData() (task *taskmanager.Task) {
 	task = s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusComplete)
-	//	task.MetaData["username"] = ""
-	//	task.MetaData["password"] = ""
-	//	task.MetaData["url"] = ""
 	s.TaskManager.SaveTask(task)
 	return
 }
@@ -70,8 +67,6 @@ func (s *Sku2CSmall) undeployVapp() (*vcloudclient.TaskElem, error) {
 func (s *Sku2CSmall) createUndeployPollingTask(vcdResponseTaskElement *vcloudclient.TaskElem) (task *taskmanager.Task) {
 	task = s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusOutsourced)
 	task.PrivateMetaData = s.ProcurementMeta
-	task.SetPrivateMeta(VCDTaskElementHrefMetaName, vcdResponseTaskElement.Href)
-	task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionUnDeploy)
 	task.SetPrivateMeta(VCDTaskElementHrefMetaName, vcdResponseTaskElement.Href)
 	task.SetPrivateMeta(taskmanager.TaskActionMetaName, TaskActionUnDeploy)
 	return

@@ -34,7 +34,6 @@ func (s *Lease) Delete(logger *log.Logger, req *http.Request) (statusCode int, r
 	)
 	statusCode = http.StatusNotFound
 	s.taskCollection.Wake()
-	logger.Println("collection dialed successfully")
 
 	if err = s.InitFromHTTPRequest(req); err == nil {
 		logger.Println("restocking inventory...")
@@ -123,9 +122,7 @@ func (s *Lease) InitFromHTTPRequest(req *http.Request) (err error) {
 //its Status to see if we it available or not, return true or false on outcome
 func (s *Lease) InventoryAvailable() (available bool) {
 	task := new(taskmanager.Task)
-	available = false
-
-	ci, err := s.taskCollection.FindAndModify(
+	changeInfo, err := s.taskCollection.FindAndModify(
 		bson.M{
 			"_id":    s.InventoryID,
 			"status": TaskStatusAvailable,
@@ -135,10 +132,9 @@ func (s *Lease) InventoryAvailable() (available bool) {
 		},
 		task,
 	)
-	if ci.Updated == 1 {
-		available = true
+	available = s.taskWasModified(changeInfo)
 
-	} else if err == nil && ci.Updated <= 0 {
+	if !s.taskWasModified(changeInfo) && err == nil {
 
 		if err := s.taskCollection.FindOne(s.InventoryID, task); err == mgo.ErrNotFound {
 			task.ID = bson.ObjectIdHex(s.InventoryID)
@@ -150,4 +146,8 @@ func (s *Lease) InventoryAvailable() (available bool) {
 		}
 	}
 	return
+}
+
+func (s *Lease) taskWasModified(changeInfo *mgo.ChangeInfo) bool {
+	return changeInfo.Updated == 1
 }
