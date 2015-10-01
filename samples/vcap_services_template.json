@@ -25,7 +25,7 @@
           "label": "user-provided",
           "tags": [],
           "credentials": {
-            "target-url": "https://hcfdev.cfapps.pez.pivotal.io/valid-key"
+            "target-url": "https://hcfdev.pezapp.io/valid-key"
           },
           "syslog_drain_url": ""
         }
