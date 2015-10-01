@@ -79,8 +79,8 @@ func (s *Sku2CSmall) PollForTasks() {
 		task *taskmanager.Task
 	)
 	if task, err = s.TaskManager.FindAndStallTaskForCaller(SkuName2CSmall); err == nil {
+		log.Println("we found a task: ", task)
 		s.handleTaskTypes(task)
-		s.TaskManager.SaveTask(task)
 
 	} else {
 		log.Println("Error (2c.small poller): ", err.Error())
@@ -88,6 +88,7 @@ func (s *Sku2CSmall) PollForTasks() {
 }
 
 func (s *Sku2CSmall) handleTaskTypes(task *taskmanager.Task) {
+	saveTask := true
 	switch task.GetPrivateMeta(taskmanager.TaskActionMetaName) {
 	case TaskActionUnDeploy:
 		s.processVCDTask(task, s.deployNew2CSmall)
@@ -97,6 +98,14 @@ func (s *Sku2CSmall) handleTaskTypes(task *taskmanager.Task) {
 
 	case TaskActionSelfDestruct:
 		s.processSelfDestructTask(task)
+
+	default:
+		log.Println("not a valid task action")
+		saveTask = false
+	}
+
+	if saveTask {
+		s.TaskManager.SaveTask(task)
 	}
 }
 
