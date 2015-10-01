@@ -32,6 +32,7 @@ func (s *Lease) Delete(logger *log.Logger, req *http.Request) (statusCode int, r
 	var (
 		err error
 	)
+	GLogger = logger
 	statusCode = http.StatusNotFound
 	s.taskCollection.Wake()
 
@@ -52,12 +53,13 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 	var (
 		err error
 	)
+	GLogger = logger
 	statusCode = http.StatusNotFound
 	s.taskCollection.Wake()
 	logger.Println("collection dialed successfully")
 
 	if err = s.InitFromHTTPRequest(req); err == nil {
-		logger.Println("obtaining lease...")
+		logger.Println("obtaining lease...", s)
 		s.Procurement()
 		statusCode = http.StatusCreated
 		response = s
@@ -105,7 +107,10 @@ func (s *Lease) InitFromHTTPRequest(req *http.Request) (err error) {
 	if req.Body != nil {
 
 		if body, err := ioutil.ReadAll(req.Body); err == nil {
-			err = json.Unmarshal(body, s)
+
+			if err = json.Unmarshal(body, s); err != nil {
+				GLogger.Println(err)
+			}
 		}
 	} else {
 		err = ErrEmptyBody
@@ -149,5 +154,5 @@ func (s *Lease) InventoryAvailable() (available bool) {
 }
 
 func (s *Lease) taskWasModified(changeInfo *mgo.ChangeInfo) bool {
-	return changeInfo.Updated == 1
+	return changeInfo != nil && changeInfo.Updated == 1
 }

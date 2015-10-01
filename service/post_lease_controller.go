@@ -14,6 +14,8 @@ func PostLeaseController() martini.Handler {
 	return func(logger *log.Logger, r render.Render, req *http.Request, taskCollection integrations.Collection) {
 		lease := NewLease(taskCollection, GetAvailableInventory(taskCollection))
 		statusCode, response := lease.Post(logger, req)
+		logger.Println(statusCode)
+		logger.Println(response)
 		r.JSON(statusCode, response)
 	}
 }
@@ -23,6 +25,8 @@ func DeleteLeaseController() martini.Handler {
 	return func(logger *log.Logger, r render.Render, req *http.Request, taskCollection integrations.Collection) {
 		lease := NewLease(taskCollection, GetAvailableInventory(taskCollection))
 		statusCode, response := lease.Delete(logger, req)
+		logger.Println(statusCode)
+		logger.Println(response)
 		r.JSON(statusCode, response)
 	}
 }

@@ -38,7 +38,7 @@ type (
 		taskCollection  integrations.Collection
 		taskManager     *taskmanager.TaskManager
 		availableSkus   map[string]skus.Sku
-		ID              string                   `json:"_id"`
+		ID              string                   `json:"lease_id"`
 		InventoryID     string                   `json:"inventory_id"`
 		UserName        string                   `json:"username"`
 		Sku             string                   `json:"sku"`

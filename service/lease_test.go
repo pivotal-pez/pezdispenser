@@ -29,6 +29,24 @@ var _ = Describe("Lease", func() {
 	})
 
 	Describe(".InventoryAvailable()", func() {
+		Context("When: no task matches can be found yielding a nil changeInfo", func() {
+			var (
+				lease *Lease
+			)
+
+			BeforeEach(func() {
+				lease = NewLease(fakes.NewFakeCollection(-1), map[string]skus.Sku{
+					"": new(fakes.FakeSku),
+				})
+			})
+
+			It("Then: it should not panic", func() {
+				Ω(func() {
+					lease.InventoryAvailable()
+				}).ShouldNot(Panic())
+			})
+		})
+
 		Context("when we can find the record but taskStatus is != available", func() {
 			var (
 				lease *Lease
@@ -107,7 +125,7 @@ var _ = Describe("Lease", func() {
 			)
 			BeforeEach(func() {
 				request = new(http.Request)
-				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"sku1234", "_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
+				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"sku1234", "lease_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
 				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
 					"sku1234": &fakes.FakeSku{
 						ProcurementTask: &taskmanager.Task{
@@ -135,7 +153,7 @@ var _ = Describe("Lease", func() {
 			)
 			BeforeEach(func() {
 				request = new(http.Request)
-				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
+				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"lease_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
 				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
 					"": new(fakes.FakeSku),
 				})
@@ -171,6 +189,9 @@ var _ = Describe("Lease", func() {
 		})
 	})
 
+	Describe("Given: method .InventoryAvailable()", func() {
+	})
+
 	Describe(".Procurement()", func() {
 		Context("when calling with a valid lease", func() {
 			var (
@@ -179,7 +200,7 @@ var _ = Describe("Lease", func() {
 			)
 			BeforeEach(func() {
 				request = new(http.Request)
-				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"1234","_id": "917397-292735-98293752935","sku":"2c.small", "inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
+				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"1234","lease_id": "917397-292735-98293752935","sku":"2c.small", "inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
 				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
 					"1234": &fakes.FakeSku{
 						ProcurementTask: &taskmanager.Task{
@@ -208,7 +229,7 @@ var _ = Describe("Lease", func() {
 			)
 			BeforeEach(func() {
 				request = new(http.Request)
-				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"1234","_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
+				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"1234","lease_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
 				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
 					"1234": &fakes.FakeSku{
 						ReStockTask: &taskmanager.Task{

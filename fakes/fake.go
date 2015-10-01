@@ -331,8 +331,13 @@ type FakeTask struct {
 //NewFakeCollection ====
 func NewFakeCollection(updated int) *FakeCollection {
 	fakeCol := new(FakeCollection)
-	fakeCol.FakeChangeInfo = &mgo.ChangeInfo{
-		Updated: updated,
+
+	if updated == -1 {
+		fakeCol.FakeChangeInfo = nil
+	} else {
+		fakeCol.FakeChangeInfo = &mgo.ChangeInfo{
+			Updated: updated,
+		}
 	}
 	return fakeCol
 }

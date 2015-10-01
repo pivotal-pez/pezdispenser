@@ -2,7 +2,9 @@ package pezdispenser
 
 import (
 	"errors"
+	"log"
 	"net/http"
+	"os"
 )
 
 const (
@@ -37,4 +39,6 @@ var (
 	ErrCanNotAddOrgRec = errors.New("Could not add a new org record")
 	//ErrEmptyBody - no data in request body
 	ErrEmptyBody = errors.New("request body is empty or invalid")
+	//GLogger - a global logger
+	GLogger *log.Logger = log.New(os.Stdout, "[default]", -1)
 )
