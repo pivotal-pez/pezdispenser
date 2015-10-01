@@ -78,11 +78,10 @@ func (s *Sku2CSmall) PollForTasks() {
 		err  error
 		task *taskmanager.Task
 	)
-	if task, err = s.TaskManager.FindAndStallTaskForCaller(SkuName2CSmall); err == nil {
-		log.Println("we found a task: ", task)
+	if task, err = s.TaskManager.FindAndStallTaskForCaller(SkuName2CSmall); task != nil && err == nil {
 		s.handleTaskTypes(task)
 
-	} else {
+	} else if task != nil && err != nil {
 		log.Println("Error (2c.small poller): ", err.Error())
 	}
 }
@@ -100,7 +99,6 @@ func (s *Sku2CSmall) handleTaskTypes(task *taskmanager.Task) {
 		s.processSelfDestructTask(task)
 
 	default:
-		log.Println("not a valid task action")
 		saveTask = false
 	}
 

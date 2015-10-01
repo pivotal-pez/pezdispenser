@@ -1,5 +1,7 @@
 package taskmanager
 
+import "errors"
+
 const (
 	//TaskLeaseProcurement --
 	TaskLeaseProcurement ProfileType = "lease_procurement"
@@ -18,4 +20,9 @@ const (
 	ExpiredTask int64 = 0
 	//TaskStatusAvailable --- task status is set to available
 	TaskStatusAvailable = "available"
+)
+
+var (
+	//ErrNoResults - no results found in query
+	ErrNoResults = errors.New("no results found")
 )

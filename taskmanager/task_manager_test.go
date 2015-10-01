@@ -11,16 +11,17 @@ import (
 )
 
 var _ = Describe("TaskManager", func() {
-	Describe(".FindLockFirstCallerName()", func() {
+	Describe("Given: .FindAndStallTaskForCaller()", func() {
 		var tm *TaskManager
 
 		BeforeEach(func() {
 			tm = NewTaskManager(new(fakes.FakeCollection))
 		})
-		Context("when called", func() {
-			It("Should do nothing right now", func() {
-				tm.FindAndStallTaskForCaller("")
-				Ω(true).Should(BeTrue())
+		Context("When: call yields no results", func() {
+			It("Then: it should return a no-results error", func() {
+				_, err := tm.FindAndStallTaskForCaller("")
+				Ω(err).Should(HaveOccurred())
+				Ω(err).Should(Equal(ErrNoResults))
 			})
 		})
 	})

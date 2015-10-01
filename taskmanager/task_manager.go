@@ -1,6 +1,7 @@
 package taskmanager
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
@@ -44,7 +45,23 @@ func (s *TaskManager) FindAndStallTaskForCaller(callerName string) (task *Task, 
 		},
 		task,
 	)
+
+	if s.isDefaultTask(*task) {
+		task = nil
+		err = ErrNoResults
+	}
+	fmt.Println("my task is: ", task)
 	return
+}
+
+func (s *TaskManager) isDefaultTask(task Task) bool {
+	defaultTask := Task{}
+	return (task.ID == defaultTask.ID &&
+		task.Timestamp == defaultTask.Timestamp &&
+		task.Expires == defaultTask.Expires &&
+		task.Status == defaultTask.Status &&
+		task.Profile == defaultTask.Profile &&
+		task.CallerName == defaultTask.CallerName)
 }
 
 //FindTask - this will find and return a task with a given ID
