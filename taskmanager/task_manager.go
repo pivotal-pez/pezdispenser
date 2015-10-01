@@ -1,7 +1,6 @@
 package taskmanager
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
@@ -50,7 +49,6 @@ func (s *TaskManager) FindAndStallTaskForCaller(callerName string) (task *Task, 
 		task = nil
 		err = ErrNoResults
 	}
-	fmt.Println("my task is: ", task)
 	return
 }
 
