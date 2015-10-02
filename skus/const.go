@@ -35,4 +35,6 @@ const (
 	LeaseExpiresFieldName = "lease_expires"
 	//InventoryIDFieldName ---
 	InventoryIDFieldName = "inventory_id"
+	//CredentialsFieldName ----
+	CredentialsFieldName = "credentials"
 )

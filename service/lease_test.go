@@ -35,7 +35,7 @@ var _ = Describe("Lease", func() {
 			)
 
 			BeforeEach(func() {
-				lease = NewLease(fakes.NewFakeCollection(-1), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(fakes.FakeCollectionHasNilChangeInfo), map[string]skus.Sku{
 					"": new(fakes.FakeSku),
 				})
 			})
@@ -52,7 +52,7 @@ var _ = Describe("Lease", func() {
 				lease *Lease
 			)
 			BeforeEach(func() {
-				lease = NewLease(fakes.NewFakeCollection(0), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(fakes.FakeCollectionHasNoChanges), map[string]skus.Sku{
 					"": new(fakes.FakeSku),
 				})
 			})
@@ -67,7 +67,7 @@ var _ = Describe("Lease", func() {
 				lease *Lease
 			)
 			BeforeEach(func() {
-				col := fakes.NewFakeCollection(1)
+				col := fakes.NewFakeCollection(fakes.FakeCollectionHasChanges)
 				col.ControlTask = taskmanager.Task{
 					Status: TaskStatusAvailable,
 				}
@@ -86,7 +86,8 @@ var _ = Describe("Lease", func() {
 				lease *Lease
 			)
 			BeforeEach(func() {
-				col := fakes.NewFakeCollection(0)
+				col := fakes.NewFakeCollection(fakes.FakeCollectionHasNilChangeInfo)
+				col.ErrFindAndModify = mgo.ErrNotFound
 				col.ErrControl = mgo.ErrNotFound
 				lease = NewLease(col, map[string]skus.Sku{
 					"": new(fakes.FakeSku),
@@ -108,7 +109,7 @@ var _ = Describe("Lease", func() {
 			)
 			BeforeEach(func() {
 				request = new(http.Request)
-				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(fakes.FakeCollectionHasChanges), map[string]skus.Sku{
 					"": new(fakes.FakeSku),
 				})
 			})
@@ -126,7 +127,7 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"sku1234", "lease_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(fakes.FakeCollectionHasChanges), map[string]skus.Sku{
 					"sku1234": &fakes.FakeSku{
 						ProcurementTask: &taskmanager.Task{
 							Status: TaskStatusUnavailable,
@@ -154,7 +155,7 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"lease_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(fakes.FakeCollectionHasChanges), map[string]skus.Sku{
 					"": new(fakes.FakeSku),
 				})
 			})
@@ -176,7 +177,7 @@ var _ = Describe("Lease", func() {
 			)
 
 			BeforeEach(func() {
-				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(fakes.FakeCollectionHasChanges), map[string]skus.Sku{
 					"": new(fakes.FakeSku),
 				})
 				request = new(http.Request)
@@ -201,7 +202,7 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"1234","lease_id": "917397-292735-98293752935","sku":"2c.small", "inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(fakes.FakeCollectionHasChanges), map[string]skus.Sku{
 					"1234": &fakes.FakeSku{
 						ProcurementTask: &taskmanager.Task{
 							Status: TaskStatusRestocking,
@@ -230,7 +231,7 @@ var _ = Describe("Lease", func() {
 			BeforeEach(func() {
 				request = new(http.Request)
 				request.Body = fakes.FakeResponseBody{bytes.NewBufferString(`{"sku":"1234","lease_id": "917397-292735-98293752935","inventory_id": "kaasd9sd9-98239h23h9-99h3ba993ba9h3ab","username": "someone","lease_duration": 14}`)}
-				lease = NewLease(fakes.NewFakeCollection(1), map[string]skus.Sku{
+				lease = NewLease(fakes.NewFakeCollection(fakes.FakeCollectionHasChanges), map[string]skus.Sku{
 					"1234": &fakes.FakeSku{
 						ReStockTask: &taskmanager.Task{
 							Status: TaskStatusRestocking,

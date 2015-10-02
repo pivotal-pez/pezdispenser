@@ -1,8 +1,10 @@
 package skus
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
@@ -30,8 +32,49 @@ func (s *Sku2CSmall) Procurement() (task *taskmanager.Task) {
 
 func (s *Sku2CSmall) createResponseTaskWithConsumerMetaData() (task *taskmanager.Task) {
 	task = s.TaskManager.NewTask(SkuName2CSmall, taskmanager.TaskLongPollQueue, StatusComplete)
+	templateName := fmt.Sprint(s.ProcurementMeta[VCDTemplateNameField])
+	templateNameParsed := strings.Split(templateName, "-")
+	slotNumber := templateNameParsed[len(templateNameParsed)-1]
+	creds := make(map[string]interface{})
+	json.Unmarshal(s.getCredsMetaData(slotNumber), &creds)
+	task.MetaData[CredentialsFieldName] = creds
 	s.TaskManager.SaveTask(task)
 	return
+}
+
+func (s *Sku2CSmall) getCredsMetaData(slotNumber string) []byte {
+	url := fmt.Sprintf("pcfaas-slot%v.pez.pivotal.io", slotNumber)
+	adminURL := fmt.Sprintf("https://opsmgr.%v:8443", url)
+	sshURL := fmt.Sprintf("opsmgr.%v:22", url)
+	consoleURL := fmt.Sprintf("https://opsmgr.%v:443", url)
+	cliURL := fmt.Sprintf("api.%v", url)
+	temporarilyHardCodedJSON := `{
+		"ops_manager": {
+			"admin_ui" : {
+				"url" : "%v",
+				"user" : "admin",
+				"pass" : "pivotal"
+			},
+			"ssh" : {
+				"url" : "%v",
+				"user" : "ubuntu",
+				"pass" : "pivotal"
+			}
+		},
+		"app_manager" : {
+			"console_ui": {
+				"url" : "%v",
+				"user" : "admin",
+				"pass" : "pivotal"
+			},
+			"cf_cli" : {
+				"url" : "%v",
+				"user" : "admin",
+				"pass" : "pivotal"
+			}
+		}
+	}`
+	return []byte(fmt.Sprintf(temporarilyHardCodedJSON, adminURL, sshURL, consoleURL, cliURL))
 }
 
 func (s *Sku2CSmall) createSelfDestructTask() {

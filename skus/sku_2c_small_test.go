@@ -170,6 +170,7 @@ var _ = Describe("Sku2CSmall", func() {
 				s.ProcurementMeta = map[string]interface{}{
 					LeaseExpiresFieldName: time.Now().UnixNano(),
 					InventoryIDFieldName:  controlInventoryID,
+					VCDTemplateNameField:  "pcfaas-slot-10",
 				}
 				fakeTaskManager.SpyTaskSaved = new(taskmanager.Task)
 				sku := s.New(fakeTaskManager, s.ProcurementMeta)
@@ -181,8 +182,9 @@ var _ = Describe("Sku2CSmall", func() {
 				Ω(task.Status).Should(Equal(StatusComplete))
 			})
 
-			It("should return no meta data", func() {
-				Ω(task.MetaData).Should(BeEmpty())
+			It("then it should return meta data with a creds field", func() {
+				Ω(task.MetaData).ShouldNot(BeEmpty())
+				Ω(task.MetaData[CredentialsFieldName]).ShouldNot(BeNil())
 			})
 
 			It("should create a self-destruct lease task", func() {

@@ -32,7 +32,6 @@ func (s *Lease) Delete(logger *log.Logger, req *http.Request) (statusCode int, r
 	var (
 		err error
 	)
-	GLogger = logger
 	statusCode = http.StatusNotFound
 	s.taskCollection.Wake()
 
@@ -53,7 +52,6 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 	var (
 		err error
 	)
-	GLogger = logger
 	statusCode = http.StatusNotFound
 	s.taskCollection.Wake()
 	logger.Println("collection dialed successfully")
@@ -93,10 +91,17 @@ func (s *Lease) Procurement() {
 			s.ProcurementMeta[LeaseExpiresFieldName] = s.LeaseEndDate
 			s.ProcurementMeta[InventoryIDFieldName] = s.InventoryID
 			sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
-			s.Task = sku.Procurement().GetRedactedVersion()
+			GLogger.Println("here is my sku: ", sku)
+			skuTask := sku.Procurement()
+			GLogger.Println("here is my task after procurement: ", skuTask)
+			s.Task = skuTask.GetRedactedVersion()
+
+		} else {
+			GLogger.Println("No inventory available")
 		}
 
 	} else {
+		GLogger.Println("No Sku Match: ", s.Sku)
 		s.Task.Status = TaskStatusUnavailable
 	}
 }
@@ -126,6 +131,7 @@ func (s *Lease) InitFromHTTPRequest(req *http.Request) (err error) {
 //inventory item. if one does not let's created it, if it does exist lets check
 //its Status to see if we it available or not, return true or false on outcome
 func (s *Lease) InventoryAvailable() (available bool) {
+	available = false
 	task := new(taskmanager.Task)
 	changeInfo, err := s.taskCollection.FindAndModify(
 		bson.M{
@@ -137,9 +143,10 @@ func (s *Lease) InventoryAvailable() (available bool) {
 		},
 		task,
 	)
-	available = s.taskWasModified(changeInfo)
+	modified := s.taskWasModified(changeInfo)
 
-	if !s.taskWasModified(changeInfo) && err == nil {
+	if err == mgo.ErrNotFound {
+		GLogger.Println("we must create a record for this inventory")
 
 		if err := s.taskCollection.FindOne(s.InventoryID, task); err == mgo.ErrNotFound {
 			task.ID = bson.ObjectIdHex(s.InventoryID)
@@ -147,8 +154,19 @@ func (s *Lease) InventoryAvailable() (available bool) {
 			task.Status = TaskStatusAvailable
 			task.MetaData = s.ProcurementMeta
 			s.taskManager.SaveTask(task)
+			GLogger.Println("We created a new record for available inventory")
 			available = true
+
+		} else {
+			GLogger.Println("an error occured when trying to create your new inventory tracker:", err)
 		}
+
+	} else if modified && err == nil {
+		GLogger.Println("We found available inventory")
+		available = true
+
+	} else {
+		GLogger.Println("There was an error: ", err, modified)
 	}
 	return
 }

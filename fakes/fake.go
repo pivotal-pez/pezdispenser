@@ -23,6 +23,9 @@ import (
 )
 
 const (
+	FakeCollectionHasChanges       = 1
+	FakeCollectionHasNoChanges     = 0
+	FakeCollectionHasNilChangeInfo = -1
 	//VcapServicesFormatter -
 	VcapServicesFormatter = `{
 				"p-mongodb": [

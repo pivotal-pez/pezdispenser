@@ -40,5 +40,5 @@ var (
 	//ErrEmptyBody - no data in request body
 	ErrEmptyBody = errors.New("request body is empty or invalid")
 	//GLogger - a global logger
-	GLogger *log.Logger = log.New(os.Stdout, "[default]", -1)
+	GLogger *log.Logger = log.New(os.Stdout, "[default]", log.LstdFlags)
 )
