@@ -10,6 +10,7 @@ import (
 
 	"github.com/pivotal-pez/pezdispenser/service"
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
+	"github.com/pivotal-pez/pezdispenser/skurepo"
 	"github.com/pivotal-pez/pezdispenser/skus"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
@@ -104,7 +105,7 @@ func (s *FakeSku) PollForTasks() {
 }
 
 //New --
-func (s *FakeSku) New(tm skus.TaskManager, procurementMeta map[string]interface{}) skus.Sku {
+func (s *FakeSku) New(tm skurepo.TaskManager, procurementMeta map[string]interface{}) skurepo.Sku {
 	return s
 }
 

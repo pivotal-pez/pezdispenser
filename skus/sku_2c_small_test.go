@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
+	"github.com/pivotal-pez/pezdispenser/skurepo"
 	. "github.com/pivotal-pez/pezdispenser/skus"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
@@ -197,7 +198,7 @@ var _ = Describe("Sku2CSmall", func() {
 
 	Describe(".ReStock()", func() {
 		Context("when called with valid metadata", func() {
-			var sku Sku
+			var sku skurepo.Sku
 			controlTaskHref := "myfakehref"
 			BeforeEach(func() {
 				fakeClient := new(fakes.FakeVCDClient)

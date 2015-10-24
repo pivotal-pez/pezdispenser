@@ -8,12 +8,12 @@ import (
 	"encoding/json"
 
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
-	"github.com/pivotal-pez/pezdispenser/skus"
+	"github.com/pivotal-pez/pezdispenser/skurepo"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
 //NewLease - create and return a new lease object
-func NewLease(taskCollection integrations.Collection, availableSkus map[string]skus.Sku) *Lease {
+func NewLease(taskCollection integrations.Collection, availableSkus map[string]skurepo.Sku) *Lease {
 
 	return &Lease{
 		taskCollection: taskCollection,

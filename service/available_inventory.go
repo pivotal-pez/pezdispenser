@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
+	"github.com/pivotal-pez/pezdispenser/skurepo"
 	"github.com/pivotal-pez/pezdispenser/skus"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
@@ -11,9 +12,9 @@ import (
 var onceLoadInventoryPoller sync.Once
 
 //GetAvailableInventory - this should return available inventory and start a long task poller
-func GetAvailableInventory(taskCollection integrations.Collection) (inventory map[string]skus.Sku) {
+func GetAvailableInventory(taskCollection integrations.Collection) (inventory map[string]skurepo.Sku) {
 
-	inventory = map[string]skus.Sku{
+	inventory = map[string]skurepo.Sku{
 		skus.SkuName2CSmall: &skus.Sku2CSmall{
 			TaskManager: taskmanager.NewTaskManager(taskCollection),
 		},

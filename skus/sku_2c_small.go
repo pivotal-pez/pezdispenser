@@ -6,12 +6,13 @@ import (
 	"log"
 	"strings"
 
+	"github.com/pivotal-pez/pezdispenser/skurepo"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 )
 
 //New - create a new instance of the given object type, initialized with some vars
-func (s *Sku2CSmall) New(tm TaskManager, procurementMeta map[string]interface{}) Sku {
+func (s *Sku2CSmall) New(tm skurepo.TaskManager, procurementMeta map[string]interface{}) skurepo.Sku {
 	httpClient := vcloudclient.DefaultClient()
 	baseURI := fmt.Sprintf("%s", procurementMeta[VCDBaseURIField])
 
