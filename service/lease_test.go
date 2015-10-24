@@ -5,9 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"labix.org/v2/mgo"
-	"labix.org/v2/mgo/bson"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
@@ -24,79 +21,6 @@ var _ = Describe("Lease", func() {
 					"": new(fakes.FakeSku),
 				})
 				Ω(lease).ShouldNot(BeNil())
-			})
-		})
-	})
-
-	Describe(".InventoryAvailable()", func() {
-		Context("When: no task matches can be found yielding a nil changeInfo", func() {
-			var (
-				lease *Lease
-			)
-
-			BeforeEach(func() {
-				lease = NewLease(fakes.NewFakeCollection(fakes.FakeCollectionHasNilChangeInfo), map[string]skus.Sku{
-					"": new(fakes.FakeSku),
-				})
-			})
-
-			It("Then: it should not panic", func() {
-				Ω(func() {
-					lease.InventoryAvailable()
-				}).ShouldNot(Panic())
-			})
-		})
-
-		Context("when we can find the record but taskStatus is != available", func() {
-			var (
-				lease *Lease
-			)
-			BeforeEach(func() {
-				lease = NewLease(fakes.NewFakeCollection(fakes.FakeCollectionHasNoChanges), map[string]skus.Sku{
-					"": new(fakes.FakeSku),
-				})
-			})
-			It("should indicate a unavailable status of the inventory item", func() {
-				yesno := lease.InventoryAvailable()
-				Ω(yesno).Should(BeFalse())
-			})
-		})
-
-		Context("when we can find the record and taskStatus is == available", func() {
-			var (
-				lease *Lease
-			)
-			BeforeEach(func() {
-				col := fakes.NewFakeCollection(fakes.FakeCollectionHasChanges)
-				col.ControlTask = taskmanager.Task{
-					Status: TaskStatusAvailable,
-				}
-				lease = NewLease(col, map[string]skus.Sku{
-					"": new(fakes.FakeSku),
-				})
-			})
-			It("should indicate a available status of the inventory item", func() {
-				yesno := lease.InventoryAvailable()
-				Ω(yesno).Should(BeTrue())
-			})
-		})
-
-		Context("when we can not find the record", func() {
-			var (
-				lease *Lease
-			)
-			BeforeEach(func() {
-				col := fakes.NewFakeCollection(fakes.FakeCollectionHasNilChangeInfo)
-				col.ErrFindAndModify = mgo.ErrNotFound
-				col.ErrControl = mgo.ErrNotFound
-				lease = NewLease(col, map[string]skus.Sku{
-					"": new(fakes.FakeSku),
-				})
-				lease.InventoryID = bson.NewObjectId().Hex()
-			})
-			It("should indicate a available status of the inventory item", func() {
-				yesno := lease.InventoryAvailable()
-				Ω(yesno).Should(BeTrue())
 			})
 		})
 	})
@@ -190,9 +114,6 @@ var _ = Describe("Lease", func() {
 		})
 	})
 
-	Describe("Given: method .InventoryAvailable()", func() {
-	})
-
 	Describe(".Procurement()", func() {
 		Context("when calling with a valid lease", func() {
 			var (
@@ -219,7 +140,6 @@ var _ = Describe("Lease", func() {
 				Ω(lease.Task.Status).ShouldNot(Equal(controlStatus))
 			})
 		})
-
 	})
 
 	Describe(".ReStock()", func() {
