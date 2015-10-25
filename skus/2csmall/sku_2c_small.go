@@ -1,4 +1,4 @@
-package skus
+package s2csmall
 
 import (
 	"encoding/json"

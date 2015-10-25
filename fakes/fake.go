@@ -11,7 +11,7 @@ import (
 	"github.com/pivotal-pez/pezdispenser/service"
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
-	"github.com/pivotal-pez/pezdispenser/skus"
+	"github.com/pivotal-pez/pezdispenser/skus/2csmall"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 	"labix.org/v2/mgo"
@@ -57,14 +57,14 @@ const (
 )
 
 //MakeFakeSku2CSmall ---
-func MakeFakeSku2CSmall(status string) (*skus.Sku2CSmall, *taskmanager.Task, *taskmanager.Task) {
-	s := new(skus.Sku2CSmall)
+func MakeFakeSku2CSmall(status string) (*s2csmall.Sku2CSmall, *taskmanager.Task, *taskmanager.Task) {
+	s := new(s2csmall.Sku2CSmall)
 	spyTask := &taskmanager.Task{
 		ID:      bson.NewObjectId(),
 		Expires: time.Now().UnixNano(),
 		PrivateMetaData: map[string]interface{}{
-			skus.VCDTaskElementHrefMetaName: "vcdTask.url.com/hithere",
-			taskmanager.TaskActionMetaName:  skus.TaskActionUnDeploy,
+			s2csmall.VCDTaskElementHrefMetaName: "vcdTask.url.com/hithere",
+			taskmanager.TaskActionMetaName:      s2csmall.TaskActionUnDeploy,
 		},
 	}
 	s.Client = &FakeVCDClient{

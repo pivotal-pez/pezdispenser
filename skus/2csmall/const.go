@@ -1,4 +1,4 @@
-package skus
+package s2csmall
 
 const (
 	//StatusComplete - a status flag for complete tasks

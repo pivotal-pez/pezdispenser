@@ -1,4 +1,4 @@
-package skus_test
+package s2csmall_test
 
 import (
 	. "github.com/onsi/ginkgo"

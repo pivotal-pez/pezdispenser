@@ -1,9 +1,13 @@
-package skus
+package s2csmall
 
 import (
 	"github.com/pivotal-pez/pezdispenser/skurepo"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 )
+
+func init() {
+	skurepo.Register(SkuName2CSmall, new(Sku2CSmall))
+}
 
 type (
 	//Sku2CSmall - a object representing a 2csmall sku

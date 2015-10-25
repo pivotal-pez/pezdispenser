@@ -1,4 +1,4 @@
-package skus_test
+package s2csmall_test
 
 import (
 	"time"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
-	. "github.com/pivotal-pez/pezdispenser/skus"
+	. "github.com/pivotal-pez/pezdispenser/skus/2csmall"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 )

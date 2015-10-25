@@ -5,7 +5,7 @@ import (
 
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
-	"github.com/pivotal-pez/pezdispenser/skus"
+	_ "github.com/pivotal-pez/pezdispenser/skus/2csmall"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
@@ -13,21 +13,21 @@ var onceLoadInventoryPoller sync.Once
 
 //GetAvailableInventory - this should return available inventory and start a long task poller
 func GetAvailableInventory(taskCollection integrations.Collection) (inventory map[string]skurepo.Sku) {
-
-	inventory = map[string]skurepo.Sku{
-		skus.SkuName2CSmall: &skus.Sku2CSmall{
-			TaskManager: taskmanager.NewTaskManager(taskCollection),
-		},
-	}
+	inventory = skurepo.GetRegistry()
 
 	onceLoadInventoryPoller.Do(func() {
-		for _, v := range inventory {
-			go func() {
-				for {
-					v.PollForTasks()
-				}
-			}()
-		}
+		startTaskPollingForRegisteredSkus(taskCollection)
 	})
 	return
+}
+
+func startTaskPollingForRegisteredSkus(taskCollection integrations.Collection) {
+	for _, v := range skurepo.GetRegistry() {
+		go func() {
+			for {
+				sku := v.New(taskmanager.NewTaskManager(taskCollection), nil)
+				sku.PollForTasks()
+			}
+		}()
+	}
 }
