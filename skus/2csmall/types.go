@@ -15,6 +15,13 @@ type (
 		Client          vcdClient
 		TaskManager     skurepo.TaskManager
 		ProcurementMeta map[string]interface{}
+		vcdInfo         *vcdCredentials
+	}
+
+	vcdCredentials struct {
+		username string
+		password string
+		base_uri string
 	}
 
 	vcdClient interface {

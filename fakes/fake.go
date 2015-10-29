@@ -58,7 +58,6 @@ const (
 
 //MakeFakeSku2CSmall ---
 func MakeFakeSku2CSmall(status string) (*s2csmall.Sku2CSmall, *taskmanager.Task, *taskmanager.Task) {
-	s := new(s2csmall.Sku2CSmall)
 	spyTask := &taskmanager.Task{
 		ID:      bson.NewObjectId(),
 		Expires: time.Now().UnixNano(),
@@ -67,6 +66,11 @@ func MakeFakeSku2CSmall(status string) (*s2csmall.Sku2CSmall, *taskmanager.Task,
 			taskmanager.TaskActionMetaName:      s2csmall.TaskActionUnDeploy,
 		},
 	}
+	myFakeManager := &FakeTaskManager{
+		ReturnedTask: spyTask,
+		SpyTaskSaved: new(taskmanager.Task),
+	}
+	s := new(s2csmall.Sku2CSmall).New(myFakeManager, make(map[string]interface{})).(*s2csmall.Sku2CSmall)
 	s.Client = &FakeVCDClient{
 		FakeVApp:               new(vcloudclient.VApp),
 		FakeVAppTemplateRecord: new(vcloudclient.VAppTemplateRecord),
@@ -75,11 +79,6 @@ func MakeFakeSku2CSmall(status string) (*s2csmall.Sku2CSmall, *taskmanager.Task,
 			Status: status,
 		},
 	}
-	myFakeManager := &FakeTaskManager{
-		ReturnedTask: spyTask,
-		SpyTaskSaved: new(taskmanager.Task),
-	}
-	s.TaskManager = myFakeManager
 	return s, spyTask, myFakeManager.SpyTaskSaved
 }
 

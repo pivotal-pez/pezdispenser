@@ -6,20 +6,43 @@ import (
 	"log"
 	"strings"
 
+	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
+	"github.com/xchapter7x/lo"
 )
+
+func getVCDInfoFromService() (vcdInfo *vcdCredentials) {
+	vcdInfo = new(vcdCredentials)
+
+	if appEnv, err := cfenv.Current(); err == nil {
+
+		if taskService, err := appEnv.Services.WithName(VCDServiceName); err == nil {
+			vcdInfo.username = taskService.Credentials[VCDUsernameField].(string)
+			vcdInfo.password = taskService.Credentials[VCDPasswordField].(string)
+			vcdInfo.base_uri = taskService.Credentials[VCDBaseURIField].(string)
+
+		} else {
+			lo.G.Error("Experienced an error trying to grab vcd service binding information:", err.Error())
+		}
+
+	} else {
+		lo.G.Error("error parsing current cfenv: ", err.Error())
+	}
+	return
+}
 
 //New - create a new instance of the given object type, initialized with some vars
 func (s *Sku2CSmall) New(tm skurepo.TaskManager, procurementMeta map[string]interface{}) skurepo.Sku {
 	httpClient := vcloudclient.DefaultClient()
-	baseURI := fmt.Sprintf("%s", procurementMeta[VCDBaseURIField])
+	vcdInfo := getVCDInfoFromService()
 
 	return &Sku2CSmall{
-		Client:          vcloudclient.NewVCDClient(httpClient, baseURI),
+		Client:          vcloudclient.NewVCDClient(httpClient, vcdInfo.base_uri),
 		ProcurementMeta: procurementMeta,
 		TaskManager:     tm,
+		vcdInfo:         vcdInfo,
 	}
 }
 
@@ -101,10 +124,8 @@ func (s *Sku2CSmall) ReStock() (task *taskmanager.Task) {
 }
 
 func (s *Sku2CSmall) undeployVapp() (*vcloudclient.TaskElem, error) {
-	user := fmt.Sprintf("%s", s.ProcurementMeta[VCDUsernameField])
-	pass := fmt.Sprintf("%s", s.ProcurementMeta[VCDPasswordField])
 	vAppID := fmt.Sprintf("%s", s.ProcurementMeta[VCDAppIDField])
-	s.Client.Auth(user, pass)
+	s.Client.Auth(s.vcdInfo.username, s.vcdInfo.password)
 	return s.Client.UnDeployVApp(vAppID)
 }
 
@@ -179,7 +200,7 @@ func (s *Sku2CSmall) processVCDTask(task *taskmanager.Task, successCallback func
 
 		if s.Client == nil {
 			httpClient := vcloudclient.DefaultClient()
-			s.Client = vcloudclient.NewVCDClient(httpClient, fmt.Sprintf("%s", task.GetPrivateMeta(VCDBaseURIField)))
+			s.Client = vcloudclient.NewVCDClient(httpClient, s.vcdInfo.base_uri)
 		}
 
 		if vcdTaskElement, err = s.Client.PollTaskURL(vcdTaskURI); err == nil {

@@ -1,6 +1,7 @@
 package s2csmall_test
 
 import (
+	"os"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -13,6 +14,42 @@ import (
 )
 
 var _ = Describe("Sku2CSmall", func() {
+	BeforeEach(func() {
+		os.Setenv("VCAP_APPLICATION", `{
+      "limits": {
+        "mem": 1024,
+        "disk": 1024,
+        "fds": 16384
+      },
+      "application_version": "0",
+      "application_name": "r",
+      "application_uris": [
+        "pivotal.io"
+      ],
+      "version": "0",
+      "name": "r",
+      "space_name": "z",
+      "space_id": "4",
+      "uris": [
+        "pivotal.io"
+      ],
+      "users": null
+		}`)
+		os.Setenv("VCAP_SERVICES", `{
+			"user-provided": [
+				{
+					"name": "pezdispenser-2csmall-vcd-1",
+					"label": "user-provided",
+					"tags": [],
+					"credentials": {
+						"base_uri": "fakevcd-01.pivotal.io",
+						"password": "S0meFak3Pa33",
+						"username": "imporantUser@localhost"
+					}
+				}
+			]
+		}`)
+	})
 	Describe(".PollForTasks()", func() {
 		Context("when the outsourced task is found to be in a success state", func() {
 
@@ -34,11 +71,8 @@ var _ = Describe("Sku2CSmall", func() {
 				sku, spyTask, spySavedTask = fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
 				spyTask.PrivateMetaData = map[string]interface{}{
 					taskmanager.TaskActionMetaName: TaskActionUnDeploy,
-					VCDUsernameField:               "fakeuser",
-					VCDPasswordField:               "fakepass",
 					VCDTemplateNameField:           "PaaSSlot-10",
 					VCDAppIDField:                  "myapp-id",
-					VCDBaseURIField:                "vcd_base_uri.com",
 				}
 			})
 			It("should move on to deploy a new 2c vapp", func() {
@@ -59,11 +93,8 @@ var _ = Describe("Sku2CSmall", func() {
 				sku, spyTask, spySavedTask = fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
 				spyTask.PrivateMetaData = map[string]interface{}{
 					taskmanager.TaskActionMetaName: TaskActionDeploy,
-					VCDUsernameField:               "fakeuser",
-					VCDPasswordField:               "fakepass",
 					VCDTemplateNameField:           "PaaSSlot-10",
 					VCDAppIDField:                  "myapp-id",
-					VCDBaseURIField:                "vcd_base_uri.com",
 				}
 			})
 			It("should show inventory as available", func() {
@@ -83,11 +114,8 @@ var _ = Describe("Sku2CSmall", func() {
 				sku, spyTask, spySavedTask = fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
 				spyTask.PrivateMetaData = map[string]interface{}{
 					taskmanager.TaskActionMetaName: TaskActionSelfDestruct,
-					VCDUsernameField:               "fakeuser",
-					VCDPasswordField:               "fakepass",
 					VCDTemplateNameField:           "PaaSSlot-10",
 					VCDAppIDField:                  "myapp-id",
-					VCDBaseURIField:                "vcd_base_uri.com",
 				}
 			})
 			It("should have kicked off a restock task", func() {
@@ -196,7 +224,7 @@ var _ = Describe("Sku2CSmall", func() {
 		})
 	})
 
-	Describe(".ReStock()", func() {
+	Describe("given a .ReStock() method", func() {
 		Context("when called with valid metadata", func() {
 			var sku skurepo.Sku
 			controlTaskHref := "myfakehref"
@@ -209,14 +237,12 @@ var _ = Describe("Sku2CSmall", func() {
 				fakeClient.FakeVApp.Tasks = vcloudclient.TasksElem{}
 				fakeClient.FakeVApp.Tasks.Task = vcloudclient.TaskElem{}
 				fakeClient.FakeVApp.Tasks.Task.Href = controlTaskHref
-
-				sku = &Sku2CSmall{
-					Client:          fakeClient,
-					TaskManager:     new(fakes.FakeTaskManager),
-					ProcurementMeta: make(map[string]interface{}),
-				}
+				sku, _, _ = fakes.MakeFakeSku2CSmall("")
+				sku.(*Sku2CSmall).Client = fakeClient
+				sku.(*Sku2CSmall).TaskManager = new(fakes.FakeTaskManager)
+				sku.(*Sku2CSmall).ProcurementMeta = make(map[string]interface{})
 			})
-			It("should return a status indicating the current status", func() {
+			It("then it should return a status indicating the current status", func() {
 				task := sku.ReStock()
 				Ω(task.Status).Should(Equal(StatusOutsourced))
 			})

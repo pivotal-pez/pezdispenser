@@ -39,6 +39,10 @@
 			"Rev": "a2ab8644e0b6a33df2cbe44673bd0f6ebba9abc3"
 		},
 		{
+			"ImportPath": "github.com/op/go-logging",
+			"Rev": "e8d5414f0947014548c2334044a0fac13187dfee"
+		},
+		{
 			"ImportPath": "github.com/oxtoacart/bpool",
 			"Rev": "4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6"
 		},
@@ -54,6 +58,10 @@
 		{
 			"ImportPath": "github.com/xchapter7x/goutil",
 			"Rev": "d11405d449b25127a32fab25ce8b1fc0388da5b3"
+		},
+		{
+			"ImportPath": "github.com/xchapter7x/lo",
+			"Rev": "aa2602d0e8e8647f0ce7b53109b37040941915aa"
 		},
 		{
 			"ImportPath": "labix.org/v2/mgo",

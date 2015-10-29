@@ -20,9 +20,9 @@ const (
 	//SkuName2CSmall --
 	SkuName2CSmall = "2c.small"
 	//VCDUsernameField - name of the field in Procurement meta containing username for vcd
-	VCDUsernameField = "vcd_username"
+	VCDUsernameField = "username"
 	//VCDPasswordField - name of the field in Procurement meta containing password for vcd
-	VCDPasswordField = "vcd_password"
+	VCDPasswordField = "password"
 	//VCDAppIDField - name of the field in Procurement meta containing appid for vcd
 	VCDAppIDField = "vapp_id"
 	//VCDBaseURIField - name of the field in Procurement meta containing baseuri for vcd
@@ -37,4 +37,6 @@ const (
 	InventoryIDFieldName = "inventory_id"
 	//CredentialsFieldName ----
 	CredentialsFieldName = "credentials"
+	//VCDServiceName --
+	VCDServiceName = "pezdispenser-2csmall-vcd-1"
 )
