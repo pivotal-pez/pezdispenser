@@ -245,12 +245,10 @@ func (s *Sku2CSmall) deployNew2CSmall(task *taskmanager.Task) {
 
 func (s *Sku2CSmall) deployVappFromTemplate(task *taskmanager.Task) (vapp *vcloudclient.VApp, err error) {
 	var (
-		username     = fmt.Sprintf("%s", task.GetPrivateMeta(VCDUsernameField))
-		password     = fmt.Sprintf("%s", task.GetPrivateMeta(VCDPasswordField))
 		templatename = fmt.Sprintf("%s", task.GetPrivateMeta(VCDTemplateNameField))
 		vappTemplate *vcloudclient.VAppTemplateRecord
 	)
-	s.Client.Auth(username, password)
+	s.Client.Auth(s.vcdInfo.username, s.vcdInfo.password)
 
 	if vappTemplate, err = s.Client.QueryTemplate(templatename); err == nil {
 		vapp, err = s.Client.DeployVApp(templatename, vappTemplate.Href, vappTemplate.Vdc)
