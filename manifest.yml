@@ -12,3 +12,4 @@ applications:
     UPS_PEZVALIDATOR_TARGET: target-url
     TASK_SERVICE_NAME: dispenser-task-service
     TASK_SERVICE_URI_NAME: uri
+    TASK_SERVICE_DATABASE_NAME: database

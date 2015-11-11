@@ -3,7 +3,6 @@ package s2csmall
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/cloudfoundry-community/go-cfenv"
@@ -147,7 +146,7 @@ func (s *Sku2CSmall) PollForTasks() {
 		s.handleTaskTypes(task)
 
 	} else if task != nil && err != nil {
-		log.Println("Error (2c.small poller): ", err.Error())
+		lo.G.Error("Error (2c.small poller): ", err.Error())
 	}
 }
 
@@ -207,7 +206,7 @@ func (s *Sku2CSmall) processVCDTask(task *taskmanager.Task, successCallback func
 			s.evaluateVCDTaskStatus(vcdTaskElement.Status, task, successCallback)
 
 		} else {
-			log.Println("Error (poll taskUrl VCD): ", err.Error())
+			lo.G.Error("Error (poll taskUrl VCD): ", err.Error())
 		}
 	}
 }

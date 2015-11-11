@@ -20,6 +20,7 @@ var _ = Describe("lease controllers", func() {
 		Context("when the handler response is called with a lease params value", func() {
 			var (
 				fakeURI              = "mongodb://c39642c7-xxxx-xxxx-xxxx-db67a3bbc98f:xxxx4b827xxxx4393dcxxxx3533xxxx@1.1.1.1:27017/70ef645b-xxxx-xxxx-xxxx-94d5b0e5107f"
+				fakeDB               = "70ef645b-xxxx-xxxx-xxxx-94d5b0e5107f"
 				handler              func(log *log.Logger, r render.Render, req *http.Request, t integrations.Collection)
 				renderer             *fakes.FakeRenderer
 				controlResponseValue = taskmanager.Task{
@@ -31,7 +32,7 @@ var _ = Describe("lease controllers", func() {
 			)
 
 			BeforeEach(func() {
-				taskCollection := SetupDB(fakes.FakeNewCollectionDialer(controlResponseValue), fakeURI, TaskCollectionName)
+				taskCollection := SetupDB(fakes.FakeNewCollectionDialer(controlResponseValue), fakeURI, fakeDB, TaskCollectionName)
 				handler = DeleteLeaseController().(func(log *log.Logger, r render.Render, req *http.Request, t integrations.Collection))
 				renderer = new(fakes.FakeRenderer)
 				request := new(http.Request)
@@ -55,6 +56,7 @@ var _ = Describe("lease controllers", func() {
 		Context("when the handler response is called with a lease params value", func() {
 			var (
 				fakeURI              = "mongodb://c39642c7-xxxx-xxxx-xxxx-db67a3bbc98f:xxxx4b827xxxx4393dcxxxx3533xxxx@1.1.1.1:27017/70ef645b-xxxx-xxxx-xxxx-94d5b0e5107f"
+				fakeDB               = "70ef645b-xxxx-xxxx-xxxx-94d5b0e5107f"
 				handler              func(log *log.Logger, r render.Render, req *http.Request, t integrations.Collection)
 				renderer             *fakes.FakeRenderer
 				controlResponseValue = taskmanager.Task{
@@ -67,7 +69,7 @@ var _ = Describe("lease controllers", func() {
 
 			BeforeEach(func() {
 
-				taskCollection := SetupDB(fakes.FakeNewCollectionDialer(controlResponseValue), fakeURI, TaskCollectionName)
+				taskCollection := SetupDB(fakes.FakeNewCollectionDialer(controlResponseValue), fakeURI, fakeDB, TaskCollectionName)
 				handler = PostLeaseController().(func(log *log.Logger, r render.Render, req *http.Request, t integrations.Collection))
 				renderer = new(fakes.FakeRenderer)
 				request := new(http.Request)

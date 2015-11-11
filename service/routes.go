@@ -22,8 +22,8 @@ var (
 
 //InitRoutes - initialize the mappings for controllers against valid routes
 func InitRoutes(m *martini.ClassicMartini, keyCheckHandler martini.Handler, appEnv *cfenv.App) {
-	taskServiceURI := getTaskBinding(appEnv)
-	taskCollection := SetupDB(integrations.NewCollectionDialer, taskServiceURI, TaskCollectionName)
+	taskServiceURI, taskServiceDatabase := getTaskBinding(appEnv)
+	taskCollection := SetupDB(integrations.NewCollectionDialer, taskServiceURI, taskServiceDatabase, TaskCollectionName)
 	m.Map(taskCollection)
 	m.Use(render.Renderer())
 
@@ -38,14 +38,19 @@ func InitRoutes(m *martini.ClassicMartini, keyCheckHandler martini.Handler, appE
 	}, keyCheckHandler)
 }
 
-func getTaskBinding(appEnv *cfenv.App) (taskServiceURI string) {
+func getTaskBinding(appEnv *cfenv.App) (taskServiceURI string, taskServiceDatabase string) {
 	taskServiceName := os.Getenv("TASK_SERVICE_NAME")
 	taskCredsURIName := os.Getenv("TASK_SERVICE_URI_NAME")
+	taskCredsDBName := os.Getenv("TASK_SERVICE_DATABASE_NAME")
 
 	if taskService, err := appEnv.Services.WithName(taskServiceName); err == nil {
 
 		if taskServiceURI = taskService.Credentials[taskCredsURIName].(string); taskServiceURI == "" {
 			panic(fmt.Sprint("we pulled an empty connection string %s from %v - %v", taskServiceURI, taskService, taskService.Credentials))
+		}
+
+		if taskServiceDatabase = taskService.Credentials[taskCredsDBName].(string); taskServiceDatabase == "" {
+			panic(fmt.Sprint("we pulled an empty connection string %s from %v - %v", taskServiceDatabase, taskService, taskService.Credentials))
 		}
 
 	} else {
