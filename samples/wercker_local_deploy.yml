@@ -30,6 +30,7 @@ dev:
           export UPS_PEZVALIDATOR_TARGET=target-url
           export TASK_SERVICE_NAME=dispenser-task-service
           export TASK_SERVICE_URI_NAME=uri
+          export TASK_SERVICE_DATABASE_NAME=database
     - script:
         name: build the server binary
         code: |
