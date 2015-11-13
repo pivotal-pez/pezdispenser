@@ -17,8 +17,8 @@
 		},
 		{
 			"ImportPath": "github.com/go-martini/martini",
-			"Comment": "v1.0-134-g184178f",
-			"Rev": "184178ffc6b2f7b86b8b99c2a411de8771708a0a"
+			"Comment": "v1.0-166-g9987fc5",
+			"Rev": "9987fc59f060a063247d22472c2fb48654bac5f6"
 		},
 		{
 			"ImportPath": "github.com/martini-contrib/render",
@@ -30,13 +30,13 @@
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
-			"Comment": "v1.2.0-11-gd94e2f4",
-			"Rev": "d94e2f4000332f62b356ecb2840c98f4218f5358"
+			"Comment": "v1.2.0-22-g39d2c24",
+			"Rev": "39d2c24f8a92c88f7e7f4d8ec6c80d3cc8f5ac65"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
-			"Comment": "v1.0-52-ga2ab864",
-			"Rev": "a2ab8644e0b6a33df2cbe44673bd0f6ebba9abc3"
+			"Comment": "v1.0-71-g2152b45",
+			"Rev": "2152b45fa28a361beba9aab0885972323a444e28"
 		},
 		{
 			"ImportPath": "github.com/op/go-logging",
@@ -48,16 +48,16 @@
 		},
 		{
 			"ImportPath": "github.com/pivotal-pez/pezauth/keycheck",
-			"Comment": "v0.0.120-28-g23b26d9",
-			"Rev": "23b26d98e9a6342fd50674d247116281a1fcc196"
+			"Comment": "v0.0.160",
+			"Rev": "50522c31d20cb4973bc749dc97fa0ec3e90141fe"
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/cloudcontroller-client",
-			"Rev": "795e287327dd3faa6a5b65e000779cffe301cb3a"
+			"Rev": "2349c0bd742e1c1371d88954e991273582533a33"
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/goutil",
-			"Rev": "d11405d449b25127a32fab25ce8b1fc0388da5b3"
+			"Rev": "046742e03686eda64c6ac938594120d7fb5b3ecc"
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/lo",
