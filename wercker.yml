@@ -53,7 +53,7 @@ deploy:
     - script:
         name: install-packages
         code: |
-          sudo apt-get install -y ssh wget
+          sudo apt-get install -y openssh-client wget
 
     - wercker/add-ssh-key@1.0.2:
         keyname: PEZ_GITHUB_KEY  
