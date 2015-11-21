@@ -34,6 +34,12 @@ type (
 		taskCollection integrations.Collection
 	}
 
+	//Agent an object which knows how to handle long running tasks. polling,
+	//timeouts etc
+	Agent struct {
+		task *Task
+	}
+
 	//ProfileType - indicator of the purpose of the task to be performed
 	ProfileType string
 )
