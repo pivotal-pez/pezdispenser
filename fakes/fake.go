@@ -284,13 +284,15 @@ func (s *MockClientDoer) Do(rq *http.Request) (rs *http.Response, e error) {
 
 //FakeTaskManager - this is a fake representation of the task manager
 type FakeTaskManager struct {
-	SpyTaskSaved *taskmanager.Task
-	ReturnedTask *taskmanager.Task
-	ReturnedErr  error
+	SaveCallCount int
+	SpyTaskSaved  *taskmanager.Task
+	ReturnedTask  *taskmanager.Task
+	ReturnedErr   error
 }
 
 //SaveTask --
 func (s *FakeTaskManager) SaveTask(t *taskmanager.Task) (*taskmanager.Task, error) {
+	s.SaveCallCount++
 
 	if s.SpyTaskSaved != nil {
 		*s.SpyTaskSaved = *t
