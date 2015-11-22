@@ -1,6 +1,9 @@
 package taskmanager
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 const (
 	//TaskAgentLongRunning --
@@ -37,7 +40,7 @@ var (
 	//ErrNoResults - no results found in query
 	ErrNoResults = errors.New("no results found")
 	//AgentTaskPollerInterval - time offset to poll a task from an agent
-	AgentTaskPollerInterval = 30
+	AgentTaskPollerInterval = time.Duration(30) * time.Second
 	//AgentTaskPollerTimeout - time until a agent will expire its task if not polled
-	AgentTaskPollerTimeout = 5 * 60
+	AgentTaskPollerTimeout = time.Duration(5) * time.Minute
 )

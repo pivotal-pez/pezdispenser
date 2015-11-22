@@ -2,7 +2,6 @@ package fakes
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -284,7 +283,7 @@ func (s *MockClientDoer) Do(rq *http.Request) (rs *http.Response, e error) {
 
 //FakeTaskManager - this is a fake representation of the task manager
 type FakeTaskManager struct {
-	SaveCallCount int
+	ExpireEmitter chan int64
 	SpyTaskSaved  *taskmanager.Task
 	ReturnedTask  *taskmanager.Task
 	ReturnedErr   error
@@ -292,12 +291,13 @@ type FakeTaskManager struct {
 
 //SaveTask --
 func (s *FakeTaskManager) SaveTask(t *taskmanager.Task) (*taskmanager.Task, error) {
-	s.SaveCallCount++
+	if s.ExpireEmitter != nil {
+		s.ExpireEmitter <- t.Expires
+	}
 
 	if s.SpyTaskSaved != nil {
 		*s.SpyTaskSaved = *t
 	}
-	fmt.Println("we have saved this", s.SpyTaskSaved)
 	return t, s.ReturnedErr
 }
 
