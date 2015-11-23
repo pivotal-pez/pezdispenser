@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("Agent", func() {
 	AgentTaskPollerInterval = time.Duration(0)
-	Describe("given a NewAgent func", func() {
+	XDescribe("given a NewAgent func", func() {
 		Context("when called with a given a task", func() {
 
 			var (
