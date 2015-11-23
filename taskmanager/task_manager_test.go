@@ -3,8 +3,6 @@ package taskmanager_test
 import (
 	"time"
 
-	"labix.org/v2/mgo"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
@@ -13,26 +11,6 @@ import (
 )
 
 var _ = Describe("TaskManager", func() {
-	Describe("Given: .GarbageCollectExpiredAgents method", func() {
-
-		var tm *TaskManager
-
-		Context("when: called and it finds expired agents", func() {
-			var controlUpdateCount = 25
-			BeforeEach(func() {
-				tm = NewTaskManager(&fakes.FakeCollection{
-					FakeChangeInfo: &mgo.ChangeInfo{
-						Updated: controlUpdateCount,
-					},
-				})
-			})
-			It("then: it should expire them", func() {
-				gcList, err := tm.GarbageCollectExpiredAgents("")
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(gcList.Updated).ShouldNot(BeNil())
-			})
-		})
-	})
 	Describe("Given: .FindAndStallTaskForCaller()", func() {
 		var tm *TaskManager
 

@@ -8,10 +8,10 @@ import (
 //NewAgent -- creates a new initialized agent object
 func NewAgent(t TaskManagerInterface, callerName string) *Agent {
 	return &Agent{
-		killTaskPoller:  make(chan bool, 10),
-		processComplete: make(chan bool, 10),
-		taskPollEmitter: make(chan bool, 10),
-		statusEmitter:   make(chan string, 10),
+		killTaskPoller:  make(chan bool, 1),
+		processComplete: make(chan bool, 1),
+		taskPollEmitter: make(chan bool, 1),
+		statusEmitter:   make(chan string, 1),
 		taskManager:     t,
 		task:            t.NewTask(callerName, TaskAgentLongRunning, AgentTaskStatusInitializing),
 	}

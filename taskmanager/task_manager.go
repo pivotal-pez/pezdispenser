@@ -3,11 +3,8 @@ package taskmanager
 import (
 	"time"
 
-	"labix.org/v2/mgo"
-	"labix.org/v2/mgo/bson"
-
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
-	"github.com/xchapter7x/lo"
+	"labix.org/v2/mgo/bson"
 )
 
 //NewTaskManager - this creates a new task manager object and returns it
@@ -69,27 +66,6 @@ func (s *TaskManager) isDefaultTask(task Task) bool {
 func (s *TaskManager) FindTask(id string) (t *Task, err error) {
 	t = new(Task)
 	err = s.taskCollection.FindOne(id, t)
-	return
-}
-
-func (s *TaskManager) GarbageCollectExpiredAgents(callerName string) (changeInfo *mgo.ChangeInfo, err error) {
-	nowEpoch := time.Now().UnixNano()
-	changeInfo, err = s.taskCollection.FindAndModify(
-		bson.M{
-			"caller_name": callerName,
-			"profile":     TaskAgentLongRunning,
-			"expires": bson.M{
-				"$lte": nowEpoch,
-				"$ne":  ExpiredTask,
-			},
-		},
-		bson.M{
-			"expires": ExpiredTask,
-			"status":  AgentTaskStatusFailed,
-		},
-		nil,
-	)
-	lo.G.Debug("change info on agent gc: ", changeInfo)
 	return
 }
 
