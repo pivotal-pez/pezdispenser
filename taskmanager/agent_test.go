@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("Agent", func() {
 	AgentTaskPollerInterval = time.Duration(0)
-	XDescribe("given a NewAgent func", func() {
+	Describe("given a NewAgent func", func() {
 		Context("when called with a given a task", func() {
 
 			var (
@@ -28,9 +28,13 @@ var _ = Describe("Agent", func() {
 			})
 			It("then it should leverage a pre-initialized task passed by the caller", func() {
 				controlAgent.Run(func(*Agent) (err error) { return })
-				Eventually(<-controlTaskManager.ExpireEmitter).Should(Equal(int64(0)))
-				Ω(controlAgent.GetTask()).ShouldNot(BeNil())
-				Ω(controlAgent.GetTask().CallerName).Should(Equal(controlCallerName))
+				select {
+				case <-controlTaskManager.ExpireEmitter:
+				default:
+					Ω(controlAgent.GetTask()).ShouldNot(BeNil())
+					Ω(controlAgent.GetTask().CallerName).Should(Equal(controlCallerName))
+					close(controlTaskManager.ExpireEmitter)
+				}
 			})
 
 			It("then it should not block, executing the function in the background", func() {
@@ -38,8 +42,13 @@ var _ = Describe("Agent", func() {
 					time.Sleep(time.Duration(10) * time.Second)
 					return nil
 				})
-				Eventually(<-controlTaskManager.ExpireEmitter).Should(Equal(int64(0)))
-				Eventually(<-controlAgent.GetStatus()).Should(Equal(AgentTaskStatusRunning))
+
+				select {
+				case <-controlTaskManager.ExpireEmitter:
+				default:
+					Eventually(<-controlAgent.GetStatus()).Should(Equal(AgentTaskStatusRunning))
+					close(controlTaskManager.ExpireEmitter)
+				}
 			})
 		})
 		Context("when the long running process exits without error", func() {
@@ -65,6 +74,7 @@ var _ = Describe("Agent", func() {
 				default:
 					Eventually(<-controlAgent.GetStatus()).Should(Equal(AgentTaskStatusRunning))
 					Eventually(<-controlAgent.GetStatus()).Should(Equal(AgentTaskStatusComplete))
+					close(controlTaskManager.ExpireEmitter)
 				}
 			})
 		})
@@ -88,6 +98,7 @@ var _ = Describe("Agent", func() {
 				default:
 					Eventually(<-controlAgent.GetStatus()).Should(Equal(AgentTaskStatusRunning))
 					Eventually(<-controlAgent.GetStatus()).Should(ContainSubstring(AgentTaskStatusFailed))
+					close(controlTaskManager.ExpireEmitter)
 				}
 			})
 		})
