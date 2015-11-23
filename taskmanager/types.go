@@ -45,12 +45,9 @@ type (
 	//Agent an object which knows how to handle long running tasks. polling,
 	//timeouts etc
 	Agent struct {
-		killTaskPoller  chan bool
-		processComplete chan bool
-		taskPollEmitter chan bool
-		statusEmitter   chan string
-		task            *Task
-		taskManager     TaskManagerInterface
+		statusEmitter chan string
+		task          *Task
+		taskManager   TaskManagerInterface
 	}
 
 	//ProfileType - indicator of the purpose of the task to be performed

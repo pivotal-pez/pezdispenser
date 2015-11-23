@@ -8,41 +8,30 @@ import (
 //NewAgent -- creates a new initialized agent object
 func NewAgent(t TaskManagerInterface, callerName string) *Agent {
 	return &Agent{
-		killTaskPoller:  make(chan bool, 1),
-		processComplete: make(chan bool, 1),
-		taskPollEmitter: make(chan bool, 1),
-		statusEmitter:   make(chan string, 1),
-		taskManager:     t,
-		task:            t.NewTask(callerName, TaskAgentLongRunning, AgentTaskStatusInitializing),
+		statusEmitter: make(chan string, 1),
+		taskManager:   t,
+		task:          t.NewTask(callerName, TaskAgentLongRunning, AgentTaskStatusInitializing),
 	}
 }
 
 //Run - this begins the running of an agent's async process
-func (s *Agent) Run(process func(*Agent) error) {
+func (s *Agent) Run(process func(agent *Agent) error) {
 	s.task.Status = AgentTaskStatusRunning
 	s.statusEmitter <- s.task.Status
 	s.taskManager.SaveTask(s.task)
-	go s.startTaskPoller()
-	go s.listenForPoll()
 
-	go func(agent Agent) {
-		s := &agent
-		err := process(s)
-		s.taskPollEmitter <- false
+	go func() {
 
-		select {
-		case <-s.processComplete:
-			if err == nil {
-				s.task.Status = AgentTaskStatusComplete
+		if err := process(s); err == nil {
+			s.task.Status = AgentTaskStatusComplete
 
-			} else {
-				s.task.Status = fmt.Sprintf("status: %s, error: %s", AgentTaskStatusFailed, err.Error())
-			}
-			s.task.Expires = 0
-			s.taskManager.SaveTask(s.task)
-			s.statusEmitter <- s.task.Status
+		} else {
+			s.task.Status = fmt.Sprintf("status: %s, error: %s", AgentTaskStatusFailed, err.Error())
 		}
-	}(*s)
+		s.task.Expires = 0
+		s.statusEmitter <- s.task.Status
+		s.taskManager.SaveTask(s.task)
+	}()
 }
 
 //GetTask - get the agents task object
@@ -55,24 +44,8 @@ func (s *Agent) GetStatus() chan string {
 	return s.statusEmitter
 }
 
-func (s *Agent) startTaskPoller() {
-ForLoop:
+func (s *Agent) executeTaskPoller() {
 	for {
-		select {
-		case <-s.killTaskPoller:
-			s.processComplete <- true
-			break ForLoop
-		default:
-			s.taskPollEmitter <- true
-		}
-		time.Sleep(AgentTaskPollerInterval)
+		time.Sleep(time.Duration(AgentTaskPollerInterval) * time.Second)
 	}
-}
-
-func (s *Agent) listenForPoll() {
-	for <-s.taskPollEmitter {
-		s.task.Expires = time.Now().Add(AgentTaskPollerTimeout).UnixNano()
-		s.taskManager.SaveTask(s.task)
-	}
-	s.killTaskPoller <- true
 }
