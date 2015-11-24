@@ -72,6 +72,13 @@ func (s *TaskManager) FindTask(id string) (t *Task, err error) {
 	return
 }
 
+func (s *TaskManager) ScheduleTask(t *Task, expireTime time.Time) {
+	t.Expires = expireTime.UnixNano()
+	t.Profile = TaskAgentScheduledTask
+	t.Status = AgentTaskStatusScheduled
+	return
+}
+
 func (s *TaskManager) GarbageCollectExpiredAgents(callerName string) (changeInfo *mgo.ChangeInfo, err error) {
 	nowEpoch := time.Now().UnixNano()
 	changeInfo, err = s.taskCollection.FindAndModify(

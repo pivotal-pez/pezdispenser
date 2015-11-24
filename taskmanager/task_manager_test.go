@@ -13,6 +13,25 @@ import (
 )
 
 var _ = Describe("TaskManager", func() {
+	Describe("given ScheduleTask method", func() {
+		Context("when called with a valid Task and Time object", func() {
+			var (
+				controlTaskManager *TaskManager
+				controlExpires     = time.Now()
+				controlTask        *Task
+			)
+			BeforeEach(func() {
+				controlTaskManager = new(TaskManager)
+				controlTask = controlTaskManager.NewTask("fake-agent", TaskLeaseReStock, "fake-stat")
+				controlTaskManager.ScheduleTask(controlTask, controlExpires)
+			})
+			It("then it should properly initialize the task for scheduling", func() {
+				Ω(controlTask.Expires).Should(Equal(controlExpires.UnixNano()))
+				Ω(controlTask.Profile).Should(Equal(TaskAgentScheduledTask))
+				Ω(controlTask.Status).Should(Equal(AgentTaskStatusScheduled))
+			})
+		})
+	})
 	Describe("Given: .GarbageCollectExpiredAgents method", func() {
 
 		var tm *TaskManager

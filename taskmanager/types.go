@@ -1,6 +1,8 @@
 package taskmanager
 
 import (
+	"time"
+
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"labix.org/v2/mgo/bson"
 )
@@ -35,6 +37,7 @@ type (
 		FindTask(id string) (t *Task, err error)
 		FindAndStallTaskForCaller(callerName string) (task *Task, err error)
 		SaveTask(t *Task) (*Task, error)
+		ScheduleTask(t *Task, expireTime time.Time)
 	}
 
 	//TaskManager - manages task interactions crud stuff

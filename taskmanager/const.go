@@ -8,6 +8,8 @@ import (
 const (
 	//TaskAgentLongRunning --
 	TaskAgentLongRunning ProfileType = "agent_task_long_running"
+	//TaskAgentScheduledTask --
+	TaskAgentScheduledTask ProfileType = "agent_scheduled_task"
 	//TaskLeaseProcurement --
 	TaskLeaseProcurement ProfileType = "lease_procurement"
 	//TaskLeaseReStock --
@@ -28,6 +30,8 @@ const (
 
 	//AgentTaskStatusInitializing ---
 	AgentTaskStatusInitializing = "initializing"
+	//AgentTaskStatusScheduled ---
+	AgentTaskStatusScheduled = "scheduled"
 	//AgentTaskStatusRunning ---
 	AgentTaskStatusRunning = "running"
 	//AgentTaskStatusComplete ---

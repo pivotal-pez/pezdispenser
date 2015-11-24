@@ -289,6 +289,11 @@ type FakeTaskManager struct {
 	ReturnedErr   error
 }
 
+//ScheduleTask ---
+func (s *FakeTaskManager) ScheduleTask(t *taskmanager.Task, expireTime time.Time) {
+	return
+}
+
 //SaveTask --
 func (s *FakeTaskManager) SaveTask(t *taskmanager.Task) (*taskmanager.Task, error) {
 	if s.ExpireEmitter != nil {
