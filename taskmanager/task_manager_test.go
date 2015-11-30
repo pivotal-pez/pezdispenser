@@ -13,6 +13,32 @@ import (
 )
 
 var _ = Describe("TaskManager", func() {
+
+	Describe("Given: .SubscribeToSchedule()", func() {
+		var (
+			tm             *TaskManager
+			fakeCollection *fakes.FakeCollection
+			controlStatus  = "fakeTaskStatus"
+			controlTask    = &Task{
+				Status: controlStatus,
+			}
+		)
+
+		BeforeEach(func() {
+			fakeCollection = new(fakes.FakeCollection)
+			fakeCollection.FakeResultFindAndModify = controlTask
+			fakeCollection.AssignResult = func(r, s interface{}) {
+				*(r.(*Task)) = *s.(*Task)
+			}
+			tm = NewTaskManager(fakeCollection)
+		})
+		Context("When: their is a scheduled task to publish", func() {
+			It("Then: it should yield the task through the returned channel", func() {
+				sub := tm.SubscribeToSchedule("")
+				Eventually(<-sub).Should(Equal(controlTask))
+			})
+		})
+	})
 	Describe("given ScheduleTask method", func() {
 		Context("when called with a valid Task and Time object", func() {
 			var (

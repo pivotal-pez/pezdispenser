@@ -72,6 +72,39 @@ func (s *TaskManager) FindTask(id string) (t *Task, err error) {
 	return
 }
 
+//SubscribeToSchedule - subscribe to a schedule and get a channel to listen on
+//for a task when it hits its scheduled time
+func (s *TaskManager) SubscribeToSchedule(callerName string) (subscription chan *Task) {
+	subscription = make(chan *Task, 1)
+	go func() {
+		for {
+			task := new(Task)
+			s.taskCollection.FindAndModify(
+				bson.M{
+					"caller_name": callerName,
+					"profile":     TaskAgentScheduledTask,
+					"expires": bson.M{
+						"$lte": time.Now().UnixNano(),
+						"$ne":  ExpiredTask,
+					},
+				},
+				bson.M{
+					"expires": time.Now().Add(AgentTaskPollerTimeout).UnixNano(),
+					"profile": TaskAgentLongRunning,
+					"status":  AgentTaskStatusInitializing,
+				},
+				task,
+			)
+
+			if !s.isDefaultTask(*task) {
+				go func() { subscription <- task }()
+			}
+			time.Sleep(AgentTaskPollerInterval)
+		}
+	}()
+	return
+}
+
 func (s *TaskManager) ScheduleTask(t *Task, expireTime time.Time) {
 	t.Expires = expireTime.UnixNano()
 	t.Profile = TaskAgentScheduledTask

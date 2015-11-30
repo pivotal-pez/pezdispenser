@@ -355,10 +355,12 @@ func NewFakeCollection(updated int) *FakeCollection {
 //FakeCollection -
 type FakeCollection struct {
 	mgo.Collection
-	ControlTask      taskmanager.Task
-	ErrControl       error
-	FakeChangeInfo   *mgo.ChangeInfo
-	ErrFindAndModify error
+	ControlTask             taskmanager.Task
+	ErrControl              error
+	FakeChangeInfo          *mgo.ChangeInfo
+	ErrFindAndModify        error
+	FakeResultFindAndModify interface{}
+	AssignResult            func(result, setValue interface{})
 }
 
 //Close -
@@ -373,6 +375,9 @@ func (s *FakeCollection) Wake() {
 
 //FindAndModify -
 func (s *FakeCollection) FindAndModify(selector interface{}, update interface{}, result interface{}) (info *mgo.ChangeInfo, err error) {
+	if s.AssignResult != nil {
+		s.AssignResult(result, s.FakeResultFindAndModify)
+	}
 	return s.FakeChangeInfo, s.ErrFindAndModify
 }
 
