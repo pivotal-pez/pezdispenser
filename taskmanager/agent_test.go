@@ -26,7 +26,7 @@ var _ = Describe("Agent", func() {
 			BeforeEach(func() {
 				controlAgent = NewAgent(controlTaskManager, controlCallerName)
 			})
-			It("then it should leverage a pre-initialized task passed by the caller", func() {
+			XIt("then it should leverage a pre-initialized task passed by the caller", func() {
 				controlAgent.Run(func(*Agent) (err error) { return })
 				select {
 				case <-controlTaskManager.ExpireEmitter:
@@ -37,7 +37,7 @@ var _ = Describe("Agent", func() {
 				}
 			})
 
-			It("then it should not block, executing the function in the background", func() {
+			XIt("then it should not block, executing the function in the background", func() {
 				controlAgent.Run(func(*Agent) error {
 					time.Sleep(time.Duration(10) * time.Second)
 					return nil
