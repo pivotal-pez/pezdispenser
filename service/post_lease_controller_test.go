@@ -47,8 +47,8 @@ var _ = Describe("lease controllers", func() {
 
 			It("should return the task object w/ a statusCode accepted", func() {
 				Ω(renderer.SpyStatus).Should(Equal(http.StatusAccepted))
-				Ω(renderer.SpyValue.(*Lease).Task.Status).Should(Equal(TaskStatusUnavailable))
-				Ω(renderer.SpyValue.(*Lease).Task.Timestamp).ShouldNot(Equal(time.Time{}))
+				Ω(renderer.SpyValue.(taskmanager.RedactedTask).Status).Should(Equal(TaskStatusUnavailable))
+				Ω(renderer.SpyValue.(taskmanager.RedactedTask).Timestamp).ShouldNot(Equal(time.Time{}))
 			})
 		})
 	})
@@ -82,10 +82,10 @@ var _ = Describe("lease controllers", func() {
 				handler(fakes.MockLogger, renderer, request, taskCollection)
 			})
 
-			It("should return the task object w/ a 200 statusCode", func() {
+			It("should return the task object w/ a 'created' statusCode", func() {
 				Ω(renderer.SpyStatus).Should(Equal(http.StatusCreated))
-				Ω(renderer.SpyValue.(*Lease).Task.Status).Should(Equal(TaskStatusUnavailable))
-				Ω(renderer.SpyValue.(*Lease).Task.Timestamp).ShouldNot(Equal(time.Time{}))
+				Ω(renderer.SpyValue.(taskmanager.RedactedTask).Status).Should(Equal(TaskStatusUnavailable))
+				Ω(renderer.SpyValue.(taskmanager.RedactedTask).Timestamp).ShouldNot(Equal(time.Time{}))
 			})
 		})
 	})

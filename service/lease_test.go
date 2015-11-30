@@ -62,10 +62,10 @@ var _ = Describe("Lease", func() {
 				lease.ProcurementMeta = make(map[string]interface{})
 			})
 
-			It("should return the lease object as the response", func() {
+			It("should return the RedactedTask object as the response", func() {
 				statusCode, response := lease.Post(fakes.MockLogger, request)
 				Ω(statusCode).Should(Equal(http.StatusCreated))
-				Ω(response.(*Lease).Task.Status).Should(Equal(TaskStatusUnavailable))
+				Ω(response.(taskmanager.RedactedTask).Status).Should(Equal(TaskStatusUnavailable))
 			})
 		})
 	})

@@ -35,7 +35,7 @@ func (s *Lease) Delete(logger *log.Logger, req *http.Request) (statusCode int, r
 		logger.Println("restocking inventory...")
 		s.ReStock()
 		statusCode = http.StatusAccepted
-		response = s
+		response = s.Task
 
 	} else {
 		response = map[string]string{"error": err.Error()}
@@ -56,7 +56,7 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 		logger.Println("obtaining lease...", s)
 		s.Procurement()
 		statusCode = http.StatusCreated
-		response = s
+		response = s.Task
 
 	} else {
 		response = map[string]string{"error": err.Error()}
