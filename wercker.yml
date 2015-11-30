@@ -48,6 +48,15 @@ build:
         code: |
           cp -R ./ ${WERCKER_OUTPUT_DIR}
 
+  after-steps:
+    - script:
+        name: coveralls upload
+        code: |
+          go get github.com/axw/gocov/gocov
+          go get github.com/mattn/goveralls
+          export GIT_BRANCH=$WERCKER_GIT_BRANCH
+          ./coverage --coveralls
+
 deploy:
   steps: 
     - script:
