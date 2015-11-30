@@ -5,6 +5,8 @@ leasing service for pez resources
 
 [![GoDoc](https://godoc.org/github.com/pivotal-pez/pezdispenser?status.png)](http://godoc.org/github.com/pivotal-pez/pezdispenser)
 
+[![Coverage Status](https://coveralls.io/repos/pivotal-pez/pezdispenser/badge.svg?branch=master&service=github)](https://coveralls.io/github/pivotal-pez/pezdispenser?branch=master)
+
 
 
 ## Running tests / build pipeline locally
