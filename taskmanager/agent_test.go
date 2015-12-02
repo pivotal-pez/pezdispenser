@@ -14,43 +14,6 @@ import (
 var _ = Describe("Agent", func() {
 	AgentTaskPollerInterval = time.Duration(0)
 	Describe("given a NewAgent func", func() {
-		Context("when called with a given a task", func() {
-
-			var (
-				controlAgent       *Agent
-				controlTaskManager = &fakes.FakeTaskManager{
-					ExpireEmitter: make(chan int64, 1),
-				}
-				controlCallerName = "fake-caller"
-			)
-			BeforeEach(func() {
-				controlAgent = NewAgent(controlTaskManager, controlCallerName)
-			})
-			XIt("then it should leverage a pre-initialized task passed by the caller", func() {
-				controlAgent.Run(func(*Agent) (err error) { return })
-				select {
-				case <-controlTaskManager.ExpireEmitter:
-				default:
-					Ω(controlAgent.GetTask()).ShouldNot(BeNil())
-					Ω(controlAgent.GetTask().CallerName).Should(Equal(controlCallerName))
-					close(controlTaskManager.ExpireEmitter)
-				}
-			})
-
-			XIt("then it should not block, executing the function in the background", func() {
-				controlAgent.Run(func(*Agent) error {
-					time.Sleep(time.Duration(10) * time.Second)
-					return nil
-				})
-
-				select {
-				case <-controlTaskManager.ExpireEmitter:
-				default:
-					Eventually(<-controlAgent.GetStatus()).Should(Equal(AgentTaskStatusRunning))
-					close(controlTaskManager.ExpireEmitter)
-				}
-			})
-		})
 		Context("when the long running process exits without error", func() {
 
 			var (
