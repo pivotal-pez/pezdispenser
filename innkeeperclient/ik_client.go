@@ -12,16 +12,16 @@ import (
 
 // New - create a new api client
 func New(log logger) (clnt InnkeeperClient) {
-	sPort := os.Getenv("INKEEPER_PORT")
+	sPort := os.Getenv("INNKEEPER_PORT")
 	port, err := strconv.Atoi(sPort)
 	if err != nil {
 		port = 5555
 	}
 	clnt = &IkClient{
-		Host:     os.Getenv("INKEEPER_HOST"),
+		Host:     os.Getenv("INNKEEPER_HOST"),
 		Port:     port,
-		User:     os.Getenv("INKEEPER_USER"),
-		Password: os.Getenv("INKEEPER_PASSWORD"),
+		User:     os.Getenv("INNKEEPER_USER"),
+		Password: os.Getenv("INNKEEPER_PASSWORD"),
 		Log:      log,
 	}
 	return

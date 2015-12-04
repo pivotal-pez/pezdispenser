@@ -10,7 +10,7 @@ import (
 
 func isEnabled() (bool){
 	for _, propSuffix := range []string{"ENABLE", "USER", "PASSWORD", "HOST"} {
-		propName := "INKEEPER_" + propSuffix
+		propName := "INNKEEPER_" + propSuffix
 		if _, found := os.LookupEnv(propName); !found {
 			fmt.Println(propName + " Is not defined")
 			return false
