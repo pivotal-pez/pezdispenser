@@ -1,6 +1,10 @@
 package skurepo
 
-import "github.com/pivotal-pez/pezdispenser/taskmanager"
+import (
+	"time"
+
+	"github.com/pivotal-pez/pezdispenser/taskmanager"
+)
 
 type (
 	//Sku - interface for a sku object
@@ -17,5 +21,7 @@ type (
 		FindAndStallTaskForCaller(callerName string) (t *taskmanager.Task, err error)
 		FindTask(id string) (t *taskmanager.Task, err error)
 		NewTask(n string, p taskmanager.ProfileType, s string) (t *taskmanager.Task)
+		ScheduleTask(t *taskmanager.Task, expireTime time.Time)
 	}
+	
 )
