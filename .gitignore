@@ -33,3 +33,4 @@ _steps/
 pezdispenser
 coverage.out
 local_wercker_configs
+.project

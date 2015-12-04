@@ -6,6 +6,7 @@ import (
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
 	_ "github.com/pivotal-pez/pezdispenser/skus/2csmall"
+	_ "github.com/pivotal-pez/pezdispenser/skus/m1small"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
