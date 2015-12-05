@@ -1,22 +1,13 @@
-box: google/golang
+box: golang
 services:
     - mongo
+    - redis
+
 dev:
   # The steps that will be executed on build
   steps:
-    - script:
-        name: temporarily set gopath to work with setup-go-workspace step
-        code: |
-          export GOPATH_OLD=$GOPATH
-          export GOPATH=/go/src/app/_gopath
-
     - setup-go-workspace:
       package-dir: github.com/pivotal-pez/pezdispenser
-
-    - script:
-        name: unset temporarily set gopath
-        code: |
-          export GOPATH=$GOPATH_OLD
 
     - script:
         name: env
