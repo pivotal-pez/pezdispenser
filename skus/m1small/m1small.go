@@ -28,6 +28,7 @@ func (s *SkuM1Small) Procurement() (*taskmanager.Task) {
 			tsk := ag.GetTask()
 			tsk.Status = "ok"
 			tsk.SetPublicMeta("phinfo", phinfo)
+			s.TaskManager.SaveTask(tsk)
 			return
 		})
 	return task
