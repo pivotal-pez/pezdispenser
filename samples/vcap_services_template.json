@@ -28,6 +28,17 @@
             "target-url": "https://hcfdev.pezapp.io/valid-key"
           },
           "syslog_drain_url": ""
+        },
+        {
+          "name": "innkeeper-service",
+          "label": "user-provided",
+          "tags": [],
+          "credentials": {
+            "uri": "xxxx",
+            "password": "xxxx",
+            "user": "xxxx"
+          },
+          "syslog_drain_url": ""
         }
       ]
     }
