@@ -39,16 +39,22 @@ func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (e
 		BasicAuthUsername: s.User,
 		BasicAuthPassword: s.Password,
 		QueryString:       query}.Do()
-	if err == nil && res.StatusCode < 300 {
+	
+	if err != nil{
+		s.Log.Println(err)
+		fmt.Println(err.Error())
+		return err
+	}
+	
+	if res.StatusCode < 300 {
 		res.Body.FromJsonTo(jsonResp)
-		fmt.Println(res.Body.ToString())
 	} else {
 		s.Log.Println(res.Body.ToString())
-		s.Log.Println(err)
 		strerr, err := res.Body.ToString()
 		if err == nil {
 			err = errors.New(strerr)
-		}
+		}		
+		s.Log.Println(err)
 	}
 	return
 }
