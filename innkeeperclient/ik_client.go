@@ -14,7 +14,7 @@ import (
 func New(log logger) (clnt InnkeeperClient) {
 	if appEnv, err := cfenv.Current(); err == nil {
 
-		if taskService, err := appEnv.Services.WithName("inkeeper-service"); err == nil {
+		if taskService, err := appEnv.Services.WithName("innkeeper-service"); err == nil {
 				clnt = &IkClient{
 			Uri: taskService.Credentials["uri"].(string),
 			Password: taskService.Credentials["password"].(string),

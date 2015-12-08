@@ -11,7 +11,7 @@ import (
 func isEnabled() bool {
 
 	if appEnv, err := cfenv.Current(); err == nil {
-		if taskService, err := appEnv.Services.WithName("inkeeper-service"); err == nil {
+		if taskService, err := appEnv.Services.WithName("innkeeper-service"); err == nil {
 			if taskService.Credentials["enable"].(string) == "1" {
 				return true
 			}
