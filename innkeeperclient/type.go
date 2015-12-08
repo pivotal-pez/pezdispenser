@@ -11,8 +11,7 @@ type (
 	}
 	// IkClient api struct
 	IkClient struct {
-		Host     string
-		Port     int
+		Uri     string
 		User     string
 		Password string
 		Log      logger

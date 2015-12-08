@@ -4,25 +4,30 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"os"
 	"strconv"
-
+	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/franela/goreq"
+	"github.com/xchapter7x/lo"
 )
 
 // New - create a new api client
 func New(log logger) (clnt InnkeeperClient) {
-	sPort := os.Getenv("INNKEEPER_PORT")
-	port, err := strconv.Atoi(sPort)
-	if err != nil {
-		port = 5555
-	}
-	clnt = &IkClient{
-		Host:     os.Getenv("INNKEEPER_HOST"),
-		Port:     port,
-		User:     os.Getenv("INNKEEPER_USER"),
-		Password: os.Getenv("INNKEEPER_PASSWORD"),
-		Log:      log,
+	if appEnv, err := cfenv.Current(); err == nil {
+
+		if taskService, err := appEnv.Services.WithName("inkeeper-service"); err == nil {
+				clnt = &IkClient{
+			Uri: taskService.Credentials["uri"].(string),
+			Password: taskService.Credentials["password"].(string),
+			User: taskService.Credentials["user"].(string),
+			Log: log,
+			}
+
+		} else {
+			lo.G.Error("Experienced an error trying to grab innkeeper service binding information:", err.Error())
+		}
+
+	} else {
+		lo.G.Error("error parsing current cfenv: ", err.Error())
 	}
 	return
 }
@@ -30,7 +35,7 @@ func New(log logger) (clnt InnkeeperClient) {
 // call -- generic call to the inkeeper endpoint
 func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (err error) {
 	res, err := goreq.Request{
-		Uri:               "http://" + s.Host + ":" + strconv.Itoa(s.Port) + "/" + path,
+		Uri:               s.Uri + "/" + path,
 		BasicAuthUsername: s.User,
 		BasicAuthPassword: s.Password,
 		QueryString:       query}.Do()

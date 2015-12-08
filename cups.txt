@@ -3,3 +3,4 @@ cf cups pezvalidator-service -p "target-url"
 # cf create-service p-mongodb development dispenser-task-service  
 cf cups dispenser-task-service -p "database, host, password, port, scheme, uri, username"
 cf cups pezdispenser-2csmall-vcd-1 -p "username, password, base_uri"
+cf cups innkeeper-service -p "enable, user, password, uri"

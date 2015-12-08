@@ -1,25 +1,27 @@
 package m1small
 
 import (
+	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/pivotal-pez/pezdispenser/innkeeperclient"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
-	"os"
-	"fmt"
+	"github.com/xchapter7x/lo"
 )
 
-func isEnabled() (bool){
-	for _, propSuffix := range []string{"ENABLE", "USER", "PASSWORD", "HOST"} {
-		propName := "INNKEEPER_" + propSuffix
-		if _, found := os.LookupEnv(propName); !found {
-			fmt.Println(propName + " Is not defined")
-			return false
+func isEnabled() bool {
+
+	if appEnv, err := cfenv.Current(); err == nil {
+		if taskService, err := appEnv.Services.WithName("inkeeper-service"); err == nil {
+			if taskService.Credentials["enable"].(string) == "1" {
+				return true
+			}
 		}
 	}
-	return true
+	lo.G.Error("m1small not enabled")
+	return false
 }
 func init() {
-	if isEnabled(){
+	if isEnabled() {
 		skurepo.Register(SkuName, new(SkuM1Small))
 	}
 }
