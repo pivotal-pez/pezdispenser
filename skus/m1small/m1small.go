@@ -24,11 +24,14 @@ func (s *SkuM1Small) Procurement() (*taskmanager.Task) {
 	task := agent.GetTask()
 	
 	agent.Run( func (ag *taskmanager.Agent) (err error){
-			phinfo, err := s.Client.ProvisionHost("PAO", "4D.lowmem.R7", 1, "pez-stage", "centos67")
-			tsk := ag.GetTask()
-			tsk.Status = "ok"
-			tsk.SetPublicMeta("phinfo", phinfo)
-			s.TaskManager.SaveTask(tsk)
+			phinfo, err := s.Client.ProvisionHost("PAO", "4D.lowmem.R7", 1, "pez-stage", "centos67")			
+			if err != nil{
+				tsk := ag.GetTask()
+				tsk.Status = "ok"
+				tsk.SetPublicMeta("phinfo", phinfo)
+				s.TaskManager.SaveTask(tsk)
+			}
+			// else agent will update the task with error			
 			return
 		})
 	return task
