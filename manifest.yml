@@ -7,6 +7,7 @@ applications:
     - pezvalidator-service
     - dispenser-task-service
     - pezdispenser-2csmall-vcd-1
+    - innkeeper-service
   env:
     UPS_PEZVALIDATOR_NAME: pezvalidator-service
     UPS_PEZVALIDATOR_TARGET: target-url
