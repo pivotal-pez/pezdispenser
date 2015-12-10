@@ -10,7 +10,6 @@ import (
 	"github.com/pivotal-pez/pezdispenser/service"
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
-	"github.com/pivotal-pez/pezdispenser/skus/2csmall"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/pivotal-pez/pezdispenser/vcloudclient"
 	"labix.org/v2/mgo"
@@ -55,34 +54,24 @@ const (
 			}`
 )
 
-//MakeFakeSku2CSmall ---
-func MakeFakeSku2CSmall(status string) (*s2csmall.Sku2CSmall, *taskmanager.Task, *taskmanager.Task) {
+//MakeFakeSku ---
+func MakeFakeSku(status string) (*FakeSku, *taskmanager.Task, *taskmanager.Task) {
 	spyTask := &taskmanager.Task{
-		ID:      bson.NewObjectId(),
-		Expires: time.Now().UnixNano(),
-		PrivateMetaData: map[string]interface{}{
-			s2csmall.VCDTaskElementHrefMetaName: "vcdTask.url.com/hithere",
-			taskmanager.TaskActionMetaName:      s2csmall.TaskActionUnDeploy,
-		},
+		ID:              bson.NewObjectId(),
+		Expires:         time.Now().UnixNano(),
+		PrivateMetaData: map[string]interface{}{},
 	}
 	myFakeManager := &FakeTaskManager{
 		ReturnedTask: spyTask,
 		SpyTaskSaved: new(taskmanager.Task),
 	}
-	s := new(s2csmall.Sku2CSmall).New(myFakeManager, make(map[string]interface{})).(*s2csmall.Sku2CSmall)
-	s.Client = &FakeVCDClient{
-		FakeVApp:               new(vcloudclient.VApp),
-		FakeVAppTemplateRecord: new(vcloudclient.VAppTemplateRecord),
-		ErrPollTaskURL:         nil,
-		FakeTaskElem: &vcloudclient.TaskElem{
-			Status: status,
-		},
-	}
+	s := new(FakeSku)
 	return s, spyTask, myFakeManager.SpyTaskSaved
 }
 
 //FakeSku -- a fake sku object
 type FakeSku struct {
+	skurepo.Sku
 	ProcurementTask *taskmanager.Task
 	ReStockTask     *taskmanager.Task
 }

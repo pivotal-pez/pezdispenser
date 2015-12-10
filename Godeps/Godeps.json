@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/pivotal-pez/pezdispenser",
-	"GoVersion": "go1.5.1",
+	"GoVersion": "go1.5.2",
 	"Packages": [
 		"./..."
 	],
@@ -52,8 +52,8 @@
 		},
 		{
 			"ImportPath": "github.com/pivotal-pez/pezauth/keycheck",
-			"Comment": "v0.0.160",
-			"Rev": "50522c31d20cb4973bc749dc97fa0ec3e90141fe"
+			"Comment": "v0.0.162-2-g81f8ba1",
+			"Rev": "81f8ba1bc30101d97a611f87473d6fd44795a487"
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/cloudcontroller-client",

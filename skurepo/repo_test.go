@@ -11,7 +11,7 @@ import (
 var _ = Describe("repo", func() {
 	var (
 		controlSkuKey = "myRegisteredSku"
-		mySku, _, _   = fakes.MakeFakeSku2CSmall(vcloudclient.TaskStatusSuccess)
+		mySku, _, _   = fakes.MakeFakeSku(vcloudclient.TaskStatusSuccess)
 	)
 	Describe("given: a Register() method", func() {
 		Context("when: passed a name and a Sku interface", func() {
