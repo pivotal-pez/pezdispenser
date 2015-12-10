@@ -22,12 +22,14 @@ func isEnabled() bool {
 }
 func init() {
 	if isEnabled() {
-		skurepo.Register(SkuName, new(SkuM1Small))
+		s := new(SkuM1Small)
+		s.Client = innkeeperclient.New()
+		skurepo.Register(SkuName, s)
 	}
 }
 
 type (
-	//SkuM1Small - a object representing a m1small sku
+	//SkuM1Small - a object representing a m1small sku implements skurepo.Sku
 	SkuM1Small struct {
 		Client          innkeeperclient.InnkeeperClient
 		TaskManager     taskmanager.TaskManagerInterface

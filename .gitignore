@@ -34,3 +34,6 @@ pezdispenser
 coverage.out
 local_wercker_configs
 .project
+ik_client_cli
+.settings/*
+.externalToolBuilders/*

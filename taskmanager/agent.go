@@ -27,7 +27,10 @@ func (s *Agent) Run(process func(*Agent) error) {
 
 	go func(agent Agent) {
 		s := &agent
+		fmt.Println("Running Agent process")
 		err := process(s)
+		fmt.Println("Done Agent process", err)
+		
 		s.taskPollEmitter <- false
 
 		select {

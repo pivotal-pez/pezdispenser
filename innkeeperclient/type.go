@@ -6,7 +6,7 @@ type (
 	}
 	// InnkeeperClient api client
 	InnkeeperClient interface {
-		ProvisionHost(geoLoc string, sku string, count int, tenantid string, osarg string) (result ProvisionHostResponse, err error)
+		ProvisionHost(geoLoc string, sku string, count int, tenantid string, osarg string) (result *ProvisionHostResponse, err error)
 		GetTenants() (result GetTenantsResponse, err error)
 	}
 	// IkClient api struct

@@ -11,7 +11,7 @@ import (
 )
 
 // New - create a new api client
-func New(log logger) (clnt InnkeeperClient) {
+func New() (clnt InnkeeperClient) {
 	if appEnv, err := cfenv.Current(); err == nil {
 
 		if taskService, err := appEnv.Services.WithName("innkeeper-service"); err == nil {
@@ -19,7 +19,6 @@ func New(log logger) (clnt InnkeeperClient) {
 			Uri: taskService.Credentials["uri"].(string),
 			Password: taskService.Credentials["password"].(string),
 			User: taskService.Credentials["user"].(string),
-			Log: log,
 			}
 
 		} else {
@@ -67,13 +66,14 @@ func (s *IkClient) GetTenants() (info GetTenantsResponse, err error) {
 
 // ProvisionHost -- given info provision a host in inkeeper
 // "http://pez-app.core.pao.pez.pivotal.io:5555/api/v1/ProvisionHost?geo_loc=PAO&sku=4D.lowmem.R7&os=esxi60u2&count=1&feature=&tenantid=pez-stage"
-func (s *IkClient) ProvisionHost(geoLoc string, sku string, count int, tenantid string, osarg string) (info ProvisionHostResponse, err error) {
+func (s *IkClient) ProvisionHost(geoLoc string, sku string, count int, tenantid string, osarg string) (info *ProvisionHostResponse, err error) {
+	info = new(ProvisionHostResponse)
 	qp := url.Values{}
 	qp.Add("goe_loc", geoLoc)
 	qp.Add("sku", sku)
 	qp.Add("count", strconv.Itoa(count))
 	qp.Add("tenantid", tenantid)
 	qp.Add("os", osarg)
-	err = s.call("api/v1/ProvisionHost", qp, &info)
+	err = s.call("api/v1/ProvisionHost", qp, info)
 	return
 }
