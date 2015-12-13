@@ -19,9 +19,12 @@ func NewAgent(t TaskManagerInterface, callerName string) *Agent {
 
 //Run - this begins the running of an agent's async process
 func (s *Agent) Run(process func(*Agent) error) {
-	s.task.Status = AgentTaskStatusRunning
+	s.task.Update(func (t *Task) (interface{}){
+			t.TaskManager = s.taskManager
+			t.Status = AgentTaskStatusRunning
+			return t
+			})
 	s.statusEmitter <- s.task.Status
-	s.taskManager.SaveTask(s.task)
 	go s.startTaskPoller()
 	go s.listenForPoll()
 
@@ -74,8 +77,10 @@ ForLoop:
 
 func (s *Agent) listenForPoll() {
 	for <-s.taskPollEmitter {
-		s.task.Expires = time.Now().Add(AgentTaskPollerTimeout).UnixNano()
-		s.taskManager.SaveTask(s.task)
+		s.task.Update(func (t *Task) (interface{}){
+				t.Expires = time.Now().Add(AgentTaskPollerTimeout).UnixNano()
+				return t
+			})
 	}
 	s.killTaskPoller <- true
 }

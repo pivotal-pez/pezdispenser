@@ -2,7 +2,7 @@ package taskmanager
 
 import (
 	"time"
-
+	"sync"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 
@@ -143,5 +143,7 @@ func (s *TaskManager) NewTask(callerName string, profile ProfileType, status str
 	t.Timestamp = time.Now().UnixNano()
 	t.MetaData = make(map[string]interface{})
 	t.PrivateMetaData = make(map[string]interface{})
+	t.Mutex = sync.RWMutex{}
+	t.TaskManager = s
 	return
 }

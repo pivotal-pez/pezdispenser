@@ -16,7 +16,7 @@ func New() (clnt InnkeeperClient) {
 
 		if taskService, err := appEnv.Services.WithName("innkeeper-service"); err == nil {
 				clnt = &IkClient{
-			Uri: taskService.Credentials["uri"].(string),
+			URI: taskService.Credentials["uri"].(string),
 			Password: taskService.Credentials["password"].(string),
 			User: taskService.Credentials["user"].(string),
 			}
@@ -34,7 +34,7 @@ func New() (clnt InnkeeperClient) {
 // call -- generic call to the inkeeper endpoint
 func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (err error) {
 	res, err := goreq.Request{
-		Uri:               s.Uri + "/" + path,
+		Uri:               s.URI + "/" + path,
 		BasicAuthUsername: s.User,
 		BasicAuthPassword: s.Password,
 		QueryString:       query}.Do()

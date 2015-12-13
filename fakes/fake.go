@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/pivotal-pez/pezdispenser/service"
@@ -60,11 +61,13 @@ func MakeFakeSku(status string) (*FakeSku, *taskmanager.Task, *taskmanager.Task)
 		ID:              bson.NewObjectId(),
 		Expires:         time.Now().UnixNano(),
 		PrivateMetaData: map[string]interface{}{},
+		Mutex:           sync.RWMutex{},
 	}
 	myFakeManager := &FakeTaskManager{
 		ReturnedTask: spyTask,
 		SpyTaskSaved: new(taskmanager.Task),
 	}
+	spyTask.TaskManager = myFakeManager
 	s := new(FakeSku)
 	return s, spyTask, myFakeManager.SpyTaskSaved
 }

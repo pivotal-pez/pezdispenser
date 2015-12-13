@@ -1,10 +1,14 @@
 package taskmanager
 
+import(
+	
+)
 //SetPrivateMeta - set a private meta data record
 func (s *Task) SetPrivateMeta(name string, value interface{}) {
 	if s.PrivateMetaData == nil {
 		s.PrivateMetaData = make(map[string]interface{})
 	}
+	
 	s.PrivateMetaData[name] = value
 }
 
@@ -37,4 +41,20 @@ func (s *Task) GetRedactedVersion() RedactedTask {
 		CallerName: s.CallerName,
 		MetaData:   s.MetaData,
 	}
+}
+// Update -- Safe way to update a task
+func (s *Task) Update(update func(*Task) (interface{})) (interface{}){
+	s.Mutex.Lock()
+	var ret = update(s)
+	s.TaskManager.SaveTask(s)
+	s.Mutex.Unlock()
+	return ret
+}
+
+// Read -- Safe way to read from a task
+func (s *Task) Read(read func(*Task) (interface{})) (interface{}){
+	s.Mutex.RLock()
+	var ret = read(s)
+	s.Mutex.RUnlock()
+	return ret
 }

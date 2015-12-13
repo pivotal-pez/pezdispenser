@@ -21,10 +21,11 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 
 	agent.Run(func(ag *taskmanager.Agent) (err error) {
 		if phinfo, err := s.Client.ProvisionHost("PAO", "4D.lowmem.R7", 1, "pez-stage", "centos67"); err == nil {
-			tsk := ag.GetTask()
-			tsk.Status = taskmanager.AgentTaskStatusComplete
-			tsk.SetPublicMeta(ProvisionHostInfoMetaName, phinfo)
-			s.TaskManager.SaveTask(tsk)
+			ag.GetTask().Update(func(t *taskmanager.Task) interface{} {
+				t.Status = taskmanager.AgentTaskStatusComplete
+				t.SetPublicMeta(ProvisionHostInfoMetaName, phinfo)
+				return t
+			})
 		}
 		return
 	})

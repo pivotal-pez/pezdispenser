@@ -69,7 +69,7 @@ var _ = Describe("Skum1small", func() {
 		Context("when called with valid input", func() {
 			var (
 				task               *taskmanager.Task
-				fakeTaskManager    = new(fakes.FakeTaskManager)
+				fakeTaskManager    *fakes.FakeTaskManager
 				controlInventoryID = "random-guid"
 				controlMessage     = "hi there"
 				controlStatus      = "complete"
@@ -90,7 +90,9 @@ var _ = Describe("Skum1small", func() {
 					"lease_expires": time.Now().UnixNano(),
 					"inventory_id":  controlInventoryID,
 				}
-				fakeTaskManager.SpyTaskSaved = new(taskmanager.Task)
+				fakeTaskManager = &fakes.FakeTaskManager{
+					SpyTaskSaved: new(taskmanager.Task),
+				}
 				sku := s.New(fakeTaskManager, s.ProcurementMeta)
 				skuCast := sku.(*SkuM1Small)
 				task = skuCast.Procurement()
@@ -100,12 +102,18 @@ var _ = Describe("Skum1small", func() {
 			})
 			It("then it should call and wait for response from innkeeper client", func() {
 				Eventually(func() interface{} {
-					return task.GetPublicMeta(ProvisionHostInfoMetaName)
+					return task.Read(func(t *taskmanager.Task) interface{} {
+						return t.GetPublicMeta(ProvisionHostInfoMetaName)
+					})
+
 				}).Should(Equal(controlPHInfo))
 			})
+
 			It("then it should update the exit status on the task", func() {
-				Eventually(func() string {
-					return task.Status
+				Eventually(func() interface{} {
+					return task.Read(func(t *taskmanager.Task) interface{} {
+						return t.Status
+					})
 				}).Should(Equal(taskmanager.AgentTaskStatusComplete))
 			})
 		})
