@@ -30,8 +30,8 @@ type (
 		CallerName      string                 `bson:"caller_name"`
 		MetaData        map[string]interface{} `bson:"metadata"`
 		PrivateMetaData map[string]interface{} `bson:"private_metadata"`
-		Mutex sync.RWMutex
-		TaskManager TaskManagerInterface
+		mutex sync.RWMutex
+		taskManager TaskManagerInterface
 	}
 
 	//TaskManagerInterface ---

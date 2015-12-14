@@ -143,7 +143,7 @@ func (s *TaskManager) NewTask(callerName string, profile ProfileType, status str
 	t.Timestamp = time.Now().UnixNano()
 	t.MetaData = make(map[string]interface{})
 	t.PrivateMetaData = make(map[string]interface{})
-	t.Mutex = sync.RWMutex{}
-	t.TaskManager = s
+	t.mutex = sync.RWMutex{}
+	t.taskManager = s
 	return
 }

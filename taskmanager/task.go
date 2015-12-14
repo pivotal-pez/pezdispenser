@@ -1,7 +1,7 @@
 package taskmanager
 
 import(
-	
+	"sync"
 )
 //SetPrivateMeta - set a private meta data record
 func (s *Task) SetPrivateMeta(name string, value interface{}) {
@@ -44,17 +44,33 @@ func (s *Task) GetRedactedVersion() RedactedTask {
 }
 // Update -- Safe way to update a task
 func (s *Task) Update(update func(*Task) (interface{})) (interface{}){
-	s.Mutex.Lock()
+	s.mutex.Lock()
 	var ret = update(s)
-	s.TaskManager.SaveTask(s)
-	s.Mutex.Unlock()
+	s.taskManager.SaveTask(s)
+	s.mutex.Unlock()
 	return ret
 }
 
 // Read -- Safe way to read from a task
 func (s *Task) Read(read func(*Task) (interface{})) (interface{}){
-	s.Mutex.RLock()
+	s.mutex.RLock()
 	var ret = read(s)
-	s.Mutex.RUnlock()
+	s.mutex.RUnlock()
 	return ret
+}
+
+// Protect -- add mutex and taskmanager protection to task
+func (s *Task) Protect(taskmanager TaskManagerInterface, mutex sync.RWMutex){
+	s.taskManager = taskmanager
+	s.mutex = mutex	
+}
+
+// Equal - define task equality
+func (s Task) Equal (b Task) bool {
+	return (s.ID == b.ID &&
+		s.Timestamp == b.Timestamp &&
+		s.Expires == b.Expires &&
+		s.Status == b.Status &&
+		s.Profile == b.Profile &&
+		s.CallerName == b.CallerName)
 }

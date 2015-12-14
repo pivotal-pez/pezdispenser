@@ -20,7 +20,7 @@ func NewAgent(t TaskManagerInterface, callerName string) *Agent {
 //Run - this begins the running of an agent's async process
 func (s *Agent) Run(process func(*Agent) error) {
 	s.task.Update(func (t *Task) (interface{}){
-			t.TaskManager = s.taskManager
+			t.taskManager = s.taskManager
 			t.Status = AgentTaskStatusRunning
 			return t
 			})
