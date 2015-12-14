@@ -1,8 +1,6 @@
 package m1small_test
 
 import (
-	"os"
-	"time"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
@@ -10,6 +8,8 @@ import (
 	"github.com/pivotal-pez/pezdispenser/innkeeperclient/fake"
 	. "github.com/pivotal-pez/pezdispenser/skus/m1small"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
+	"os"
+	"time"
 )
 
 var VCAP_SERVICES = `{
@@ -69,7 +69,7 @@ var _ = Describe("Skum1small", func() {
 			var (
 				fakeTaskManager    *fakes.FakeTaskManager
 				controlInventoryID = "random-guid"
-				skuCast  *SkuM1Small
+				skuCast            *SkuM1Small
 			)
 			BeforeEach(func() {
 				s := new(SkuM1Small)
@@ -83,11 +83,19 @@ var _ = Describe("Skum1small", func() {
 				sku := s.New(fakeTaskManager, s.ProcurementMeta)
 				skuCast = sku.(*SkuM1Small)
 			})
-			It("should produce new innkeeperclient", func(){
-				skuCast.GetInnkeeperClient()
+			It("should produce new innkeeperclient", func() {
+				_, err := skuCast.GetInnkeeperClient()
+				Ω(err).ShouldNot(HaveOccurred())
 			})
 		})
-		})	
+	})
+	Describe("given .IsEnabled() method", func() {
+		Context("when called with VCAP context setup", func() {
+			It("should return true", func() {
+				Ω(IsEnabled()).Should(Equal(true))
+			})
+		})
+	})
 	Describe("given .Procurement() method", func() {
 		Context("when called with valid input", func() {
 			var (
@@ -101,7 +109,7 @@ var _ = Describe("Skum1small", func() {
 					Status:  controlStatus,
 				}
 				controlClient *fakeinnkeeperclient.IKClient
-				skuCast  *SkuM1Small
+				skuCast       *SkuM1Small
 			)
 			BeforeEach(func() {
 				controlClient = &fakeinnkeeperclient.IKClient{
@@ -139,16 +147,6 @@ var _ = Describe("Skum1small", func() {
 						return t.Status
 					})
 				}).Should(Equal(taskmanager.AgentTaskStatusComplete))
-			})
-			It("then poll should do nothing", func(){
-				skuCast.PollForTasks()
-			})
-			It("then Restock should do nothing", func(){
-				skuCast.ReStock()
-			})
-
-			It("then New should produce a new provider", func(){
-				skuCast.New(fakeTaskManager, skuCast.ProcurementMeta)
 			})
 
 		})

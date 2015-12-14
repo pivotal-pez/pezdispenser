@@ -23,12 +23,14 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 	task := agent.GetTask()
 
 	agent.Run(func(ag *taskmanager.Agent) (err error) {
-		if phinfo, err := s.GetInnkeeperClient().ProvisionHost("PAO", "4D.lowmem.R7", 1, "pez-stage", "centos67"); err == nil {
-			ag.GetTask().Update(func(t *taskmanager.Task) interface{} {
-				t.Status = taskmanager.AgentTaskStatusComplete
-				t.SetPublicMeta(ProvisionHostInfoMetaName, phinfo)
-				return t
-			})
+		if clnt, err := s.GetInnkeeperClient(); err == nil {
+			if phinfo, err := clnt.ProvisionHost("PAO", "4D.lowmem.R7", 1, "pez-stage", "centos67"); err == nil {
+				ag.GetTask().Update(func(t *taskmanager.Task) interface{} {
+					t.Status = taskmanager.AgentTaskStatusComplete
+					t.SetPublicMeta(ProvisionHostInfoMetaName, phinfo)
+					return t
+				})
+			}
 		}
 		return
 	})
@@ -52,7 +54,7 @@ func (s *SkuM1Small) New(tm skurepo.TaskManager, procurementMeta map[string]inte
 }
 
 // InitInnkeeperClient -- initialize innkeeper client based on cf configuration
-func (s *SkuM1Small)InitInnkeeperClient() (clnt innkeeperclient.InnkeeperClient, err error) {
+func (s *SkuM1Small) InitInnkeeperClient() (clnt innkeeperclient.InnkeeperClient, err error) {
 	if appEnv, err := cfenv.Current(); err == nil {
 
 		if taskService, err := appEnv.Services.WithName("innkeeper-service"); err == nil {
@@ -61,19 +63,20 @@ func (s *SkuM1Small)InitInnkeeperClient() (clnt innkeeperclient.InnkeeperClient,
 				User:     taskService.Credentials["user"].(string),
 				Password: taskService.Credentials["password"].(string),
 			}
-		} 
-	} 
+		}
+	}
 	return
 }
 
 // GetInnkeeperClient -- get an innkeeper client and cache it in the object
-func (s *SkuM1Small) GetInnkeeperClient() innkeeperclient.InnkeeperClient {
+func (s *SkuM1Small) GetInnkeeperClient() (innkeeperclient.InnkeeperClient, error) {
+	var err error = nil
 	if s.Client == nil {
 		if clnt, err := s.InitInnkeeperClient(); err == nil {
 			s.Client = clnt
-		} else{
-			lo.G.Error("error parsing current cfenv: ", err.Error())			
+		} else {
+			lo.G.Error("error parsing current cfenv: ", err.Error())
 		}
 	}
-	return s.Client
+	return s.Client, err
 }

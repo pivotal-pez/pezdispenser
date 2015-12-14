@@ -8,7 +8,7 @@ import (
 	"github.com/xchapter7x/lo"
 )
 
-func isEnabled() bool {
+func IsEnabled() bool {
 
 	if appEnv, err := cfenv.Current(); err == nil {
 		if taskService, err := appEnv.Services.WithName("innkeeper-service"); err == nil {
@@ -21,7 +21,7 @@ func isEnabled() bool {
 	return false
 }
 func init() {
-	if isEnabled() {
+	if IsEnabled() {
 		s := new(SkuM1Small)
 		skurepo.Register(SkuName, s)
 	}
