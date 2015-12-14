@@ -3,7 +3,6 @@ package m1small_test
 import (
 	"os"
 	"time"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
@@ -65,6 +64,30 @@ var _ = Describe("Skum1small", func() {
 		os.Setenv("VCAP_APPLICATION", VCAP_APPLICATION)
 		os.Setenv("VCAP_SERVICES", VCAP_SERVICES)
 	})
+	Describe("given .GetInnkeeperClient() method", func() {
+		Context("when called", func() {
+			var (
+				fakeTaskManager    *fakes.FakeTaskManager
+				controlInventoryID = "random-guid"
+				skuCast  *SkuM1Small
+			)
+			BeforeEach(func() {
+				s := new(SkuM1Small)
+				s.ProcurementMeta = map[string]interface{}{
+					"lease_expires": time.Now().UnixNano(),
+					"inventory_id":  controlInventoryID,
+				}
+				fakeTaskManager = &fakes.FakeTaskManager{
+					SpyTaskSaved: new(taskmanager.Task),
+				}
+				sku := s.New(fakeTaskManager, s.ProcurementMeta)
+				skuCast = sku.(*SkuM1Small)
+			})
+			It("should produce new innkeeperclient", func(){
+				skuCast.GetInnkeeperClient()
+			})
+		})
+		})	
 	Describe("given .Procurement() method", func() {
 		Context("when called with valid input", func() {
 			var (
@@ -78,6 +101,7 @@ var _ = Describe("Skum1small", func() {
 					Status:  controlStatus,
 				}
 				controlClient *fakeinnkeeperclient.IKClient
+				skuCast  *SkuM1Small
 			)
 			BeforeEach(func() {
 				controlClient = &fakeinnkeeperclient.IKClient{
@@ -94,7 +118,7 @@ var _ = Describe("Skum1small", func() {
 					SpyTaskSaved: new(taskmanager.Task),
 				}
 				sku := s.New(fakeTaskManager, s.ProcurementMeta)
-				skuCast := sku.(*SkuM1Small)
+				skuCast = sku.(*SkuM1Small)
 				task = skuCast.Procurement()
 			})
 			It("then it should call the innkeeper service to initiate m1small procurement process", func() {
@@ -116,6 +140,17 @@ var _ = Describe("Skum1small", func() {
 					})
 				}).Should(Equal(taskmanager.AgentTaskStatusComplete))
 			})
+			It("then poll should do nothing", func(){
+				skuCast.PollForTasks()
+			})
+			It("then Restock should do nothing", func(){
+				skuCast.ReStock()
+			})
+
+			It("then New should produce a new provider", func(){
+				skuCast.New(fakeTaskManager, skuCast.ProcurementMeta)
+			})
+
 		})
 	})
 })

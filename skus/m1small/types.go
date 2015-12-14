@@ -23,7 +23,6 @@ func isEnabled() bool {
 func init() {
 	if isEnabled() {
 		s := new(SkuM1Small)
-		s.Client = innkeeperclient.New()
 		skurepo.Register(SkuName, s)
 	}
 }

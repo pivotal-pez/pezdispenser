@@ -3,33 +3,20 @@ package innkeeperclient
 import (
 	"errors"
 	"fmt"
+	"github.com/franela/goreq"
 	"net/url"
 	"strconv"
-	"github.com/cloudfoundry-community/go-cfenv"
-	"github.com/franela/goreq"
-	"github.com/xchapter7x/lo"
 )
 
 // New - create a new api client
-func New() (clnt InnkeeperClient) {
-	if appEnv, err := cfenv.Current(); err == nil {
-
-		if taskService, err := appEnv.Services.WithName("innkeeper-service"); err == nil {
-				clnt = &IkClient{
-			URI: taskService.Credentials["uri"].(string),
-			Password: taskService.Credentials["password"].(string),
-			User: taskService.Credentials["user"].(string),
-			}
-
-		} else {
-			lo.G.Error("Experienced an error trying to grab innkeeper service binding information:", err.Error())
-		}
-
-	} else {
-		lo.G.Error("error parsing current cfenv: ", err.Error())
+func New(uri string, user string, password string) (InnkeeperClient){
+	return &IkClient{
+		URI: uri,
+		User: user,
+		Password: password,
 	}
-	return
-}
+} 
+
 
 // call -- generic call to the inkeeper endpoint
 func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (err error) {
@@ -38,13 +25,13 @@ func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (e
 		BasicAuthUsername: s.User,
 		BasicAuthPassword: s.Password,
 		QueryString:       query}.Do()
-	
-	if err != nil{
+
+	if err != nil {
 		s.Log.Println(err)
 		fmt.Println(err.Error())
 		return err
 	}
-	
+
 	if res.StatusCode < 300 {
 		res.Body.FromJsonTo(jsonResp)
 	} else {
@@ -52,7 +39,7 @@ func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (e
 		strerr, err := res.Body.ToString()
 		if err == nil {
 			err = errors.New(strerr)
-		}		
+		}
 		s.Log.Println(err)
 	}
 	return
