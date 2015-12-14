@@ -2,10 +2,10 @@ package innkeeperclient
 
 import (
 	"errors"
-	"fmt"
 	"github.com/franela/goreq"
 	"net/url"
 	"strconv"
+	"github.com/xchapter7x/lo"
 )
 
 // New - create a new api client
@@ -27,8 +27,7 @@ func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (e
 		QueryString:       query}.Do()
 
 	if err != nil {
-		s.Log.Println(err)
-		fmt.Println(err.Error())
+		lo.G.Error(err.Error())
 		return err
 	}
 

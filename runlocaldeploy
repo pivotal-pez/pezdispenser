@@ -26,7 +26,13 @@ then
   echo "$envfile"
   exit 1
 fi
+DOCKER_LOCAL=""
+if [[ $(docker images|grep redis) && $(docker images|grep mongo) && $(docker images|grep golang) ]]; then 
+  echo "Using previously cached docker images"
+  DOCKER_LOCAL="--docker-local"
+fi
+
 
 rm -fR _builds _steps _projects
-wercker --verbose --environment $1 dev --wercker-yml local_wercker_configs/wercker_local_deploy.yml --publish 80
+wercker --verbose --environment $1 dev --wercker-yml local_wercker_configs/wercker_local_deploy.yml --publish 80 ${DOCKER_LOCAL}
 rm -fR _builds _steps _projects
