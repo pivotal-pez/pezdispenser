@@ -19,36 +19,38 @@ func NewAgent(t TaskManagerInterface, callerName string) *Agent {
 
 //Run - this begins the running of an agent's async process
 func (s *Agent) Run(process func(*Agent) error) {
-	s.task.Update(func (t *Task) (interface{}){
-			t.taskManager = s.taskManager
-			t.Status = AgentTaskStatusRunning
-			return t
-			})
-	s.statusEmitter <- s.task.Status
+	s.task.Update(func(t *Task) interface{} {
+		t.taskManager = s.taskManager
+		t.Status = AgentTaskStatusRunning
+		return t
+	})
+	s.statusEmitter <- AgentTaskStatusRunning
 	go s.startTaskPoller()
 	go s.listenForPoll()
 
 	go func(agent Agent) {
 		s := &agent
-		fmt.Println("Running Agent process")
-		err := process(s)
-		fmt.Println("Done Agent process", err)
-		
-		s.taskPollEmitter <- false
-
-		select {
-		case <-s.processComplete:
-			if err == nil {
-				s.task.Status = AgentTaskStatusComplete
-
-			} else {
-				s.task.Status = fmt.Sprintf("status: %s, error: %s", AgentTaskStatusFailed, err.Error())
-			}
-			s.task.Expires = 0
-			s.taskManager.SaveTask(s.task)
-			s.statusEmitter <- s.task.Status
-		}
+		s.processExitHanderlDecorate(process)
+		<-s.processComplete
 	}(*s)
+}
+
+func (s *Agent) processExitHanderlDecorate(process func(*Agent) error) {
+	err := process(s)
+	fmt.Println("Done Agent process", process, err)
+
+	s.taskPollEmitter <- false
+
+	status := AgentTaskStatusComplete
+	if err != nil {
+		status = fmt.Sprintf("status: %s, error: %s", AgentTaskStatusFailed, err.Error())
+	}
+	s.task.Update(func(t *Task) interface{} {
+		t.Status = status
+		t.Expires = 0
+		return t
+	})
+	s.statusEmitter <- status
 }
 
 //GetTask - get the agents task object
@@ -77,10 +79,10 @@ ForLoop:
 
 func (s *Agent) listenForPoll() {
 	for <-s.taskPollEmitter {
-		s.task.Update(func (t *Task) (interface{}){
-				t.Expires = time.Now().Add(AgentTaskPollerTimeout).UnixNano()
-				return t
-			})
+		s.task.Update(func(t *Task) interface{} {
+			t.Expires = time.Now().Add(AgentTaskPollerTimeout).UnixNano()
+			return t
+		})
 	}
 	s.killTaskPoller <- true
 }

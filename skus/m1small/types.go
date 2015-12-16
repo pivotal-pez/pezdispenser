@@ -8,6 +8,7 @@ import (
 	"github.com/xchapter7x/lo"
 )
 
+// IsEnabled -- Check if this sku is enabled using cf env
 func IsEnabled() bool {
 
 	if appEnv, err := cfenv.Current(); err == nil {
@@ -22,9 +23,14 @@ func IsEnabled() bool {
 }
 func init() {
 	if IsEnabled() {
-		s := new(SkuM1Small)
-		skurepo.Register(SkuName, s)
+		Init()
 	}
+}
+
+// Init - externally available init method
+func Init() {
+	s := new(SkuM1Small)
+	skurepo.Register(SkuName, s)
 }
 
 type (

@@ -2,6 +2,7 @@ package taskmanager
 
 import(
 	"sync"
+	"fmt"
 )
 //SetPrivateMeta - set a private meta data record
 func (s *Task) SetPrivateMeta(name string, value interface{}) {
@@ -32,7 +33,8 @@ func (s *Task) GetPrivateMeta(name string) interface{} {
 
 //GetRedactedVersion - returns a redacted version of this task, removing private info
 func (s *Task) GetRedactedVersion() RedactedTask {
-	return RedactedTask{
+	s.mutex.RLock()
+	rt := RedactedTask{
 		ID:         s.ID,
 		Timestamp:  s.Timestamp,
 		Expires:    s.Expires,
@@ -41,6 +43,8 @@ func (s *Task) GetRedactedVersion() RedactedTask {
 		CallerName: s.CallerName,
 		MetaData:   s.MetaData,
 	}
+	s.mutex.RUnlock()
+	return rt
 }
 // Update -- Safe way to update a task
 func (s *Task) Update(update func(*Task) (interface{})) (interface{}){
@@ -73,4 +77,11 @@ func (s Task) Equal (b Task) bool {
 		s.Status == b.Status &&
 		s.Profile == b.Profile &&
 		s.CallerName == b.CallerName)
+}
+
+func (s Task) String() string {
+	s.mutex.RLock()
+	str := fmt.Sprintln(s.CallerName, s.Expires, s.ID, s.MetaData, s.Profile)
+	s.mutex.RUnlock()
+	return str
 }

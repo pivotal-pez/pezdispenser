@@ -30,9 +30,11 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 					t.SetPublicMeta(ProvisionHostInfoMetaName, phinfo)
 					return t
 				})
-			}
+			} else {
+				return err
+			} 
 		}
-		return
+		return err
 	})
 
 	return task
@@ -70,7 +72,7 @@ func (s *SkuM1Small) InitInnkeeperClient() (clnt innkeeperclient.InnkeeperClient
 
 // GetInnkeeperClient -- get an innkeeper client and cache it in the object
 func (s *SkuM1Small) GetInnkeeperClient() (innkeeperclient.InnkeeperClient, error) {
-	var err error = nil
+	var err error
 	if s.Client == nil {
 		if clnt, err := s.InitInnkeeperClient(); err == nil {
 			s.Client = clnt

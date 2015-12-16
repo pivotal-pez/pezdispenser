@@ -105,6 +105,7 @@ func (s *TaskManager) SubscribeToSchedule(callerName string) (subscription chan 
 	return
 }
 
+// ScheduleTask --
 func (s *TaskManager) ScheduleTask(t *Task, expireTime time.Time) {
 	t.Expires = expireTime.UnixNano()
 	t.Profile = TaskAgentScheduledTask
@@ -112,6 +113,7 @@ func (s *TaskManager) ScheduleTask(t *Task, expireTime time.Time) {
 	return
 }
 
+// GarbageCollectExpiredAgents --
 func (s *TaskManager) GarbageCollectExpiredAgents(callerName string) (changeInfo *mgo.ChangeInfo, err error) {
 	nowEpoch := time.Now().UnixNano()
 	changeInfo, err = s.taskCollection.FindAndModify(

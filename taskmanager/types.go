@@ -1,8 +1,8 @@
 package taskmanager
 
 import (
-	"time"
 	"sync"
+	"time"
 
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"labix.org/v2/mgo/bson"
@@ -30,8 +30,8 @@ type (
 		CallerName      string                 `bson:"caller_name"`
 		MetaData        map[string]interface{} `bson:"metadata"`
 		PrivateMetaData map[string]interface{} `bson:"private_metadata"`
-		mutex sync.RWMutex
-		taskManager TaskManagerInterface
+		mutex           sync.RWMutex
+		taskManager     TaskManagerInterface
 	}
 
 	//TaskManagerInterface ---

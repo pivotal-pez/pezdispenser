@@ -6,9 +6,13 @@ import (
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
 	//Register m1small
-	_ "github.com/pivotal-pez/pezdispenser/skus/m1small"
+	"github.com/pivotal-pez/pezdispenser/skus/m1small"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
+
+func init() {
+	m1small.Init()
+}
 
 var onceLoadInventoryPoller sync.Once
 

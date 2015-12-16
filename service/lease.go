@@ -65,34 +65,41 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 }
 
 //ReStock - this will reclaim resources for a given lease
-func (s *Lease) ReStock() {
+func (s *Lease) ReStock() (skuTask *taskmanager.Task){
 
 	if skuConstructor, ok := s.availableSkus[s.Sku]; ok {
 		s.ProcurementMeta[InventoryIDFieldName] = s.InventoryID
 		sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
-		s.Task = sku.ReStock().GetRedactedVersion()
+		skuTask = sku.ReStock()
+		s.Task = skuTask.GetRedactedVersion()
 
 	} else {
 		s.Task.Status = TaskStatusUnavailable
 	}
+	return
 }
 
 //Procurement - method to issue a procurement request for the given lease item.
-func (s *Lease) Procurement() {
+func (s *Lease) Procurement() (skuTask *taskmanager.Task) {
 
 	if skuConstructor, ok := s.availableSkus[s.Sku]; ok {
 		s.ProcurementMeta[LeaseExpiresFieldName] = s.LeaseEndDate
 		s.ProcurementMeta[InventoryIDFieldName] = s.InventoryID
 		sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
 		GLogger.Println("here is my sku: ", sku)
-		skuTask := sku.Procurement()
-		GLogger.Println("here is my task after procurement: ", skuTask)
+		skuTask = sku.Procurement()
+		tt := skuTask.Read(func (t * taskmanager.Task) interface{}{
+				tt := *t
+				return tt
+			})
+		GLogger.Println("here is my task after procurement: ", tt)
 		s.Task = skuTask.GetRedactedVersion()
 
 	} else {
-		GLogger.Println("No Sku Match: ", s.Sku)
+		GLogger.Println("No Sku Match: ", s.Sku, s.availableSkus)
 		s.Task.Status = TaskStatusUnavailable
 	}
+	return
 }
 
 //InitFromHTTPRequest - initialize a lease from the http request object body
