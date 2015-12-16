@@ -16,6 +16,9 @@ import (
 
 // PollForTasks -- no longer needed, agent.Run in already asynchronous
 func (s *SkuM1Small) PollForTasks() {
+	if task, err := s.TaskManager.FindAndStallTaskForCaller(SkuName); err == nil {
+		fmt.Println(task)
+	}
 	return
 }
 

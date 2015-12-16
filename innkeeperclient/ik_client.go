@@ -32,14 +32,17 @@ func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (e
 	}
 
 	if res.StatusCode < 300 {
-		res.Body.FromJsonTo(jsonResp)
+		err = res.Body.FromJsonTo(jsonResp)
+		if err != nil {
+			lo.G.Error(err.Error())
+		}
 	} else {
-		s.Log.Println(res.Body.ToString())
+		lo.G.Debug(res.Body.ToString())
 		strerr, err := res.Body.ToString()
 		if err == nil {
 			err = errors.New(strerr)
 		}
-		s.Log.Println(err)
+		lo.G.Error(err.Error())
 	}
 	return
 }
