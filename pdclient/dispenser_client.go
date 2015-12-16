@@ -3,6 +3,7 @@ package pdclient
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -23,7 +24,7 @@ func NewClient(apiKey string, url string, client clientDoer) *PDClient {
 func (s *PDClient) PostLease(leaseId, inventoryId, skuId string, leaseDaysDuration int64) (leaseCreateResponse LeaseCreateResponseBody, res *http.Response, err error) {
 	var body io.Reader
 	if body, err = s.getRequestBody(leaseId, inventoryId, skuId, leaseDaysDuration); err == nil {
-		req, _ := s.createRequest("POST", s.URL, body)
+		req, _ := s.createRequest("POST", fmt.Sprintf("%s/v1/lease", s.URL), body)
 		res, err = s.client.Do(req)
 		resBodyBytes, _ := ioutil.ReadAll(res.Body)
 		json.Unmarshal(resBodyBytes, &leaseCreateResponse)
