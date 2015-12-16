@@ -2,10 +2,13 @@ package pdclient
 
 import (
 	"bytes"
-	"fmt"
+	"encoding/json"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/xchapter7x/lo"
 )
 
 //NewClient - constructor for a new dispenser client
@@ -17,31 +20,37 @@ func NewClient(apiKey string, url string, client clientDoer) *PDClient {
 	}
 }
 
-func (s *PDClient) PostLease(leaseId, inventoryId, skuId string) {
-	req, _ := s.createRequest("POST", s.URL, s.getRequestBody(leaseId, inventoryId, skuId))
-	s.client.Do(req)
+func (s *PDClient) PostLease(leaseId, inventoryId, skuId string, leaseDaysDuration int64) (leaseCreateResponse LeaseCreateResponseBody, res *http.Response, err error) {
+	var body io.Reader
+	if body, err = s.getRequestBody(leaseId, inventoryId, skuId, leaseDaysDuration); err == nil {
+		req, _ := s.createRequest("POST", s.URL, body)
+		res, err = s.client.Do(req)
+		resBodyBytes, _ := ioutil.ReadAll(res.Body)
+		json.Unmarshal(resBodyBytes, &leaseCreateResponse)
+
+	} else {
+		lo.G.Error("request body error: ", err.Error())
+	}
+	return
 }
 
-func (s *PDClient) getRequestBody(leaseId, inventoryId, skuId string) (body io.Reader) {
-	var durationDays int64 = 14
-	now := time.Now()
+func (s *PDClient) getRequestBody(leaseId, inventoryId, skuId string, durationDays int64) (body io.Reader, err error) {
+	var (
+		now       = time.Now()
+		bodyBytes []byte
+	)
 	expire := now.Add(time.Duration(durationDays) * 24 * time.Hour)
-	body = bytes.NewBufferString(
-		fmt.Sprintf(`{
-			"lease_id":"%s",
-			"inventory_id":"%s",
-			"username":"joe@user.net",
-			"sku":"%s",
-			"lease_duration":%d,
-			"lease_end_date":%d,
-			"lease_start_date":%d,
-			"procurement_meta":{}`,
-			leaseId,
-			inventoryId,
-			skuId,
-			durationDays,
-			expire.UnixNano(),
-			now.UnixNano()))
+	leaseBody := LeaseRequestBody{
+		LeaseID:        leaseId,
+		InventoryID:    inventoryId,
+		Sku:            skuId,
+		LeaseDuration:  durationDays,
+		LeaseEndDate:   expire.UnixNano(),
+		LeaseStartDate: now.UnixNano(),
+	}
+	if bodyBytes, err = json.Marshal(leaseBody); err == nil {
+		body = bytes.NewBuffer(bodyBytes)
+	}
 	return
 }
 
