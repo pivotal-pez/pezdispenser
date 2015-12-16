@@ -21,9 +21,9 @@ func NewClient(apiKey string, url string, client clientDoer) *PDClient {
 	}
 }
 
-func (s *PDClient) PostLease(leaseId, inventoryId, skuId string, leaseDaysDuration int64) (leaseCreateResponse LeaseCreateResponseBody, res *http.Response, err error) {
+func (s *PDClient) PostLease(leaseID, inventoryID, skuID string, leaseDaysDuration int64) (leaseCreateResponse LeaseCreateResponseBody, res *http.Response, err error) {
 	var body io.Reader
-	if body, err = s.getRequestBody(leaseId, inventoryId, skuId, leaseDaysDuration); err == nil {
+	if body, err = s.getRequestBody(leaseID, inventoryID, skuID, leaseDaysDuration); err == nil {
 		req, _ := s.createRequest("POST", fmt.Sprintf("%s/v1/lease", s.URL), body)
 
 		if res, err = s.client.Do(req); res.StatusCode == http.StatusOK {
@@ -40,16 +40,16 @@ func (s *PDClient) PostLease(leaseId, inventoryId, skuId string, leaseDaysDurati
 	return
 }
 
-func (s *PDClient) getRequestBody(leaseId, inventoryId, skuId string, durationDays int64) (body io.Reader, err error) {
+func (s *PDClient) getRequestBody(leaseID, inventoryID, skuID string, durationDays int64) (body io.Reader, err error) {
 	var (
 		now       = time.Now()
 		bodyBytes []byte
 	)
 	expire := now.Add(time.Duration(durationDays) * 24 * time.Hour)
 	leaseBody := LeaseRequestBody{
-		LeaseID:        leaseId,
-		InventoryID:    inventoryId,
-		Sku:            skuId,
+		LeaseID:        leaseID,
+		InventoryID:    inventoryID,
+		Sku:            skuID,
 		LeaseDuration:  durationDays,
 		LeaseEndDate:   expire.UnixNano(),
 		LeaseStartDate: now.UnixNano(),
