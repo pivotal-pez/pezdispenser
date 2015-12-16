@@ -25,9 +25,14 @@ func (s *PDClient) PostLease(leaseId, inventoryId, skuId string, leaseDaysDurati
 	var body io.Reader
 	if body, err = s.getRequestBody(leaseId, inventoryId, skuId, leaseDaysDuration); err == nil {
 		req, _ := s.createRequest("POST", fmt.Sprintf("%s/v1/lease", s.URL), body)
-		res, err = s.client.Do(req)
-		resBodyBytes, _ := ioutil.ReadAll(res.Body)
-		json.Unmarshal(resBodyBytes, &leaseCreateResponse)
+
+		if res, err = s.client.Do(req); res.StatusCode == http.StatusOK {
+			resBodyBytes, _ := ioutil.ReadAll(res.Body)
+			json.Unmarshal(resBodyBytes, &leaseCreateResponse)
+
+		} else {
+			err = ErrInvalidDispenserResponse
+		}
 
 	} else {
 		lo.G.Error("request body error: ", err.Error())
