@@ -1,6 +1,9 @@
 package m1small_test
 
 import (
+	"os"
+	"time"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
@@ -8,10 +11,7 @@ import (
 	"github.com/pivotal-pez/pezdispenser/innkeeperclient/fake"
 	. "github.com/pivotal-pez/pezdispenser/skus/m1small"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
-	"os"
-	"time"
 )
-
 
 var _ = Describe("Skum1small", func() {
 	BeforeEach(func() {
@@ -82,9 +82,6 @@ var _ = Describe("Skum1small", func() {
 				sku := s.New(fakeTaskManager, s.ProcurementMeta)
 				skuCast = sku.(*SkuM1Small)
 				task = skuCast.Procurement()
-			})
-			It("then it should call the innkeeper service to initiate m1small procurement process", func() {
-				Ω(task.Status).Should(Equal(taskmanager.AgentTaskStatusRunning))
 			})
 			It("then it should call and wait for response from innkeeper client", func() {
 				Eventually(func() interface{} {
