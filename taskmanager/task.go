@@ -1,15 +1,16 @@
 package taskmanager
 
-import(
-	"sync"
+import (
 	"fmt"
+	"sync"
 )
+
 //SetPrivateMeta - set a private meta data record
 func (s *Task) SetPrivateMeta(name string, value interface{}) {
 	if s.PrivateMetaData == nil {
 		s.PrivateMetaData = make(map[string]interface{})
 	}
-	
+
 	s.PrivateMetaData[name] = value
 }
 
@@ -46,8 +47,9 @@ func (s *Task) GetRedactedVersion() RedactedTask {
 	s.mutex.RUnlock()
 	return rt
 }
+
 // Update -- Safe way to update a task
-func (s *Task) Update(update func(*Task) (interface{})) (interface{}){
+func (s *Task) Update(update func(*Task) interface{}) interface{} {
 	s.mutex.Lock()
 	var ret = update(s)
 	s.taskManager.SaveTask(s)
@@ -56,7 +58,7 @@ func (s *Task) Update(update func(*Task) (interface{})) (interface{}){
 }
 
 // Read -- Safe way to read from a task
-func (s *Task) Read(read func(*Task) (interface{})) (interface{}){
+func (s *Task) Read(read func(*Task) interface{}) interface{} {
 	s.mutex.RLock()
 	var ret = read(s)
 	s.mutex.RUnlock()
@@ -64,13 +66,13 @@ func (s *Task) Read(read func(*Task) (interface{})) (interface{}){
 }
 
 // Protect -- add mutex and taskmanager protection to task
-func (s *Task) Protect(taskmanager TaskManagerInterface, mutex sync.RWMutex){
+func (s *Task) Protect(taskmanager TaskManagerInterface, mutex sync.RWMutex) {
 	s.taskManager = taskmanager
-	s.mutex = mutex	
+	s.mutex = mutex
 }
 
 // Equal - define task equality
-func (s Task) Equal (b Task) bool {
+func (s Task) Equal(b Task) bool {
 	return (s.ID == b.ID &&
 		s.Timestamp == b.Timestamp &&
 		s.Expires == b.Expires &&

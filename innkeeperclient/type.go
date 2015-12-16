@@ -49,9 +49,5 @@ type (
 		    }],
 		    "message": "ok"
 			}
-			{[{"slotid": 1, "tenantid": "tech-support-openstack"},
-				{"slotid": 2, "tenantid": "photon"},
-				{"slotid": 3, "tenantid": "pez-stage"},
-				{"slotid": 4, "tenantid": "photon-2"}]}
 	*/
 )

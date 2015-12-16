@@ -2,21 +2,21 @@ package innkeeperclient
 
 import (
 	"errors"
-	"github.com/franela/goreq"
 	"net/url"
 	"strconv"
+
+	"github.com/franela/goreq"
 	"github.com/xchapter7x/lo"
 )
 
 // New - create a new api client
-func New(uri string, user string, password string) (InnkeeperClient){
+func New(uri string, user string, password string) InnkeeperClient {
 	return &IkClient{
-		URI: uri,
-		User: user,
+		URI:      uri,
+		User:     user,
 		Password: password,
 	}
-} 
-
+}
 
 // call -- generic call to the inkeeper endpoint
 func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (err error) {

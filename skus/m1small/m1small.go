@@ -1,6 +1,8 @@
 package m1small
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/pivotal-pez/pezdispenser/innkeeperclient"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
@@ -32,7 +34,7 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 				})
 			} else {
 				return err
-			} 
+			}
 		}
 		return err
 	})

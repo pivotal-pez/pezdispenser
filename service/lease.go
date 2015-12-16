@@ -65,7 +65,7 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 }
 
 //ReStock - this will reclaim resources for a given lease
-func (s *Lease) ReStock() (skuTask *taskmanager.Task){
+func (s *Lease) ReStock() (skuTask *taskmanager.Task) {
 
 	if skuConstructor, ok := s.availableSkus[s.Sku]; ok {
 		s.ProcurementMeta[InventoryIDFieldName] = s.InventoryID
@@ -88,10 +88,10 @@ func (s *Lease) Procurement() (skuTask *taskmanager.Task) {
 		sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
 		GLogger.Println("here is my sku: ", sku)
 		skuTask = sku.Procurement()
-		tt := skuTask.Read(func (t * taskmanager.Task) interface{}{
-				tt := *t
-				return tt
-			})
+		tt := skuTask.Read(func(t *taskmanager.Task) interface{} {
+			tt := *t
+			return tt
+		})
 		GLogger.Println("here is my task after procurement: ", tt)
 		s.Task = skuTask.GetRedactedVersion()
 

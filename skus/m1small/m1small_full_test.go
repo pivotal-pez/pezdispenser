@@ -1,10 +1,12 @@
 package m1small_test
 
 import (
+	"net/http"
 	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/ghttp"
 	"github.com/pivotal-pez/pezdispenser/fakes"
 	"github.com/pivotal-pez/pezdispenser/service"
 	"github.com/pivotal-pez/pezdispenser/skus/m1small"
