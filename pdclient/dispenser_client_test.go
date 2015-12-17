@@ -44,11 +44,11 @@ var _ = Describe("PDClient struct", func() {
 			controlResProfile := "longpoll_queue"
 			controlResCaller := "m1.small"
 			controlResponseBody := fmt.Sprintf(`{
-				"id": "%s","timestamp": %d,"expires": %d,"status": "%s","profile": "%s","caller_name": "%s",
-				"meta_data": {}
+				"ID": "%s","Timestamp": %d,"Expires": %d,"Status": "%s","Profile": "%s","CallerName": "%s",
+				"MetaData": {}
 			}`, controlResID, controlResTS, controlResExpires, controlResStatus, controlResProfile, controlResCaller)
 			var (
-				leaseCreateResponse LeaseCreateResponseBody
+				leaseCreateResponse TaskResponse
 				res                 *http.Response
 				err                 error
 				fakeClient          *fake.ClientDoer
@@ -96,10 +96,46 @@ var _ = Describe("PDClient struct", func() {
 		})
 	})
 
-	XDescribe("given a GetTask(id) method call", func() {
-		Context("when called with a valid taskguid", func() {
+	Describe("given a GetTask(id) method call", func() {
+		Context("when called with a valid taskid", func() {
+			var (
+				task       TaskResponse
+				res        *http.Response
+				err        error
+				fakeClient *fake.ClientDoer
+				pdclient   *PDClient
+				controlKey = "random-api-key"
+				controlURL = "api.random.io"
+			)
+			controlResID := "560ede8bfccecc0072000001"
+			controlResTS := int64(1443815051336165844)
+			controlResExpires := int64(0)
+			controlResStatus := "complete"
+			controlResProfile := "longpoll_queue"
+			controlResCaller := "m1.small"
+			controlResponseBody := fmt.Sprintf(`{
+				"ID": "%s","Timestamp": %d,"Expires": %d,"Status": "%s","Profile": "%s","CallerName": "%s",
+				"MetaData": {}
+			}`, controlResID, controlResTS, controlResExpires, controlResStatus, controlResProfile, controlResCaller)
+			BeforeEach(func() {
+				fakeClient = &fake.ClientDoer{
+					Response: &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(controlResponseBody)),
+					},
+				}
+				pdclient = NewClient(controlKey, controlURL, fakeClient)
+				task, res, err = pdclient.GetTask(controlResID)
+			})
 			It("then it should receive the task object from the rest endpoint, parse and return it", func() {
-				Ω(true).Should(Equal(false))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(res.StatusCode).Should(Equal(http.StatusOK))
+				Ω(task.ID).Should(Equal(controlResID))
+				Ω(task.Timestamp).Should(Equal(controlResTS))
+				Ω(task.Expires).Should(Equal(controlResExpires))
+				Ω(task.Status).Should(Equal(controlResStatus))
+				Ω(task.Profile).Should(Equal(controlResProfile))
+				Ω(task.CallerName).Should(Equal(controlResCaller))
 			})
 		})
 	})
