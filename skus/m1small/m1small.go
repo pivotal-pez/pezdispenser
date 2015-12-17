@@ -29,12 +29,16 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 
 	agent.Run(func(ag *taskmanager.Agent) (err error) {
 		if clnt, err := s.GetInnkeeperClient(); err == nil {
-			if phinfo, err := clnt.ProvisionHost("PAO", "4D.lowmem.R7", 1, "pez-stage", "centos67"); err == nil {
+			if phinfo, err := clnt.ProvisionHost("m1.small", "pez-stage"); err == nil {
 				ag.GetTask().Update(func(t *taskmanager.Task) interface{} {
 					t.Status = taskmanager.AgentTaskStatusComplete
 					t.SetPublicMeta(ProvisionHostInfoMetaName, phinfo)
 					return t
 				})
+
+				fmt.Println("clients: ", clnt, s.Client)
+				fmt.Println("data: ", phinfo)
+				clnt.GetStatus(phinfo.Data[0].RequestID)
 			} else {
 				return err
 			}

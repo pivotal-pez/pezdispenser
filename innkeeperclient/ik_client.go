@@ -3,7 +3,6 @@ package innkeeperclient
 import (
 	"errors"
 	"net/url"
-	"strconv"
 
 	"github.com/franela/goreq"
 	"github.com/xchapter7x/lo"
@@ -47,6 +46,11 @@ func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (e
 	return
 }
 
+//GetStatus --
+func (s *IkClient) GetStatus(requestID string) (resp *GetStatusResponse, err error) {
+	return
+}
+
 // GetTenants -- /api/v1/GetTenants get current tenants
 func (s *IkClient) GetTenants() (info GetTenantsResponse, err error) {
 	err = s.call("api/v1/GetTenants", nil, &info)
@@ -55,14 +59,11 @@ func (s *IkClient) GetTenants() (info GetTenantsResponse, err error) {
 
 // ProvisionHost -- given info provision a host in inkeeper
 // "http://pez-app.core.pao.pez.pivotal.io:5555/api/v1/ProvisionHost?geo_loc=PAO&sku=4D.lowmem.R7&os=esxi60u2&count=1&feature=&tenantid=pez-stage"
-func (s *IkClient) ProvisionHost(geoLoc string, sku string, count int, tenantid string, osarg string) (info *ProvisionHostResponse, err error) {
+func (s *IkClient) ProvisionHost(sku string, tenantid string) (info *ProvisionHostResponse, err error) {
 	info = new(ProvisionHostResponse)
 	qp := url.Values{}
-	qp.Add("goe_loc", geoLoc)
 	qp.Add("sku", sku)
-	qp.Add("count", strconv.Itoa(count))
 	qp.Add("tenantid", tenantid)
-	qp.Add("os", osarg)
 	err = s.call("api/v1/ProvisionHost", qp, info)
 	return
 }
