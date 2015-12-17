@@ -26,6 +26,7 @@ type (
 		Status  string        `json:"status"`
 	}
 
+	//GetStatusResponse - a status response object
 	GetStatusResponse struct {
 		Data []struct {
 			Name    string `json:"name"`
@@ -46,9 +47,12 @@ type (
 		Message string       `json:"message"`
 		Status  string       `json:"status"`
 	}
+	//RequestData - a request data object
 	RequestData struct {
 		RequestID string `json:"requestid"`
 	}
+
+	//TenantData - a tenant data object
 	TenantData struct {
 		Slotid   int    `json:"slotid"`
 		Tenantid string `json:"tenantid"`
