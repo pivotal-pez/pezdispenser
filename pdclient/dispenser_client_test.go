@@ -2,6 +2,7 @@ package pdclient_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -62,6 +63,19 @@ var _ = Describe("PDClient struct", func() {
 				}
 				pdclient = NewClient(controlKey, controlURL, fakeClient)
 				leaseCreateResponse, res, err = pdclient.PostLease(controlLeaseID, controlInventoryID, controlSkuID, 14)
+			})
+			Context("when clientDoer throws an error", func() {
+				BeforeEach(func() {
+					fakeClient = &fake.ClientDoer{
+						Error:    errors.New("fake error"),
+						Response: &http.Response{},
+					}
+					pdclient = NewClient(controlKey, controlURL, fakeClient)
+					leaseCreateResponse, res, err = pdclient.PostLease(controlLeaseID, controlInventoryID, controlSkuID, 14)
+				})
+				It("then it should return an error through postlease", func() {
+					Ω(err).Should(HaveOccurred())
+				})
 			})
 			It("then it should create a valid request object", func() {
 				body, _ := ioutil.ReadAll(fakeClient.SpyRequest.Body)
