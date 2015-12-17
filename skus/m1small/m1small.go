@@ -2,6 +2,7 @@ package m1small
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/pivotal-pez/pezdispenser/innkeeperclient"
@@ -22,6 +23,53 @@ func (s *SkuM1Small) PollForTasks() {
 	return
 }
 
+//StartPoller --
+func (s *SkuM1Small) StartPoller(requestID string, task *taskmanager.Task) (err error) {
+	var (
+		clnt innkeeperclient.InnkeeperClient
+		resp innkeeperclient.GetStatusResponse
+	)
+
+	if clnt, err = s.GetInnkeeperClient(); err == nil {
+
+		if resp, err = s.waitForStatusComplete(requestID, clnt); err == nil {
+			s.updateTaskForStatusComplete(task, resp)
+		}
+	}
+	return
+}
+
+func (s *SkuM1Small) updateTaskForStatusComplete(task *taskmanager.Task, resp innkeeperclient.GetStatusResponse) {
+	task.Update(func(t *taskmanager.Task) interface{} {
+		t.Status = taskmanager.AgentTaskStatusComplete
+		t.Expires = taskmanager.ExpiredTask
+		t.SetPublicMeta(GetStatusInfoMetaName, resp)
+		return t
+	})
+}
+
+func (s *SkuM1Small) waitForStatusComplete(requestID string, clnt innkeeperclient.InnkeeperClient) (resp innkeeperclient.GetStatusResponse, err error) {
+	respLocal := &innkeeperclient.GetStatusResponse{}
+
+	for {
+
+		if respLocal, err = clnt.GetStatus(requestID); err != nil {
+			lo.G.Error("get status yielded error: ", err)
+
+		} else {
+			resp = *respLocal
+		}
+
+		if resp.Status != taskmanager.AgentTaskStatusComplete {
+			time.Sleep(taskmanager.AgentTaskPollerInterval)
+
+		} else {
+			break
+		}
+	}
+	return
+}
+
 // Procurement -- use agent to run async task
 func (s *SkuM1Small) Procurement() *taskmanager.Task {
 	agent := taskmanager.NewAgent(s.TaskManager, SkuName)
@@ -35,10 +83,7 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 					t.SetPublicMeta(ProvisionHostInfoMetaName, phinfo)
 					return t
 				})
-
-				fmt.Println("clients: ", clnt, s.Client)
-				fmt.Println("data: ", phinfo)
-				clnt.GetStatus(phinfo.Data[0].RequestID)
+				go s.StartPoller(phinfo.Data[0].RequestID, task)
 			} else {
 				return err
 			}
