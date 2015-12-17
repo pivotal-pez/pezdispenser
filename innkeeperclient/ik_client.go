@@ -48,6 +48,10 @@ func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (e
 
 //GetStatus --
 func (s *IkClient) GetStatus(requestID string) (resp *GetStatusResponse, err error) {
+	resp = new(GetStatusResponse)
+	qp := url.Values{}
+	qp.Add("requestid", requestID)
+	err = s.call("api/v1/StatusDetails", qp, resp)
 	return
 }
 

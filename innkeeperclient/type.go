@@ -26,17 +26,18 @@ type (
 		Status  string        `json:"status"`
 	}
 
-	//GetStatusResponse - a status response object
+	//Data --
+	Data struct {
+		Credentials interface{} `json:"credentials"`
+		Status      string      `json:"status"`
+	}
+	//GetStatusResponse -- a status response object
 	GetStatusResponse struct {
-		Data []struct {
-			Name    string `json:"name"`
-			OobIP   string `json:"oob_ip"`
-			OobPw   string `json:"oob_pw"`
-			OobUser string `json:"oob_user"`
-		} `json:"data"`
+		Data    Data   `json:"data"`
 		Message string `json:"message"`
 		Status  string `json:"status"`
 	}
+
 	// GetTenantsResponse -- auto json struct
 	//{[{"slotid": 1, "tenantid": "tech-support-openstack"},
 	//			{"slotid": 2, "tenantid": "photon"},
