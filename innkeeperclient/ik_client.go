@@ -5,7 +5,6 @@ import (
 	"net/url"
 
 	"github.com/franela/goreq"
-	"github.com/xchapter7x/lo"
 )
 
 // New - create a new api client
@@ -24,24 +23,15 @@ func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (e
 		BasicAuthUsername: s.User,
 		BasicAuthPassword: s.Password,
 		QueryString:       query}.Do()
+	if err == nil {
 
-	if err != nil {
-		lo.G.Error(err.Error())
-		return err
-	}
+		if res.StatusCode < 300 {
+			err = res.Body.FromJsonTo(jsonResp)
 
-	if res.StatusCode < 300 {
-		err = res.Body.FromJsonTo(jsonResp)
-		if err != nil {
-			lo.G.Error(err.Error())
-		}
-	} else {
-		lo.G.Debug(res.Body.ToString())
-		strerr, err := res.Body.ToString()
-		if err == nil {
+		} else {
+			strerr, _ := res.Body.ToString()
 			err = errors.New(strerr)
 		}
-		lo.G.Error(err.Error())
 	}
 	return
 }
@@ -57,7 +47,6 @@ func (s *IkClient) GetStatus(requestID string) (resp *GetStatusResponse, err err
 
 // GetTenants -- /api/v1/GetTenants get current tenants
 func (s *IkClient) GetTenants() (info GetTenantsResponse, err error) {
-	err = s.call("api/v1/GetTenants", nil, &info)
 	return
 }
 
