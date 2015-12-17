@@ -57,7 +57,7 @@ var _ = Describe("PDClient struct", func() {
 			BeforeEach(func() {
 				fakeClient = &fake.ClientDoer{
 					Response: &http.Response{
-						StatusCode: http.StatusOK,
+						StatusCode: http.StatusCreated,
 						Body:       ioutil.NopCloser(bytes.NewBufferString(controlResponseBody)),
 					},
 				}
@@ -85,7 +85,7 @@ var _ = Describe("PDClient struct", func() {
 			})
 			It("then it should receive the task object from the rest endpoint, parse and return it", func() {
 				Ω(err).ShouldNot(HaveOccurred())
-				Ω(res.StatusCode).Should(Equal(http.StatusOK))
+				Ω(res.StatusCode).Should(Equal(http.StatusCreated))
 				Ω(leaseCreateResponse.ID).Should(Equal(controlResID))
 				Ω(leaseCreateResponse.Timestamp).Should(Equal(controlResTS))
 				Ω(leaseCreateResponse.Expires).Should(Equal(controlResExpires))
