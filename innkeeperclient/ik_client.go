@@ -17,7 +17,7 @@ func New(uri string, user string, password string) InnkeeperClient {
 }
 
 // call -- generic call to the inkeeper endpoint
-func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (err error) {
+func (s *IkClient) Call(path string, query interface{}, jsonResp interface{}) (err error) {
 	res, err := goreq.Request{
 		Insecure:          true,
 		Uri:               s.URI + "/" + path,
@@ -42,7 +42,7 @@ func (s *IkClient) GetStatus(requestID string) (resp *GetStatusResponse, err err
 	resp = new(GetStatusResponse)
 	qp := url.Values{}
 	qp.Add("requestid", requestID)
-	err = s.call("api/v1/StatusDetails", qp, resp)
+	err = s.Call("api/v1/StatusDetails", qp, resp)
 	return
 }
 
@@ -58,6 +58,6 @@ func (s *IkClient) ProvisionHost(sku string, tenantid string) (info *ProvisionHo
 	qp := url.Values{}
 	qp.Add("sku", sku)
 	qp.Add("tenantid", tenantid)
-	err = s.call("api/v1/ProvisionHost", qp, info)
+	err = s.Call("api/v1/Provision", qp, info)
 	return
 }
