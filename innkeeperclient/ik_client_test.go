@@ -41,6 +41,37 @@ var _ = Describe("Given IkClient", func() {
 			})
 		})
 	})
+	Describe("Given .ProvisionHost()", func() {
+		Context("When called with valid sku and auth on a self signed tls connection", func() {
+			var (
+				err               error
+				res               *ProvisionHostResponse
+				server            *ghttp.Server
+				innkeeperUser     = "admin"
+				innkeeperPassword = "pass"
+			)
+			BeforeEach(func() {
+				server = ghttp.NewTLSServer()
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyBasicAuth(innkeeperUser, innkeeperPassword),
+						ghttp.RespondWith(http.StatusOK, `{ "status": "success", "data": [{"requestid": "28ac758e-a02c-11e5-9531-0050569b9b57"}], "message": "ok" }`),
+					),
+				)
+				ikClient := New(server.URL(), innkeeperUser, innkeeperPassword)
+				res, err = ikClient.ProvisionHost("m1.small", "pez-owner")
+			})
+			AfterEach(func() {
+				server.Close()
+			})
+			It("Then it should respond with success status and a request id", func() {
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(res.Status).Should(Equal(StatusSuccess))
+				Ω(res.Data[0].RequestID).ShouldNot(Equal(""))
+			})
+		})
+	})
+
 	Describe("Given .GetStatus() method", func() {
 
 		Context("When called with a valid requestid and that requestid has a status 'success'", func() {

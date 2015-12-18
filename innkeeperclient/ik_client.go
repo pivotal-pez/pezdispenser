@@ -19,6 +19,7 @@ func New(uri string, user string, password string) InnkeeperClient {
 // call -- generic call to the inkeeper endpoint
 func (s *IkClient) call(path string, query interface{}, jsonResp interface{}) (err error) {
 	res, err := goreq.Request{
+		Insecure:          true,
 		Uri:               s.URI + "/" + path,
 		BasicAuthUsername: s.User,
 		BasicAuthPassword: s.Password,
