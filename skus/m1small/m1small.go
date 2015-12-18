@@ -60,7 +60,7 @@ func (s *SkuM1Small) waitForStatusComplete(requestID string, clnt innkeeperclien
 			resp = *respLocal
 		}
 
-		if resp.Status != taskmanager.AgentTaskStatusComplete {
+		if resp.Data.Status != taskmanager.AgentTaskStatusComplete {
 			time.Sleep(taskmanager.AgentTaskPollerInterval)
 
 		} else {

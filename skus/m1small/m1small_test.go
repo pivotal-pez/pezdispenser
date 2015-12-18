@@ -92,6 +92,7 @@ var _ = Describe("Skum1small", func() {
 			It("then it should update the original lease task metadata with innkeeper info", func() {
 				controlStatusResponse := innkeeperclient.GetStatusResponse{
 					Status: taskmanager.AgentTaskStatusComplete,
+					Data:   innkeeperclient.Data{Status: taskmanager.AgentTaskStatusComplete},
 				}
 				Ω(spyTask.MetaData[GetStatusInfoMetaName].(innkeeperclient.GetStatusResponse)).Should(Equal(controlStatusResponse))
 			})
