@@ -41,6 +41,7 @@ func (s *IKClient) GetStatus(requestID string) (resp *innkeeperclient.GetStatusR
 	atomic.AddInt64(s.SpyStatusCallCount, 1)
 	if atomic.LoadInt64(s.SpyStatusCallCount) > s.StatusCallCountForComplete {
 		resp.Status = taskmanager.AgentTaskStatusComplete
+		resp.Data.Status = taskmanager.AgentTaskStatusComplete
 	}
 	return
 }
