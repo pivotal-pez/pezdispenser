@@ -77,7 +77,7 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 
 	agent.Run(func(ag *taskmanager.Agent) (err error) {
 		if clnt, err := s.GetInnkeeperClient(); err == nil {
-			if phinfo, err := clnt.ProvisionHost("m1.small", "pez-stage"); err == nil {
+			if phinfo, err := clnt.ProvisionHost(ClientSkuName, ClientLeaseOwner); err == nil {
 				ag.GetTask().Update(func(t *taskmanager.Task) interface{} {
 					t.Status = taskmanager.AgentTaskStatusComplete
 					t.SetPublicMeta(ProvisionHostInfoMetaName, phinfo)

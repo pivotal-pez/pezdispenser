@@ -6,4 +6,8 @@ const (
 	// ProvisionHostInfoMetaName -- key name
 	ProvisionHostInfoMetaName = "phinfo"
 	GetStatusInfoMetaName     = "status"
+
+	// ClientSkuName --
+	ClientSkuName    = "m1.small"
+	ClientLeaseOwner = "pez-stage"
 )
