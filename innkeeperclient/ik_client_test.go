@@ -36,7 +36,7 @@ var _ = Describe("Given IkClient", func() {
 		Context("When called with valid auth & arguments", func() {
 
 			BeforeEach(func() {
-				client, server = getConnectedIKClient(ghttp.NewTLSServer())
+				client, server = getConnectedIKClient(ghttp.NewServer())
 				res, err = client.ProvisionHost("m1.small", "pez-owner")
 			})
 			AfterEach(func() {
@@ -49,7 +49,7 @@ var _ = Describe("Given IkClient", func() {
 		Context("When called with valid auth & arguments on a self signed tls connection", func() {
 
 			BeforeEach(func() {
-				client, server = getConnectedIKClient(ghttp.NewServer())
+				client, server = getConnectedIKClient(ghttp.NewTLSServer())
 				res, err = client.ProvisionHost("m1.small", "pez-owner")
 			})
 			AfterEach(func() {
