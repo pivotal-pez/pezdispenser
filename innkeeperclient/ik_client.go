@@ -2,6 +2,7 @@ package innkeeperclient
 
 import (
 	"errors"
+	"net/http"
 	"net/url"
 
 	"github.com/franela/goreq"
@@ -16,6 +17,10 @@ func New(uri string, user string, password string) InnkeeperClient {
 	}
 }
 
+func isStatusOK(statusCode int) bool {
+	return (statusCode == http.StatusOK || statusCode == http.StatusCreated || statusCode == http.StatusAccepted)
+}
+
 // call -- generic call to the inkeeper endpoint
 func (s *IkClient) Call(path string, query interface{}, jsonResp interface{}) (err error) {
 	res, err := goreq.Request{
@@ -26,7 +31,7 @@ func (s *IkClient) Call(path string, query interface{}, jsonResp interface{}) (e
 		QueryString:       query}.Do()
 	if err == nil {
 
-		if res.StatusCode < 300 {
+		if isStatusOK(res.StatusCode) {
 			err = res.Body.FromJsonTo(jsonResp)
 
 		} else {
