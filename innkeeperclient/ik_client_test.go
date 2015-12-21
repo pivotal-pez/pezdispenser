@@ -10,30 +10,68 @@ import (
 	"github.com/onsi/gomega/ghttp"
 )
 
+func getConnectedIKClient(server *ghttp.Server) (InnkeeperClient, *ghttp.Server) {
+	var (
+		innkeeperUser     = "admin"
+		innkeeperPassword = "pass"
+	)
+	server.AppendHandlers(
+		ghttp.CombineHandlers(
+			ghttp.VerifyBasicAuth(innkeeperUser, innkeeperPassword),
+			ghttp.RespondWith(http.StatusOK, `{ "status": "success", "data": [{"requestid": "28ac758e-a02c-11e5-9531-0050569b9b57"}], "message": "ok" }`),
+		),
+	)
+	return New(server.URL(), innkeeperUser, innkeeperPassword), server
+}
+
 var _ = Describe("Given IkClient", func() {
-	Describe("Given .ProvisionHost()", func() {
-		var authTest = func(useHTTPS bool) {
-			var (
-				err               error
-				res               *ProvisionHostResponse
-				server            *ghttp.Server
-				innkeeperUser     = "admin"
-				innkeeperPassword = "pass"
-			)
+
+	Describe("Given an ikclient object", func() {
+		var (
+			err    error
+			res    *ProvisionHostResponse
+			server *ghttp.Server
+			client InnkeeperClient
+		)
+		Context("When called with valid auth & arguments", func() {
+
 			BeforeEach(func() {
-				if useHTTPS {
-					server = ghttp.NewTLSServer()
-				} else {
-					server = ghttp.NewServer()
-				}
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyBasicAuth(innkeeperUser, innkeeperPassword),
-						ghttp.RespondWith(http.StatusOK, `{ "status": "success", "data": [{"requestid": "28ac758e-a02c-11e5-9531-0050569b9b57"}], "message": "ok" }`),
-					),
-				)
-				ikClient := New(server.URL(), innkeeperUser, innkeeperPassword)
-				res, err = ikClient.ProvisionHost("m1.small", "pez-owner")
+				client, server = getConnectedIKClient(ghttp.NewTLSServer())
+				res, err = client.ProvisionHost("m1.small", "pez-owner")
+			})
+			AfterEach(func() {
+				server.Close()
+			})
+			It("Then it should respond without cert errors", func() {
+				Ω(err).ShouldNot(HaveOccurred())
+			})
+		})
+		Context("When called with valid auth & arguments on a self signed tls connection", func() {
+
+			BeforeEach(func() {
+				client, server = getConnectedIKClient(ghttp.NewServer())
+				res, err = client.ProvisionHost("m1.small", "pez-owner")
+			})
+			AfterEach(func() {
+				server.Close()
+			})
+			It("Then it should respond without cert errors", func() {
+				Ω(err).ShouldNot(HaveOccurred())
+			})
+		})
+	})
+	Describe("Given .ProvisionHost()", func() {
+		var (
+			err    error
+			res    *ProvisionHostResponse
+			server *ghttp.Server
+			client InnkeeperClient
+		)
+		Context("When called with valid sku and lease owner arguments", func() {
+
+			BeforeEach(func() {
+				client, server = getConnectedIKClient(ghttp.NewServer())
+				res, err = client.ProvisionHost("m1.small", "pez-owner")
 			})
 			AfterEach(func() {
 				server.Close()
@@ -43,12 +81,6 @@ var _ = Describe("Given IkClient", func() {
 				Ω(res.Status).Should(Equal(StatusSuccess))
 				Ω(res.Data[0].RequestID).ShouldNot(Equal(""))
 			})
-		}
-		Context("When called with valid sku and auth", func() {
-			authTest(false)
-		})
-		Context("When called with valid sku and auth on a self signed tls connection", func() {
-			authTest(true)
 		})
 	})
 	Describe("Given .GetStatus() method", func() {
