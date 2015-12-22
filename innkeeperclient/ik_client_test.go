@@ -213,7 +213,7 @@ var _ = Describe("Given IkClient", func() {
 				server.Close()
 			})
 			It("Then it should an error", func() {
-				Ω(err).Should(HaveOccurred())
+				Ω(err).ShouldNot(HaveOccurred())
 			})
 			It("then it should return an object with a the status", func() {
 				Ω(res.Status).ShouldNot(Equal(StatusSuccess))
