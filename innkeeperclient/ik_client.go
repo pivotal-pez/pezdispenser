@@ -44,6 +44,10 @@ func (s *IkClient) Call(path string, query interface{}, jsonResp interface{}) (e
 
 //DeProvisionHost - make a deprovision call to innkeeper for a given requestID
 func (s *IkClient) DeProvisionHost(requestID string) (err error) {
+	resp := new(GetStatusResponse)
+	qp := url.Values{}
+	qp.Add("requestid", requestID)
+	err = s.Call(RouteDeProvisionHost, qp, resp)
 	return
 }
 

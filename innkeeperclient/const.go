@@ -5,6 +5,7 @@ const (
 	StatusRunning = "running"
 	StatusSuccess = "success"
 
-	RouteProvisionHost = "api/v1/Provision"
-	RouteGetStatus     = "api/v1/StatusDetails"
+	RouteProvisionHost   = "api/v1/Provision"
+	RouteGetStatus       = "api/v1/StatusDetails"
+	RouteDeProvisionHost = "api/v1/DeProvision"
 )

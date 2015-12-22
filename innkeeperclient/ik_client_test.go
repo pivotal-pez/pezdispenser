@@ -157,4 +157,36 @@ var _ = Describe("Given IkClient", func() {
 			})
 		})
 	})
+
+	Describe("Given .DeProvisionHost() method", func() {
+
+		Context("When called with a valid requestid", func() {
+			var (
+				err               error
+				server            *ghttp.Server
+				innkeeperUser     = "admin"
+				innkeeperPassword = "pass"
+			)
+			BeforeEach(func() {
+				server = ghttp.NewServer()
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyBasicAuth(innkeeperUser, innkeeperPassword),
+						ghttp.RespondWith(http.StatusOK, `{
+							"status": "success",
+							"message": "deleting in progress" 
+						}`),
+					),
+				)
+				ikClient := New(server.URL(), innkeeperUser, innkeeperPassword)
+				err = ikClient.DeProvisionHost("requestid")
+			})
+			AfterEach(func() {
+				server.Close()
+			})
+			It("Then it should not yield an error", func() {
+				Ω(err).ShouldNot(HaveOccurred())
+			})
+		})
+	})
 })
