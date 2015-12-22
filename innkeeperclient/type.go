@@ -9,7 +9,7 @@ type (
 		ProvisionHost(sku string, tenantid string) (result *ProvisionHostResponse, err error)
 		GetStatus(requestID string) (resp *GetStatusResponse, err error)
 		GetTenants() (result GetTenantsResponse, err error)
-		DeProvisionHost(requestID string) (err error)
+		DeProvisionHost(requestID string) (resp *GetStatusResponse, err error)
 	}
 	// IkClient api struct
 	IkClient struct {

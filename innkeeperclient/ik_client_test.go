@@ -163,6 +163,7 @@ var _ = Describe("Given IkClient", func() {
 		Context("When called with a valid requestid", func() {
 			var (
 				err               error
+				res               *GetStatusResponse
 				server            *ghttp.Server
 				innkeeperUser     = "admin"
 				innkeeperPassword = "pass"
@@ -172,20 +173,50 @@ var _ = Describe("Given IkClient", func() {
 				server.AppendHandlers(
 					ghttp.CombineHandlers(
 						ghttp.VerifyBasicAuth(innkeeperUser, innkeeperPassword),
-						ghttp.RespondWith(http.StatusOK, `{
-							"status": "success",
-							"message": "deleting in progress" 
-						}`),
+						ghttp.RespondWith(http.StatusOK, `{"status": "success", "message": "ok"}`),
 					),
 				)
 				ikClient := New(server.URL(), innkeeperUser, innkeeperPassword)
-				err = ikClient.DeProvisionHost("requestid")
+				res, err = ikClient.DeProvisionHost("requestid")
 			})
 			AfterEach(func() {
 				server.Close()
 			})
 			It("Then it should not yield an error", func() {
 				Ω(err).ShouldNot(HaveOccurred())
+			})
+			It("then it should return an object with a success status", func() {
+				Ω(res.Status).Should(Equal(StatusSuccess))
+			})
+		})
+
+		Context("When called with yielding a non-successful status", func() {
+			var (
+				err               error
+				res               *GetStatusResponse
+				server            *ghttp.Server
+				innkeeperUser     = "admin"
+				innkeeperPassword = "pass"
+			)
+			BeforeEach(func() {
+				server = ghttp.NewServer()
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyBasicAuth(innkeeperUser, innkeeperPassword),
+						ghttp.RespondWith(http.StatusOK, `{"status": "failure", "message": "i am soooooo not ok"}`),
+					),
+				)
+				ikClient := New(server.URL(), innkeeperUser, innkeeperPassword)
+				res, err = ikClient.DeProvisionHost("requestid")
+			})
+			AfterEach(func() {
+				server.Close()
+			})
+			It("Then it should an error", func() {
+				Ω(err).Should(HaveOccurred())
+			})
+			It("then it should return an object with a the status", func() {
+				Ω(res.Status).ShouldNot(Equal(StatusSuccess))
 			})
 		})
 	})

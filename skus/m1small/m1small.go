@@ -100,8 +100,8 @@ func (s *SkuM1Small) ReStock() (tm *taskmanager.Task) {
 
 	if clnt, err := s.GetInnkeeperClient(); err == nil {
 
-		if err := clnt.DeProvisionHost(requestID); err != nil {
-			lo.G.Error("de-provision requestid call error: ", requestID, err)
+		if res, err := clnt.DeProvisionHost(requestID); err != nil && res.Status != "success" {
+			lo.G.Error("de-provision requestid call error: ", requestID, err, res)
 		}
 	}
 	return

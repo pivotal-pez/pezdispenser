@@ -49,7 +49,7 @@ func (s *IKClient) GetStatus(requestID string) (resp *innkeeperclient.GetStatusR
 }
 
 //DeProvisionHost - make a deprovision call to innkeeper for a given requestID
-func (s *IKClient) DeProvisionHost(requestID string) (err error) {
+func (s *IKClient) DeProvisionHost(requestID string) (resp *innkeeperclient.GetStatusResponse, err error) {
 	s.SpyRequestID = requestID
-	return s.Error
+	return nil, s.Error
 }
