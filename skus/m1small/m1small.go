@@ -96,6 +96,14 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 
 // ReStock -- WARNING not implemented
 func (s *SkuM1Small) ReStock() (tm *taskmanager.Task) {
+	requestID := s.ProcurementMeta[ProcurementMetaFieldRequestID].(string)
+
+	if clnt, err := s.GetInnkeeperClient(); err == nil {
+
+		if err := clnt.DeProvisionHost(requestID); err != nil {
+			lo.G.Error("de-provision requestid call error: ", requestID, err)
+		}
+	}
 	return
 }
 

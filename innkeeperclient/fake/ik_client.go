@@ -16,6 +16,8 @@ type IKClient struct {
 	cnt                        int
 	SpyStatusCallCount         *int64
 	StatusCallCountForComplete int64
+	SpyRequestID               string
+	Error                      error
 }
 
 // ProvisionHost --
@@ -44,4 +46,10 @@ func (s *IKClient) GetStatus(requestID string) (resp *innkeeperclient.GetStatusR
 		resp.Data.Status = taskmanager.AgentTaskStatusComplete
 	}
 	return
+}
+
+//DeProvisionHost - make a deprovision call to innkeeper for a given requestID
+func (s *IKClient) DeProvisionHost(requestID string) (err error) {
+	s.SpyRequestID = requestID
+	return s.Error
 }

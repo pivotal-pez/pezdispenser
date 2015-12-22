@@ -20,6 +20,26 @@ var _ = Describe("Skum1small", func() {
 		os.Setenv("VCAP_APPLICATION", GetDefaultVCAPApplicationString())
 		os.Setenv("VCAP_SERVICES", GetDefaultVCAPServicesString())
 	})
+	Describe("given .ReStock() method", func() {
+		Context("when called on a m1.small with a valid requestID metadata field", func() {
+			var (
+				ikClient         *fakeinnkeeperclient.IKClient
+				controlRequestID = "randomid"
+			)
+			BeforeEach(func() {
+				ikClient = new(fakeinnkeeperclient.IKClient)
+				s := new(SkuM1Small)
+				s.ProcurementMeta = map[string]interface{}{
+					ProcurementMetaFieldRequestID: controlRequestID,
+				}
+				s.Client = ikClient
+				s.ReStock()
+			})
+			It("then it should attempt to deprovision the resource mapped to the given requestID", func() {
+				Ω(ikClient.SpyRequestID).Should(Equal(controlRequestID))
+			})
+		})
+	})
 	Describe("given .GetInnkeeperClient() method", func() {
 		Context("when called", func() {
 			var (
