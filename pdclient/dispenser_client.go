@@ -38,8 +38,8 @@ func (s *PDClient) GetTask(taskID string) (task TaskResponse, res *http.Response
 }
 
 //DeleteLease -- allows a client user to make a DELETE lease call to dispenser
-func (s *PDClient) DeleteLease(leaseID, inventoryID, skuID string, metadata map[string]interface{}) {
-
+func (s *PDClient) DeleteLease(leaseID, inventoryID, skuID string, metadata map[string]interface{}) (err error) {
+	return
 }
 
 //PostLease -- allows a client user to post a lease to dispenser
