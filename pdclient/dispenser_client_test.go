@@ -140,10 +140,15 @@ var _ = Describe("PDClient struct", func() {
 		})
 	})
 
-	XDescribe("given a DeleteLease() method call", func() {
-		Context("when called with a valid taskguid", func() {
-			It("then it should receive the task object from the rest endpoint, parse and return it", func() {
-				Ω(true).Should(Equal(false))
+	Describe("given a DeleteLease() method stub", func() {
+		Context("when called with valid arguments", func() {
+			var err error
+			BeforeEach(func() {
+				pdclient := NewClient("", "", new(fake.ClientDoer))
+				err = pdclient.DeleteLease("", "", "", make(map[string]interface{}, 1))
+			})
+			It("then it should execute a delete call without error", func() {
+				Ω(err).ShouldNot(HaveOccurred())
 			})
 		})
 	})
