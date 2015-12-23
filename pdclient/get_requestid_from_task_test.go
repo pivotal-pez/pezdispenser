@@ -42,19 +42,6 @@ func getTaskResponse(requestID string) (taskResponse TaskResponse) {
 				],
 				"message": "ok",
 				"status": "success"
-			},
-			"status": {
-				"data": {
-					"credentials": {
-						"name": "host-07-16",
-						"oob_ip": "10.65.70.116",
-						"oob_pw": "d3v0ps!",
-						"oob_user": "pezuser"
-					},
-					"status": "complete"
-				},
-				"message": "ok",
-				"status": "success"
 			}
 		}
 	}`, requestID)
