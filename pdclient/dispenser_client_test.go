@@ -141,14 +141,54 @@ var _ = Describe("PDClient struct", func() {
 	})
 
 	Describe("given a DeleteLease() method stub", func() {
-		Context("when called with valid arguments", func() {
-			var err error
+
+		Context("when called with invalid arguments", func() {
+			var (
+				err error
+				res *http.Response
+			)
 			BeforeEach(func() {
-				pdclient := NewClient("", "", new(fake.ClientDoer))
-				err = pdclient.DeleteLease("", "", "", make(map[string]interface{}, 1))
+
+				fakeClient := &fake.ClientDoer{
+					Response: &http.Response{
+						StatusCode: http.StatusBadRequest,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`{"ID": "%s","Timestamp": %d,"Expires": %d,"Status": "%s","Profile": "%s","CallerName": "%s","MetaData": {}}`)),
+					},
+				}
+				pdclient := NewClient("", "", fakeClient)
+				res, err = pdclient.DeleteLease("asdfasd", "asdfasd", "asdfasdf", map[string]interface{}{
+					"requestid": "123412354123612361346",
+				})
+			})
+			It("then it should yield an error", func() {
+				Ω(err).Should(HaveOccurred())
+			})
+		})
+		Context("when called with valid arguments", func() {
+			var (
+				err        error
+				res        *http.Response
+				fakeClient *fake.ClientDoer
+			)
+			BeforeEach(func() {
+				fakeClient = &fake.ClientDoer{
+					Response: &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`{"ID": "%s","Timestamp": %d,"Expires": %d,"Status": "%s","Profile": "%s","CallerName": "%s","MetaData": {}}`)),
+					},
+				}
+				pdclient := NewClient("", "", fakeClient)
+				res, err = pdclient.DeleteLease("asdfasd", "asdfasd", "asdfasdf", map[string]interface{}{
+					"requestid": "123412354123612361346",
+				})
 			})
 			It("then it should execute a delete call without error", func() {
 				Ω(err).ShouldNot(HaveOccurred())
+			})
+
+			It("then it should pass a request with the proper metadata", func() {
+				body, _ := ioutil.ReadAll(fakeClient.SpyRequest.Body)
+				Ω(body).Should(ContainSubstring("requestid"))
 			})
 		})
 	})
