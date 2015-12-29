@@ -39,9 +39,9 @@ var _ = Describe("given a GetRequestIDFromTaskResponse func", func() {
 				tr := getNoDataTaskResponse()
 				requestID, err = GetRequestIDFromTaskResponse(tr)
 			})
-			It("then it should return an error", func() {
+			It("then it should not return an error", func() {
 				Ω(requestID).Should(BeEmpty())
-				Ω(err).Should(HaveOccurred())
+				Ω(err).ShouldNot(HaveOccurred())
 			})
 		})
 	})

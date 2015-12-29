@@ -78,6 +78,8 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 	agent.Run(func(ag *taskmanager.Agent) (err error) {
 		if clnt, err := s.GetInnkeeperClient(); err == nil {
 			if phinfo, err := clnt.ProvisionHost(ClientSkuName, ClientLeaseOwner); err == nil {
+				lo.G.Debug("provisionhost response: ", phinfo)
+
 				ag.GetTask().Update(func(t *taskmanager.Task) interface{} {
 					t.Status = taskmanager.AgentTaskStatusComplete
 					t.SetPublicMeta(ProvisionHostInfoMetaName, phinfo)
