@@ -25,6 +25,7 @@ var _ = Describe("Skum1small", func() {
 			var (
 				ikClient         *fakeinnkeeperclient.IKClient
 				controlRequestID = "randomid"
+				task             *taskmanager.Task
 			)
 			BeforeEach(func() {
 				ikClient = new(fakeinnkeeperclient.IKClient)
@@ -33,10 +34,14 @@ var _ = Describe("Skum1small", func() {
 					ProcurementMetaFieldRequestID: controlRequestID,
 				}
 				s.Client = ikClient
-				s.ReStock()
+				task = s.ReStock()
 			})
 			It("then it should attempt to deprovision the resource mapped to the given requestID", func() {
 				Ω(ikClient.SpyRequestID).Should(Equal(controlRequestID))
+			})
+
+			It("then it should not return a nil taks", func() {
+				Ω(task).ShouldNot(BeNil())
 			})
 		})
 	})

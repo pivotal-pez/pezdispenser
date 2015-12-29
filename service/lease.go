@@ -19,7 +19,7 @@ func NewLease(taskCollection integrations.Collection, availableSkus map[string]s
 		taskCollection: taskCollection,
 		taskManager:    taskmanager.NewTaskManager(taskCollection),
 		availableSkus:  availableSkus,
-		Task:           new(taskmanager.Task).GetRedactedVersion(),
+		Task:           taskmanager.RedactedTask{},
 	}
 }
 
