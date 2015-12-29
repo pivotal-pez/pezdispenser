@@ -14,5 +14,5 @@ const (
 	ClientLeaseOwner = "pez-stage"
 	//ProcurementMetaFieldRequestID -- fieldname for a defined metadata field for
 	//requestid
-	ProcurementMetaFieldRequestID = "request_id"
+	ProcurementMetaFieldRequestID = "requestid"
 )
