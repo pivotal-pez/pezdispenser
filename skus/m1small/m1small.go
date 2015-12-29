@@ -99,12 +99,16 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 // ReStock -- this will grab a requestid from procurementMeta and call the innkeeper client to deprovision.
 func (s *SkuM1Small) ReStock() (tm *taskmanager.Task) {
 	requestID := s.ProcurementMeta[ProcurementMetaFieldRequestID].(string)
+	lo.G.Debug("requestID: ", requestID)
 
 	if clnt, err := s.GetInnkeeperClient(); err == nil {
 
-		if res, err := clnt.DeProvisionHost(requestID); err != nil && res.Status != "success" {
+		var err error
+		var res *innkeeperclient.GetStatusResponse
+		if res, err = clnt.DeProvisionHost(requestID); err != nil && res.Status != "success" {
 			lo.G.Error("de-provision requestid call error: ", requestID, err, res)
 		}
+		lo.G.Debug("deprovision call results: ", requestID, err, res)
 	}
 	return
 }
