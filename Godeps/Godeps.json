@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/pivotal-pez/pezdispenser",
-	"GoVersion": "go1.5.1",
+	"GoVersion": "go1.5.2",
 	"Packages": [
 		"./..."
 	],
@@ -16,6 +16,10 @@
 			"Rev": "33e0aa1cb7c019ccc3fbe049a8262a6403d30504"
 		},
 		{
+			"ImportPath": "github.com/fatih/structs",
+			"Rev": "c701457aaa1ff6709d5e35fccb5c129448e0a37b"
+		},
+		{
 			"ImportPath": "github.com/franela/goreq",
 			"Rev": "72c51a544272e007ab3da4f7d9ac959b7af7af03"
 		},
@@ -26,7 +30,7 @@
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf/proto",
-			"Rev": "68415e7123da32b07eab49c96d2c4d6158360e9b"
+			"Rev": "0ea3c033ce27e6af07fad5229bd22ad896cdbd02"
 		},
 		{
 			"ImportPath": "github.com/martini-contrib/render",
@@ -56,12 +60,12 @@
 		},
 		{
 			"ImportPath": "github.com/pivotal-pez/pezauth/keycheck",
-			"Comment": "v0.0.160",
-			"Rev": "50522c31d20cb4973bc749dc97fa0ec3e90141fe"
+			"Comment": "v0.0.162-3-g7c01f70",
+			"Rev": "7c01f70760da2124e6fac36b569d9130552afea8"
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/cloudcontroller-client",
-			"Rev": "2349c0bd742e1c1371d88954e991273582533a33"
+			"Rev": "27896811a22849ade4d3b738fd2d41e8a2b61407"
 		},
 		{
 			"ImportPath": "github.com/xchapter7x/goutil",

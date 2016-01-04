@@ -9,10 +9,10 @@ const (
 	GetStatusInfoMetaName = "status"
 	// ClientSkuName --
 	ClientSkuName = "m1.small"
-	//ClientLeaseOwner - default lease owner name (to be replaced with something
-	//more useable)
-	ClientLeaseOwner = "pez-stage"
 	//ProcurementMetaFieldRequestID -- fieldname for a defined metadata field for
 	//requestid
 	ProcurementMetaFieldRequestID = "requestid"
+
+	procurementMetaFieldName    = "ProcurementMeta"
+	userIdentifierMetaFieldName = "UserName"
 )

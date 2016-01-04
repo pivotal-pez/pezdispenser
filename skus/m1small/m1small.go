@@ -6,7 +6,6 @@ import (
 
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/pivotal-pez/pezdispenser/innkeeperclient"
-	"github.com/pivotal-pez/pezdispenser/skurepo"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 	"github.com/xchapter7x/lo"
 )
@@ -77,7 +76,7 @@ func (s *SkuM1Small) Procurement() *taskmanager.Task {
 
 	agent.Run(func(ag *taskmanager.Agent) (err error) {
 		if clnt, err := s.GetInnkeeperClient(); err == nil {
-			if phinfo, err := clnt.ProvisionHost(ClientSkuName, ClientLeaseOwner); err == nil {
+			if phinfo, err := clnt.ProvisionHost(ClientSkuName, s.UserIdentifier); err == nil {
 				lo.G.Debug("provisionhost response: ", phinfo)
 
 				ag.GetTask().Update(func(t *taskmanager.Task) interface{} {
@@ -113,16 +112,6 @@ func (s *SkuM1Small) ReStock() (tm *taskmanager.Task) {
 		lo.G.Debug("deprovision call results: ", requestID, err, res)
 	}
 	return
-}
-
-// New -- return a new SKU provider
-func (s *SkuM1Small) New(tm skurepo.TaskManager, procurementMeta map[string]interface{}) skurepo.Sku {
-
-	return &SkuM1Small{
-		Client:          s.Client,
-		ProcurementMeta: procurementMeta,
-		TaskManager:     tm,
-	}
 }
 
 // InitInnkeeperClient -- initialize innkeeper client based on cf configuration

@@ -19,7 +19,7 @@ var _ = Describe("repo", func() {
 				Register(controlSkuKey, mySku)
 			})
 			AfterEach(func() {
-				Repo = make(map[string]Sku)
+				Repo = make(map[string]SkuBuilder)
 			})
 			It("then: it should add the given Sku under the given name in the registry", func() {
 				registry := GetRegistry()
@@ -31,12 +31,12 @@ var _ = Describe("repo", func() {
 
 	Describe("given: a GetRegistry() method", func() {
 		Context("when: called without any registrerd Skus", func() {
-			var registry map[string]Sku
+			var registry map[string]SkuBuilder
 			BeforeEach(func() {
 				registry = GetRegistry()
 			})
 			AfterEach(func() {
-				Repo = make(map[string]Sku)
+				Repo = make(map[string]SkuBuilder)
 			})
 			It("then: it should return an empty map of Sku interfaces", func() {
 				Ω(registry).Should(BeEmpty())
@@ -44,13 +44,13 @@ var _ = Describe("repo", func() {
 			})
 		})
 		Context("when: called containing registrerd Skus", func() {
-			var registry map[string]Sku
+			var registry map[string]SkuBuilder
 			BeforeEach(func() {
 				Register(controlSkuKey, mySku)
 				registry = GetRegistry()
 			})
 			AfterEach(func() {
-				Repo = make(map[string]Sku)
+				Repo = make(map[string]SkuBuilder)
 			})
 			It("then: it should return the map of registered Sku interfaces", func() {
 				Ω(registry).ShouldNot(BeEmpty())

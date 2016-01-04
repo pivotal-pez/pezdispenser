@@ -17,11 +17,13 @@ type IKClient struct {
 	SpyStatusCallCount         *int64
 	StatusCallCountForComplete int64
 	SpyRequestID               string
+	SpyTenantId                atomic.Value
 	Error                      error
 }
 
 // ProvisionHost --
 func (s *IKClient) ProvisionHost(sku string, tenantid string) (result *innkeeperclient.ProvisionHostResponse, err error) {
+	s.SpyTenantId.Store(tenantid)
 	result = new(innkeeperclient.ProvisionHostResponse)
 	result.Data = make([]innkeeperclient.RequestData, 1)
 	if len(s.FakeStatus) > s.cnt {

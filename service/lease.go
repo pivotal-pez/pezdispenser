@@ -7,13 +7,15 @@ import (
 
 	"encoding/json"
 
+	"github.com/fatih/structs"
+
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
 	"github.com/pivotal-pez/pezdispenser/taskmanager"
 )
 
 //NewLease - create and return a new lease object
-func NewLease(taskCollection integrations.Collection, availableSkus map[string]skurepo.Sku) *Lease {
+func NewLease(taskCollection integrations.Collection, availableSkus map[string]skurepo.SkuBuilder) *Lease {
 
 	return &Lease{
 		taskCollection: taskCollection,
@@ -68,8 +70,8 @@ func (s *Lease) Post(logger *log.Logger, req *http.Request) (statusCode int, res
 func (s *Lease) ReStock() (skuTask *taskmanager.Task) {
 
 	if skuConstructor, ok := s.availableSkus[s.Sku]; ok {
-		s.ProcurementMeta[InventoryIDFieldName] = s.InventoryID
-		sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
+		leaseMap := structs.Map(s)
+		sku := skuConstructor.New(s.taskManager, leaseMap)
 		skuTask = sku.ReStock()
 		s.Task = skuTask.GetRedactedVersion()
 
@@ -83,9 +85,8 @@ func (s *Lease) ReStock() (skuTask *taskmanager.Task) {
 func (s *Lease) Procurement() (skuTask *taskmanager.Task) {
 
 	if skuConstructor, ok := s.availableSkus[s.Sku]; ok {
-		s.ProcurementMeta[LeaseExpiresFieldName] = s.LeaseEndDate
-		s.ProcurementMeta[InventoryIDFieldName] = s.InventoryID
-		sku := skuConstructor.New(s.taskManager, s.ProcurementMeta)
+		leaseMap := structs.Map(s)
+		sku := skuConstructor.New(s.taskManager, leaseMap)
 		GLogger.Println("here is my sku: ", sku)
 		skuTask = sku.Procurement()
 		tt := skuTask.Read(func(t *taskmanager.Task) interface{} {

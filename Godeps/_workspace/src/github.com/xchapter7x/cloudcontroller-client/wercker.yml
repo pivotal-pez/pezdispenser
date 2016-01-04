@@ -1,4 +1,4 @@
-box: google/golang
+box: golang
 
 build:
   # The steps that will be executed on build
@@ -31,5 +31,5 @@ build:
         code: |
           go get github.com/axw/gocov/gocov
           go get github.com/mattn/goveralls
-          GIT_BRANCH=$WERCKER_GIT_BRANCH
+          export GIT_BRANCH=$WERCKER_GIT_BRANCH
           ./coverage --coveralls

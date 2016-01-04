@@ -29,7 +29,8 @@ func init() {
 
 // Init - externally available init method
 func Init() {
-	s := new(SkuM1Small)
+	s := new(SkuM1SmallBuilder)
+	s.Client, _ = new(SkuM1Small).GetInnkeeperClient()
 	skurepo.Register(SkuName, s)
 }
 
@@ -39,5 +40,11 @@ type (
 		Client          innkeeperclient.InnkeeperClient
 		TaskManager     taskmanager.TaskManagerInterface
 		ProcurementMeta map[string]interface{}
+		UserIdentifier  string
+	}
+
+	//SkuM1SmallBuilder - a object representing a m1small sku implements skurepo.Sku
+	SkuM1SmallBuilder struct {
+		Client innkeeperclient.InnkeeperClient
 	}
 )

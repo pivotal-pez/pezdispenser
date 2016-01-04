@@ -37,7 +37,7 @@ type (
 	Lease struct {
 		taskCollection  integrations.Collection
 		taskManager     *taskmanager.TaskManager
-		availableSkus   map[string]skurepo.Sku
+		availableSkus   map[string]skurepo.SkuBuilder
 		ID              string                   `json:"lease_id"`
 		InventoryID     string                   `json:"inventory_id"`
 		UserName        string                   `json:"username"`

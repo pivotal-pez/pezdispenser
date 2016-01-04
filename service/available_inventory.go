@@ -3,6 +3,7 @@ package pezdispenser
 import (
 	"sync"
 
+	"github.com/fatih/structs"
 	"github.com/pivotal-pez/pezdispenser/service/integrations"
 	"github.com/pivotal-pez/pezdispenser/skurepo"
 	//Register m1small
@@ -17,7 +18,7 @@ func init() {
 var onceLoadInventoryPoller sync.Once
 
 //GetAvailableInventory - this should return available inventory and start a long task poller
-func GetAvailableInventory(taskCollection integrations.Collection) (inventory map[string]skurepo.Sku) {
+func GetAvailableInventory(taskCollection integrations.Collection) (inventory map[string]skurepo.SkuBuilder) {
 	inventory = skurepo.GetRegistry()
 
 	onceLoadInventoryPoller.Do(func() {
@@ -30,7 +31,10 @@ func startTaskPollingForRegisteredSkus(taskCollection integrations.Collection) {
 	for _, v := range skurepo.GetRegistry() {
 		go func() {
 			for {
-				sku := v.New(taskmanager.NewTaskManager(taskCollection), nil)
+				lease := &Lease{
+					ProcurementMeta: make(map[string]interface{}),
+				}
+				sku := v.New(taskmanager.NewTaskManager(taskCollection), structs.Map(lease))
 				sku.PollForTasks()
 			}
 		}()

@@ -6,6 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/fatih/structs"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-pez/pezdispenser/fakes"
@@ -53,15 +54,17 @@ var _ = Describe("Skum1small", func() {
 				skuCast            *SkuM1Small
 			)
 			BeforeEach(func() {
-				s := new(SkuM1Small)
-				s.ProcurementMeta = map[string]interface{}{
-					"lease_expires": time.Now().UnixNano(),
-					"inventory_id":  controlInventoryID,
+				s := map[string]interface{}{
+					"ProcurementMeta": map[string]interface{}{
+						"lease_expires": time.Now().UnixNano(),
+						"inventory_id":  controlInventoryID,
+					},
+					"UserName": "some-guid",
 				}
 				fakeTaskManager = &fakes.FakeTaskManager{
 					SpyTaskSaved: new(taskmanager.Task),
 				}
-				sku := s.New(fakeTaskManager, s.ProcurementMeta)
+				sku := new(SkuM1SmallBuilder).New(fakeTaskManager, s)
 				skuCast = sku.(*SkuM1Small)
 			})
 			It("should produce new innkeeperclient", func() {
@@ -102,7 +105,7 @@ var _ = Describe("Skum1small", func() {
 					SpyTaskSaved: new(taskmanager.Task),
 				}
 				spyTask.Protect(fakeTaskManager, sync.RWMutex{})
-				sku := s.New(fakeTaskManager, s.ProcurementMeta)
+				sku := new(SkuM1SmallBuilder).New(fakeTaskManager, structs.Map(s))
 				skuCast := sku.(*SkuM1Small)
 				skuCast.Client = fakeInnKeeperClient
 				fakeInnKeeperClient.SpyStatusCallCount = new(int64)
@@ -129,6 +132,7 @@ var _ = Describe("Skum1small", func() {
 				fakeInnKeeperClient *fakeinnkeeperclient.IKClient
 				controlInventoryID  = "id-something"
 				controlRequestID    = "request-test-id"
+				controlUserName     = "random-guid"
 			)
 			BeforeEach(func() {
 				fakeInnKeeperClient = new(fakeinnkeeperclient.IKClient)
@@ -136,15 +140,17 @@ var _ = Describe("Skum1small", func() {
 				fakeInnKeeperClient.FakeData[0] = innkeeperclient.RequestData{
 					RequestID: controlRequestID,
 				}
-				s := new(SkuM1Small)
-				s.ProcurementMeta = map[string]interface{}{
-					"lease_expires": time.Now().UnixNano(),
-					"inventory_id":  controlInventoryID,
+				s := map[string]interface{}{
+					"ProcurementMeta": map[string]interface{}{
+						"lease_expires": time.Now().UnixNano(),
+						"inventory_id":  controlInventoryID,
+					},
+					"UserName": controlUserName,
 				}
 				fakeTaskManager := &fakes.FakeTaskManager{
 					SpyTaskSaved: new(taskmanager.Task),
 				}
-				sku := s.New(fakeTaskManager, s.ProcurementMeta)
+				sku := new(SkuM1SmallBuilder).New(fakeTaskManager, s)
 				skuCast := sku.(*SkuM1Small)
 				skuCast.Client = fakeInnKeeperClient
 				fakeInnKeeperClient.SpyStatusCallCount = new(int64)
@@ -157,6 +163,11 @@ var _ = Describe("Skum1small", func() {
 				}).Should(BeNumerically(">", int64(0)))
 			})
 
+			It("then it should call using the Lease's UserName value as tenantid", func() {
+				Eventually(func() interface{} {
+					return fakeInnKeeperClient.SpyTenantId.Load()
+				}).Should(Equal(controlUserName))
+			})
 		})
 		Context("when called with valid input", func() {
 			var (
@@ -181,16 +192,20 @@ var _ = Describe("Skum1small", func() {
 					FakeStatus:         []string{controlStatus},
 					SpyStatusCallCount: new(int64),
 				}
-				s := new(SkuM1Small)
-				s.Client = controlClient
-				s.ProcurementMeta = map[string]interface{}{
-					"lease_expires": time.Now().UnixNano(),
-					"inventory_id":  controlInventoryID,
+				mapMeta := map[string]interface{}{
+					"ProcurementMeta": map[string]interface{}{
+						"lease_expires": time.Now().UnixNano(),
+						"inventory_id":  controlInventoryID,
+					},
+					"UserName": "random-guid",
 				}
 				fakeTaskManager = &fakes.FakeTaskManager{
 					SpyTaskSaved: new(taskmanager.Task),
 				}
-				sku := s.New(fakeTaskManager, s.ProcurementMeta)
+				skuBuilder := &SkuM1SmallBuilder{
+					Client: controlClient,
+				}
+				sku := skuBuilder.New(fakeTaskManager, mapMeta)
 				skuCast = sku.(*SkuM1Small)
 				task = skuCast.Procurement()
 			})

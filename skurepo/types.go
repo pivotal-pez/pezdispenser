@@ -7,12 +7,16 @@ import (
 )
 
 type (
+	//SkuBuilder - a object that can build skus
+	SkuBuilder interface {
+		New(tm TaskManager, meta map[string]interface{}) Sku
+	}
+
 	//Sku - interface for a sku object
 	Sku interface {
 		Procurement() *taskmanager.Task
 		ReStock() *taskmanager.Task
 		PollForTasks()
-		New(tm TaskManager, procurementMeta map[string]interface{}) Sku
 	}
 
 	//TaskManager - an interface representing a taskmanager object
@@ -23,5 +27,4 @@ type (
 		NewTask(n string, p taskmanager.ProfileType, s string) (t *taskmanager.Task)
 		ScheduleTask(t *taskmanager.Task, expireTime time.Time)
 	}
-	
 )

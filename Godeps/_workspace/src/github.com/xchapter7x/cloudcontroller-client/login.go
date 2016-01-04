@@ -83,10 +83,15 @@ func (s *Client) HttpClient() ClientDoer {
 	return s.client
 }
 
+//AccessTokenDecorate - will decorate the given http.Request with the clients accesstoken aquired during the Login call
+func (s *Client) AccessTokenDecorate(req *http.Request) {
+	req.Header.Add(HeaderAuth, fmt.Sprintf("%s %s", s.TokenType, s.AccessToken))
+}
+
 //CreateAuthRequest - Creates a request w/ auth token added to the header to allow authenticated calls to the cloud controller
 func (s *Client) CreateAuthRequest(verb, requestURL, path string, args interface{}) (*http.Request, error) {
 	req, err := s.CreateRequest(verb, requestURL, path, args)
-	req.Header.Add(HeaderAuth, fmt.Sprintf("%s %s", s.TokenType, s.AccessToken))
+	s.AccessTokenDecorate(req)
 	return req, err
 }
 
