@@ -23,6 +23,7 @@ import (
 )
 
 const (
+	//FakeCollectionHasChanges --
 	FakeCollectionHasChanges       = 1
 	FakeCollectionHasNoChanges     = 0
 	FakeCollectionHasNilChangeInfo = -1

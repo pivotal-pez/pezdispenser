@@ -165,7 +165,7 @@ var _ = Describe("Skum1small", func() {
 
 			It("then it should call using the Lease's UserName value as tenantid", func() {
 				Eventually(func() interface{} {
-					return fakeInnKeeperClient.SpyTenantId.Load()
+					return fakeInnKeeperClient.SpyTenantID.Load()
 				}).Should(Equal(controlUserName))
 			})
 		})

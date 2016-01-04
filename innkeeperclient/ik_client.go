@@ -21,7 +21,7 @@ func isStatusOK(statusCode int) bool {
 	return (statusCode == http.StatusOK || statusCode == http.StatusCreated || statusCode == http.StatusAccepted)
 }
 
-// call -- generic call to the inkeeper endpoint
+// Call -- generic call to the inkeeper endpoint
 func (s *IkClient) Call(path string, query interface{}, jsonResp interface{}) (err error) {
 	res, err := goreq.Request{
 		Insecure:          true,
