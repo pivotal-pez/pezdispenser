@@ -34,6 +34,7 @@ var _ = Describe("PDClient struct", func() {
 		Context("when called with valid arguments", func() {
 			controlKey := "random-api-key"
 			controlURL := "api.random.io"
+			controlUsername := "fake-org-guid"
 			controlLeaseID := "fakelease"
 			controlInventoryID := "fakeinventoryid"
 			controlSkuID := "fakesku"
@@ -62,7 +63,7 @@ var _ = Describe("PDClient struct", func() {
 					},
 				}
 				pdclient = NewClient(controlKey, controlURL, fakeClient)
-				leaseCreateResponse, res, err = pdclient.PostLease(controlLeaseID, controlInventoryID, controlSkuID, 14)
+				leaseCreateResponse, res, err = pdclient.PostLease(controlLeaseID, controlInventoryID, controlSkuID, controlUsername, 14)
 			})
 			Context("when clientDoer throws an error", func() {
 				BeforeEach(func() {
@@ -71,7 +72,7 @@ var _ = Describe("PDClient struct", func() {
 						Response: &http.Response{},
 					}
 					pdclient = NewClient(controlKey, controlURL, fakeClient)
-					leaseCreateResponse, res, err = pdclient.PostLease(controlLeaseID, controlInventoryID, controlSkuID, 14)
+					leaseCreateResponse, res, err = pdclient.PostLease(controlLeaseID, controlInventoryID, controlSkuID, controlUsername, 14)
 				})
 				It("then it should return an error through postlease", func() {
 					Ω(err).Should(HaveOccurred())
