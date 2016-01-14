@@ -27,8 +27,11 @@ type (
 
 	//Data --
 	Data struct {
-		Credentials interface{} `json:"credentials"`
-		Status      string      `json:"status"`
+		Credentials interface{}            `json:"credentials"`
+		Status      string                 `json:"status"`
+		Storage     map[string]interface{} `json:"storage"`
+		Hosts       map[string]interface{} `json:"hosts"`
+		Network     map[string]interface{} `json:"network"`
 	}
 	//GetStatusResponse -- a status response object
 	GetStatusResponse struct {
